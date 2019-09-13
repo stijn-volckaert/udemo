@@ -37,7 +37,7 @@ UDReader::UDReader( UEngine* InEngine, const FURL& InURL, Uudnative * Control )
 		if (newFile.Right(4).Caps() != TEXT(".DEM"))
 			newFile += TEXT(".dem");
 	}
-	InURL.Map = newFile;
+	const_cast<FURL*>(&InURL)->Map = newFile;
 	GLog->Logf(TEXT("UDEMO: InURL.Map = %s"), *InURL.Map);
 #endif
 

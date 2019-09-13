@@ -46,28 +46,28 @@ void UuDemoDriver::TimeSync(FTime NewTime, FTime OldTime)
 {
 	guard(UuDemoDriver::TimeSync);
 
-	try
+	if (ServerConnection && 
+		Notify && 
+		GetLevel() && 
+		GetLevel()->GetLevelInfo() && 
+		Interface && 
+		Interface->DemoSpec && 
+		Interface->DemoSpec->GameReplicationInfo)
 	{
-		if (ServerConnection && Notify && GetLevel() && GetLevel()->GetLevelInfo() && Interface->DemoSpec->GameReplicationInfo && Interface && Interface->DemoSpec)
+		if (GetLevel()->GetLevelInfo()->Pauser == TEXT("")
+			&& GetLevel()->GetLevelInfo()->TimeSeconds + Interface->ltsoffset - Interface->DemoSpec->GameReplicationInfo->SecondCount > RealDilation)
 		{
-			if (GetLevel()->GetLevelInfo()->Pauser == TEXT("")
-				&& GetLevel()->GetLevelInfo()->TimeSeconds + Interface->ltsoffset - Interface->DemoSpec->GameReplicationInfo->SecondCount > RealDilation)
+			Interface->DemoSpec->GameReplicationInfo->ElapsedTime++;
+			if (Interface->DemoSpec->GameReplicationInfo->RemainingMinute != 0)
 			{
-				Interface->DemoSpec->GameReplicationInfo->ElapsedTime++;
-				if (Interface->DemoSpec->GameReplicationInfo->RemainingMinute != 0)
-				{
-					Interface->DemoSpec->GameReplicationInfo->RemainingTime = Interface->DemoSpec->GameReplicationInfo->RemainingMinute;
-					Interface->DemoSpec->GameReplicationInfo->RemainingMinute = 0;
-				}
-				if (Interface->DemoSpec->GameReplicationInfo->RemainingTime > 0 && !Interface->DemoSpec->GameReplicationInfo->bStopCountDown)
-					Interface->DemoSpec->GameReplicationInfo->RemainingTime--;
-				Interface->DemoSpec->GameReplicationInfo->SecondCount += RealDilation;
-
+				Interface->DemoSpec->GameReplicationInfo->RemainingTime = Interface->DemoSpec->GameReplicationInfo->RemainingMinute;
+				Interface->DemoSpec->GameReplicationInfo->RemainingMinute = 0;
 			}
+			if (Interface->DemoSpec->GameReplicationInfo->RemainingTime > 0 && !Interface->DemoSpec->GameReplicationInfo->bStopCountDown)
+				Interface->DemoSpec->GameReplicationInfo->RemainingTime--;
+			Interface->DemoSpec->GameReplicationInfo->SecondCount += RealDilation;
+
 		}
-	}
-	catch(...)
-	{
 	}
 
 	unguard;
@@ -603,9 +603,9 @@ void UAdvancedConnection::HandleClientPlayer( APlayerPawn* Pawn )
 	Pawn->SetPlayer( Viewport );
 
 	check (Pawn->Player);
-	Viewport->Actor->Role	    = ROLE_Authority;
-	Viewport->Actor->ShowFlags = SHOW_Backdrop | SHOW_Actors | SHOW_PlayerCtrl | SHOW_RealTime;
-	Viewport->Actor->RendMap   = REN_DynLight;	
+	Viewport->Actor->Role		= ROLE_Authority;
+	Viewport->Actor->ShowFlags	= SHOW_Backdrop | SHOW_Actors | SHOW_PlayerCtrl | SHOW_RealTime;
+	Viewport->Actor->RendMap	= REN_DynLight;	
 	Pawn->bNetOwner = 1;
 	Pawn->Physics   = PHYS_Flying;
 	Viewport->Input->ResetInput();

@@ -55,6 +55,8 @@ var bool oldShHide;             // if true must unhide belt!
 var Ammo DummyAmmo;             // hack!
 var InterCeptHud h;
 var float oldltsoffset;
+var Actor OldViewTarget;
+var bool bWasZooming;
 
 //garf interpolation code:
 var float timepassed, totaltimeR, predictiontime;
@@ -780,35 +782,36 @@ event PreRender( canvas Canvas )
         {
             oldWeap = PlayerPawn(ViewTarget).Weapon;
             PlayerPawn(ViewTarget).Weapon = none;
+
+			// set viewtarget to none so the engine calls RenderOverlays on the
+			// demoplaybackspec, rather than the viewtarget...
+
+			OldViewtarget = ViewTarget;
+			ViewTarget.bHidden = true;
+			ViewTarget = none;	
         }
-    }
+		else
+		{
+			OldViewtarget = none;
+		}
+	}
 }
 
 event RenderOverLays(Canvas Canvas)
 {
-    // (Anth) Moved to PostRender!
-}
-
-event PostRender( canvas Canvas )
-{
-    local int i;
-    local float DamageTime, StatScale, X;
-    local ut_shieldbelteffect belt;
-    local PlayerReplicationInfo PRI;
-
     // (Added by Anth)
     local bool bWasHidden;
     local rotator CamRot;
     local vector CamLoc,newLoc,nLoc;
     local ENetRole oldRole;
     local Actor Dummy;
-    local actor Other;
-    local vector HitLocation, HitNormal, StartTrace, EndTrace;
+    local vector HitLocation, HitNormal;
 
-    FixPRIArray();
-
-    // (Added by Anth) new 3.3 fix
-    BuildFlagArray();
+	if (OldViewTarget != None)
+	{
+	   ViewTarget = OldViewTarget;
+	   ViewTarget.bHidden = false;
+	}
 
     // (Added by Anth) Weapon Rendering was disabled by the code in PreRender
     // This code will calculate the correct positioning of the weapon and it will
@@ -857,7 +860,7 @@ event PostRender( canvas Canvas )
         // player who plays the demo and apply it to the recorder's weapon
         //
         // 3.3: This seemed to lag a lot of demos... Disabled!
-        /*PlayerPawn(ViewTarget).Handedness = Handedness;
+        PlayerPawn(ViewTarget).Handedness = Handedness;
         if (PlayerPawn(ViewTarget).Weapon != None)
         {
             if (Handedness != 2)
@@ -870,7 +873,7 @@ event PostRender( canvas Canvas )
             PlayerPawn(ViewTarget).Weapon.Role=ROLE_AUTHORITY;
             PlayerPawn(ViewTarget).Weapon.setHand(Handedness);
             PlayerPawn(ViewTarget).Weapon.ROle=oldRole;
-        } */
+        }
 
         // No call to ViewTarget.RenderOverLays here!!!
         if (PlayerPawn(ViewTarget).Weapon != None)
@@ -887,6 +890,21 @@ event PostRender( canvas Canvas )
         if (bWasHidden)
             PlayerPawn(ViewTarget).Weapon.bHideWeapon = true;
     }
+}
+
+event PostRender( canvas Canvas )
+{
+    local int i;
+    local float DamageTime, StatScale, X;
+    local ut_shieldbelteffect belt;
+    local PlayerReplicationInfo PRI;
+	local vector HitLocation, HitNormal, StartTrace, EndTrace;
+	local actor Other;
+	
+    FixPRIArray();
+
+    // (Added by Anth) new 3.3 fix
+    BuildFlagArray();
 
     if (oldShHide)
     {
@@ -1011,6 +1029,24 @@ event UpdateEyeHeight(float DeltaTime)
         GetAxes(PlayerLinked.Rotation,X,Y,Z);
         PlayerLinked.CheckBob(DeltaTime, sqrt(PlayerLinked.Velocity.X * PlayerLinked.Velocity.X + PlayerLinked.Velocity.Y * PlayerLinked.Velocity.Y), Y);
         oldEyeH=PlayerLinked.EyeHeight;
+
+		if (!bBehindView)
+		{
+			bZooming = PlayerLinked.bZooming;
+			if (bZooming)
+			{
+				DesiredFOV = PlayerLinked.DesiredFOV;
+				bWasZooming = true;
+			}
+			else
+			{
+				if (bWasZooming)
+				{
+					FixFOV();
+			   		bWasZooming = false;
+				}			
+			}
+		}
     }
 }
 
@@ -1131,7 +1167,8 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
         }
         if ( PTarget != None )
         {
-            if ( PTarget.bIsPlayer )
+            if ( PTarget.bIsPlayer &&
+			   PlayerPawn(PTarget) != none)
             {
                 // (Changed by Anth) Also calculate if viewtarget != demorecorder!!!
                 PlayerLinked.EyeHeight = oldEyeH; //double hack

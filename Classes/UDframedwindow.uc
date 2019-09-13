@@ -32,6 +32,6 @@ function Close(optional bool bByParent)
 defaultproperties
 {
     ClientClass=Class'DemoMainClientWindow'
-    WindowTitle="Unreal Tournament Demo Manager 3.4 - Written by UsAaR33, Edited by AnthraX"
+    WindowTitle="Unreal Tournament Demo Manager 3.5 - Written by UsAaR33, Edited by AnthraX"
 }
 

@@ -12,7 +12,7 @@ class DownloadClient expands UWindowDialogClientWindow;
 // Variables
 // =============================================================================
 var UWindowConsoleTextAreaControl eLog;
-var DemoList                      PkgList
+var DemoList                      PkgList;
 var DemoList                      Cur;
 var UwindowSmallButton            Cancel;
 var UZDownloader                  Downloader;

@@ -108,8 +108,8 @@ void Uudnative::execBasePath (FFrame& Stack, RESULT_DECL)
 	*(FString*)Result = appBaseDir();
 #else
 	char cCurrentPath[FILENAME_MAX];
-	getcwd(cCurrentPath, sizeof(cCurrentPath));
-	*(FString*)Result = ANSI_TO_TCHAR(cCurrentPath);
+	if (getcwd(cCurrentPath, sizeof(cCurrentPath)))
+		*(FString*)Result = ANSI_TO_TCHAR(cCurrentPath);
 #endif
 	unguard;
 }
@@ -265,7 +265,7 @@ void Uudnative::execIsMisMatch (FFrame& Stack, RESULT_DECL)
 	P_GET_STR(FileName);
 	P_GET_STRUCT(FGuid,PackageGUID); //guid
 	P_GET_INT(Gen);
-	P_FINISH;
+	P_FINISH;	
 	
 	// Null filename => should never happen
 	if (FileName==TEXT(""))
@@ -287,14 +287,25 @@ void Uudnative::execIsMisMatch (FFrame& Stack, RESULT_DECL)
 	else if ((Linker->Summary.Guid) != PackageGUID) //mismatch!
 		*(BYTE*)Result=2;
 	// Generations mismatch => recompiled but conformed files?
-	else if (Linker->Summary.Generations.Num() < Gen)
-	{ 
-		GLog->Logf(TEXT("udemo: %s have generation error! desired: %d actual: %d"),*FileName,Gen,Linker->Summary.Generations.Num());
-		*(BYTE*)Result=1;
-	}
-	// Seems ok
 	else
-		*(BYTE*)Result=0;
+	{
+		FString	Ver = UTexture::__Client->Viewports(0)->Actor->Level->EngineVersion;
+		INT iVer = strtol(TCHAR_TO_ANSI(*Ver), NULL, 10);
+
+		TArray<FGenerationInfo>* Generations = (iVer < 469) ? 
+			reinterpret_cast<TArray<FGenerationInfo>*>(reinterpret_cast<unsigned long>(&Linker->Summary.Guid) + sizeof(FGuid)) :
+			*reinterpret_cast<TArray<FGenerationInfo>**>(reinterpret_cast<unsigned long>(&Linker->Summary.Guid) + sizeof(FGuid));
+
+		if (Generations->Num() < Gen)
+		{
+			GLog->Logf(TEXT("udemo: %s have generation error! desired: %d actual: %d"), *FileName, Gen, Generations->Num());
+			*(BYTE*)Result = 1;
+		}
+		// Seems ok
+		else
+			*(BYTE*)Result = 0;
+	}
+	
 	EndLoad();
 	unguard;
 }

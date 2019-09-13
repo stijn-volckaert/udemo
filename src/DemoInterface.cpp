@@ -252,11 +252,12 @@ void UDemoInterface::execJumpBack (FFrame& Stack, RESULT_DECL)
 	TMap<AActor*,UActorChannel*>*	ActorChannels;		// Ptr to TMap<AActor*,UActorChannel*> UNetConnection::ActorChannels
 
 	FString	Ver = UTexture::__Client->Viewports(0)->Actor->Level->EngineVersion;
+	INT iVer = strtol(TCHAR_TO_ANSI(*Ver), NULL, 10);
 
 	GLog->Logf(TEXT("UDEMO: Calculating Channel Positions..."));
 
 	// (Anth) New uber hack here. This was fun to figure out.
-	if (Ver != TEXT("436") && Ver != TEXT("432"))
+	if (iVer > 436 && iVer < 469)
 	{
 		// Must be UTPG patch...
 		InPacketId		= (INT*)							( (DWORD)DemoDriver->ServerConnection + 0x0E68 );
@@ -268,7 +269,7 @@ void UDemoInterface::execJumpBack (FFrame& Stack, RESULT_DECL)
 		OpenChannels	= (TArray<UChannel*>*)				( (DWORD)DemoDriver->ServerConnection + 0x3E80 );
 		ActorChannels	= (TMap<AActor*,UActorChannel*>*)	( (DWORD)DemoDriver->ServerConnection + 0x3E98 );
 	}
-	else
+	else if (iVer > 400 && iVer <= 436)
 	{
 		// Standard v432 structures
 		InPacketId		= (INT*)							( (DWORD)DemoDriver->ServerConnection + 0x0E54 );
@@ -279,6 +280,17 @@ void UDemoInterface::execJumpBack (FFrame& Stack, RESULT_DECL)
 		InReliable		= (INT*)							( (DWORD)DemoDriver->ServerConnection + 0x2E58 );
 		OpenChannels	= (TArray<UChannel*>*)				( (DWORD)DemoDriver->ServerConnection + 0x3E6C );
 		ActorChannels	= (TMap<AActor*,UActorChannel*>*)	( (DWORD)DemoDriver->ServerConnection + 0x3E84 );
+	}
+	else
+	{
+		InPacketId = &DemoDriver->ServerConnection->InPacketId;
+		OutPacketId = &DemoDriver->ServerConnection->OutPacketId;
+		OutAckPacketId = &DemoDriver->ServerConnection->OutAckPacketId;
+		Channels = reinterpret_cast<UChannel**>(&DemoDriver->ServerConnection->Channels);
+		OutReliable = reinterpret_cast<INT*>(&DemoDriver->ServerConnection->OutReliable);
+		InReliable = reinterpret_cast<INT*>(&DemoDriver->ServerConnection->InReliable);
+		OpenChannels = &DemoDriver->ServerConnection->OpenChannels;
+		ActorChannels = &DemoDriver->ServerConnection->ActorChannels;
 	}
 
 	// Destroy ALL actor channels (but not control channel!!!)
