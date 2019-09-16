@@ -54,8 +54,11 @@ seeking, or any other nice feature of the new demo driver!
 
 v3.5:
 * [ADDED] Compatibility with Unreal Tournament v469
+* [FIXED] You can now, once again, save downloaded files in the cache folder
 * [FIXED] Sniper rifle not zooming in
 * [FIXED] Weapon rendering glitches
+* [FIXED] Crashes after seeking back in a demo
+* [CHANGED] Removed outdated redirect servers from the default config
 
 v3.4 - Open source release:
 * [CHANGED] Lots and lots of portability fixes. Demo Manager now works on

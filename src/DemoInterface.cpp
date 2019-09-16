@@ -210,13 +210,12 @@ void UDemoInterface::execReadCache (FFrame& Stack, RESULT_DECL)
 
 	DemoDriver->bNoTick=false;
 	DemoDriver->Time=DemoDriver->ServerPacketTime; //double hack.. geez
-	eventLinkToPlayer(DemoDriver->SoundPlayer,DemoDriver->Want3rdP&&DemoDriver->SoundPlayer); //reset if lost!
+	eventLinkToPlayer(DemoDriver->SoundPlayer,DemoDriver->Want3rdP && DemoDriver->SoundPlayer); //reset if lost!
 	unguard;
 }
 
 /*-----------------------------------------------------------------------------
-	execReadTo - This would be the seekto thingie! Need to fix this, crashes
-	very often on modern systems!
+	execReadTo - This would be the seekto thingie! 
 -----------------------------------------------------------------------------*/
 void UDemoInterface::execReadTo (FFrame& Stack, RESULT_DECL)
 {
@@ -281,16 +280,17 @@ void UDemoInterface::execJumpBack (FFrame& Stack, RESULT_DECL)
 		OpenChannels	= (TArray<UChannel*>*)				( (DWORD)DemoDriver->ServerConnection + 0x3E6C );
 		ActorChannels	= (TMap<AActor*,UActorChannel*>*)	( (DWORD)DemoDriver->ServerConnection + 0x3E84 );
 	}
-	else
+	else if (iVer >= 469)
 	{
-		InPacketId = &DemoDriver->ServerConnection->InPacketId;
-		OutPacketId = &DemoDriver->ServerConnection->OutPacketId;
-		OutAckPacketId = &DemoDriver->ServerConnection->OutAckPacketId;
-		Channels = reinterpret_cast<UChannel**>(&DemoDriver->ServerConnection->Channels);
-		OutReliable = reinterpret_cast<INT*>(&DemoDriver->ServerConnection->OutReliable);
-		InReliable = reinterpret_cast<INT*>(&DemoDriver->ServerConnection->InReliable);
-		OpenChannels = &DemoDriver->ServerConnection->OpenChannels;
-		ActorChannels = &DemoDriver->ServerConnection->ActorChannels;
+		// Anth: after calculating all of the new offsets, I realized they're identical to the UTPG patches :D
+		InPacketId		= (INT*)							( (DWORD)DemoDriver->ServerConnection + 0x0E68 );
+		OutPacketId		= (INT*)							( (DWORD)DemoDriver->ServerConnection + 0x0E6C );
+		OutAckPacketId	= (INT*)							( (DWORD)DemoDriver->ServerConnection + 0x0E70 );
+		Channels		= (UChannel**)						( (DWORD)DemoDriver->ServerConnection + 0x0E74 );
+		OutReliable		= (INT*)							( (DWORD)DemoDriver->ServerConnection + 0x1E70 );
+		InReliable		= (INT*)							( (DWORD)DemoDriver->ServerConnection + 0x2E6C );
+		OpenChannels	= (TArray<UChannel*>*)				( (DWORD)DemoDriver->ServerConnection + 0x3E80 );
+		ActorChannels	= (TMap<AActor*, UActorChannel*>*)	( (DWORD)DemoDriver->ServerConnection + 0x3E98 );
 	}
 
 	// Destroy ALL actor channels (but not control channel!!!)
@@ -351,22 +351,25 @@ void UDemoInterface::execJumpBack (FFrame& Stack, RESULT_DECL)
 	UClass* EffectsClass = StaticLoadClass( AActor::StaticClass(), NULL, TEXT("engine.Effects"), NULL, LOAD_NoFail, NULL );
 	for( i=0; i<DemoSpec->XLevel->Actors.Num(); i++ )
 	{
+		AActor* Actor = DemoSpec->XLevel->Actors(i);
+
 		// Player owned actor that is not the demo spec?
-		if (DemoSpec->XLevel->Actors(i)
-			&& DemoSpec->XLevel->Actors(i) != DemoSpec
-			&& DemoSpec->XLevel->Actors(i)->Role == ROLE_Authority
-			&& !(DemoSpec->XLevel->Actors(i)->bStatic && DemoSpec->XLevel->Actors(i)->bNoDelete))
+		if (Actor && 
+			Actor != DemoSpec &&
+			Actor->Role == ROLE_Authority &&
+			 !(Actor->bStatic && Actor->bNoDelete))
 		{
 			// (Anth)
 			// Projectiles, decals, effects have no actor channel but still have to be deleted
 			// Keeping AInfo objects because destroying them would ruin huds, scoreboards and whatnot
-			if (DemoSpec->XLevel->Actors(i)->IsA(AProjectile::StaticClass())
-				|| DemoSpec->XLevel->Actors(i)->IsA(ADecal::StaticClass())
-				|| DemoSpec->XLevel->Actors(i)->IsA(ALight::StaticClass())
-				|| DemoSpec->XLevel->Actors(i)->IsA(EffectsClass)
-				/*|| DemoSpec->XLevel->Actors(i)->IsA(AInfo::StaticClass())*/) //keep AInfo?
+			if (Actor->IsA(AProjectile::StaticClass()) ||
+				Actor->IsA(ADecal::StaticClass()) ||
+				Actor->IsA(ALight::StaticClass()) ||
+				Actor->IsA(EffectsClass)
+				/*|| Actor->IsA(AInfo::StaticClass())*/) //keep AInfo?
 			{
-				DemoSpec->XLevel->DestroyActor(DemoSpec->XLevel->Actors(i), 1); //even if net!
+				GLog->Logf(TEXT("UDEMO: Killing Actor %s"), Actor->GetFullName());
+				DemoSpec->XLevel->DestroyActor(Actor, 1); //even if net!
 			}
 		}
 	}
@@ -389,6 +392,9 @@ void UDemoInterface::execJumpBack (FFrame& Stack, RESULT_DECL)
 	// Reset Level time
 	DemoSpec->Level->TimeSeconds	= 0;
 	ltsoffset = 0.0; // resync level.TimeSeconds
+
+	// Anth: Put the socket state back in USOCK_Pending so the engine calls HandleClientPlayer on our connection again once the linked player has respawned.
+	DemoDriver->ServerConnection->State = USOCK_Pending;
 
 	GLog->Logf(TEXT("UDEMO: Done!"));
 	unguard;

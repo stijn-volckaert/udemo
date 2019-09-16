@@ -71,7 +71,7 @@ void UDReader::getTime(double * time, int * frames)
 	guard(UDReader::getTime);
 	FArchive*FileAr;
 	guard(FileArProcess);
-	FileAr =  ((UDemoRecDriver*)DemoRecDriver)->FileAr;
+	FileAr =  static_cast<UDemoRecDriver*>(DemoRecDriver)->FileAr;
 	if (!FileAr)
 	{
 		GLog->Logf(TEXT("error.. FARCHIVE COULD NOT BE READ FROM DEMO!"));

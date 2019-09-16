@@ -33,7 +33,7 @@ var config string Format; //format of info. %L=level, %D=day, %Y=year %M=month, 
 var config bool bRecordWhenSpectating; // (Anth) Auto record when spectating?
 
 //downloading:
-var config byte DownloadType; //0=cache it, 1=goto paths, 2=try to download INT file
+var config byte DownloadType; //0=cache it, 1=goto paths
 var config String RedirectServers[24]; //list of redirect servers where files may be downloaded from
 
 //advanced demo driver settings:
@@ -248,31 +248,7 @@ defaultproperties {
   bRecordWhenSpectating=true
   CacheSeconds=7.0
   TickSize=0.4
-  DownloadType=2
+  DownloadType=1
   InterpolateView=true
-  RedirectServers(0)="ucc.sobservers.com"
-  RedirectServers(1)="66.28.180.9"
-  RedirectServers(2)="unrealmafia.com/redirects/um"
-  RedirectServers(3)="208.254.35.1/maps"
-  RedirectServers(4)="uz.clanzenkai.net/uz"
-  RedirectServers(5)="utdownloads.online.no/redirect"
-  RedirectServers(6)="arago5.tn.utwente.nl/unreal/Compressed"
-  RedirectServers(7)="unreal.divinia.com/redirect"
-  RedirectServers(8)="www.icequake.net/ut/redirect"
-  RedirectServers(9)="www.cpti.org/uz"
-  RedirectServers(10)="fragged.yerbox.org/UTfiles"
-  RedirectServers(11)="www.belgames.com/servers/utpackages"
-  RedirectServers(12)="www.i4games.net/download/ut/redirect"
-  RedirectServers(13)="www.organized-evolution.com/ucc"
-  RedirectServers(14)="www.utctf.jolt.co.uk/downloads/redirect"
-  RedirectServers(15)="dma.no-ip.org/ut"
-  RedirectServers(16)="www.basaku.com/unreal/"
-  RedirectServers(17)="mspencer.dynu.com/tacopsredirect/"
-  RedirectServers(18)="(Empty)"
-  RedirectServers(19)="(Empty)"
-  RedirectServers(20)="(Empty)"
-  RedirectServers(21)="(Empty)"
-  RedirectServers(22)="(Empty)"
-  RedirectServers(23)="(Empty)"
-
+  RedirectServers(0)="uz.ut-files.com"
 }

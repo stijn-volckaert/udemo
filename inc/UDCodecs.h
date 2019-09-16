@@ -22,7 +22,7 @@ static BYTE BitMask[8] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
 #ifdef __LINUX_X86__
 	#define SAFEBYTE BYTE
 #else
-	#define SAFEBYTE ANSICHAR
+	#define SAFEBYTE ANSICHAR // v436's SDK does not properly export UnTemplate operations on BYTEs. We use regular chars instead.
 #endif
 
 /*-----------------------------------------------------------------------------
@@ -48,7 +48,7 @@ public:
 	,	Buffer		( (CountBits/8) )
 	,	Pos			( 0 )
 	{				
-		appMemcpy( &Buffer(0), Src, CountBits/8 );		
+		memcpy( &Buffer(0), Src, CountBits/8 );		
 		//GLog->Logf(TEXT("Created Bitreader: %d %d"),CountBits,Buffer(0));
 	}
 	BYTE ReadBit()
@@ -56,7 +56,7 @@ public:
 		BYTE A;		
 		INT BytePos = Pos/8;
 		INT InBytePos = Pos - BytePos*8;
-		appMemcpy( &A, &Buffer(BytePos), 1 );
+		memcpy( &A, &Buffer(BytePos), 1 );
 		Pos++;
 		// Inverted byte order!!!!
 		return ((A & BitMask[InBytePos]) != 0);
@@ -66,8 +66,8 @@ public:
 		BYTE A, B;
 		INT BytePos = Pos/8;
 		INT InBytePos = Pos - BytePos*8;		
-		appMemcpy( &A, &Buffer(BytePos), 1 );
-		appMemcpy( &B, &Buffer(BytePos+1), 1 );
+		memcpy( &A, &Buffer(BytePos), 1 );
+		memcpy( &B, &Buffer(BytePos+1), 1 );
 		Pos += 8;
 		// Inverted byte order!!!!
 		return (A >> InBytePos) + (B << (8-InBytePos));
@@ -116,7 +116,7 @@ public:
 		if( Length == 1 )
 			Bytes(Pos) = ((BYTE*)InData)[0];
 		else
-			appMemcpy( &Bytes(Pos), InData, Length );
+			memcpy( &Bytes(Pos), InData, Length );
 		Pos += Length;
 	}
 	INT Tell()
@@ -155,7 +155,7 @@ public:
 		if( Num == 1 )
 			((BYTE*)Data)[0] = Bytes(Pos);
 		else
-			appMemcpy( Data, &Bytes(Pos), Num );
+			memcpy( Data, &Bytes(Pos), Num );
 		Pos += Num;
 	}
 	INT Tell()
@@ -233,7 +233,7 @@ public:
 				DecompressCount[ i ]=0;
 			for( i=0; i<DecompressLength; i++ )
 			{
-				appMemcpy( &DI, &DecompressBuffer(i), 1 );
+				memcpy( &DI, &DecompressBuffer(i), 1 );
 				DecompressCount[ i!=Last ? DI : 256 ]++;
 			}
 			INT Sum = 0;
@@ -245,7 +245,7 @@ public:
 			}
 			for( i=0; i<DecompressLength; i++ )
 			{
-				appMemcpy( &DI, &DecompressBuffer(i), 1 );
+				memcpy( &DI, &DecompressBuffer(i), 1 );
 				INT Index = i!=Last ? DI : 256;
 				Temp(RunningTotal[Index] + DecompressCount[Index]++) = i;
 			}
@@ -291,7 +291,7 @@ public:
 		{
 			In << A;
 			Out << A;
-			appMemcpy( &B, &A, 1 );
+			memcpy( &B, &A, 1 );
 			if( B!=PrevChar )
 			{
 				PrevChar = B;
@@ -407,7 +407,7 @@ public:
 			}			
 			BYTE B = Node->Ch;
 			SAFEBYTE A;
-			appMemcpy( &A, &B, 1 );
+			memcpy( &A, &B, 1 );
 			Out << A;
 		}
 		return 1;
@@ -438,9 +438,9 @@ public:
 		while( !In.AtEnd() )
 		{
 			In << A;
-			appMemcpy ( &B, &A, 1 );
+			memcpy ( &B, &A, 1 );
 			C = List[B];
-			appMemcpy ( &D, &C, 1 );
+			memcpy ( &D, &C, 1 );
 			Out << D;
 			INT NewPos=0;
 			for( i=B; i>NewPos; i-- )
@@ -469,9 +469,9 @@ private:
 			FFBufferReader Reader(InData);
 			FFBufferWriter Writer(OutData);
 			FTime StartTime, EndTime;
-			StartTime = appSeconds();
+			StartTime = appSecondsSlow();
 			(Codecs(First + Step*i)->*Func)( *(i ? &Reader : &In), *(i<Codecs.Num()-1 ? &Writer : &Out) );
-			EndTime = appSeconds() - StartTime.GetFloat();
+			EndTime = appSecondsSlow() - StartTime.GetFloat();
 			TotalTime += EndTime.GetFloat();
 			GWarn->Logf(TEXT("stage %d: %f secs"), i, EndTime.GetFloat() );
 			GWarn->Logf(TEXT("InData size: %d - OutData size: %d"),InData.Num(),OutData.Num());

@@ -42,7 +42,7 @@ function bool CheckCache()
     switch (DownLoadType)
     {
         case 0:
-            return bool(class'DemoSettings'.default.DownloadType);
+            return class'DemoSettings'.default.DownloadType>=1;
         case 1:
             return (cur.binstalled==1&&class'DemoSettings'.default.DownloadType==0);
         case 2:

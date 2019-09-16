@@ -42,7 +42,7 @@ function Created()
     DLType.SetEditable(False);
     DLType.additem("In Cache Directory");
     DLType.AddItem("In Main Directories");
-    DLType.AddItem("Main Directories w/ INT Installing");
+//    DLType.AddItem("Main Directories w/ INT Installing");
     DLType.setselectedindex(class'DemoSettings'.default.DownloadType);
     ControlOffset += 22;
 

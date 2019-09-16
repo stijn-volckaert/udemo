@@ -101,10 +101,13 @@ void UUZHandler::execSaveFile (FFrame& Stack, RESULT_DECL)
   
 	// Create filewriter for decompressed file and decompress
 	guard(Decompress);
-	UzDeCompAr = (INT) GFileManager->CreateFileWriter( *FilenameFull, FILEWRITE_NoFail, GError );	
+	if (bCache)
+		UzDeCompAr = (INT) GFileManager->CreateFileWriter(TEXT("udemo.tmp"), FILEWRITE_NoFail, GError);
+	else
+		UzDeCompAr = (INT) GFileManager->CreateFileWriter( *FilenameFull, FILEWRITE_NoFail, GError );	
 	Codec.Decode( *Reader, *(FArchive*)UzDeCompAr );
 	delete (FArchive*)UzDeCompAr;
-    	delete Reader; 
+    delete Reader; 
 	unguard;	
 
 	// Delete temp file
@@ -119,8 +122,12 @@ void UUZHandler::execSaveFile (FFrame& Stack, RESULT_DECL)
 		*(BYTE*)Result = 0;
 		return;
 	}
+
 	// Not int file => must be upackage
-	Reader = GFileManager->CreateFileReader( *FilenameFull, FILEREAD_NoFail, GError );
+	if (bCache)
+		Reader = GFileManager->CreateFileReader(TEXT("udemo.tmp"), FILEREAD_NoFail, GError );
+	else
+		Reader = GFileManager->CreateFileReader(*FilenameFull, FILEREAD_NoFail, GError);
 	
 	// Check Tag
 	INT Tag;
@@ -159,6 +166,17 @@ void UUZHandler::execSaveFile (FFrame& Stack, RESULT_DECL)
 	}
 
 	delete Reader;
+
+	if (bCache)
+	{
+		FConfigCacheIni CacheIni;
+		FString RealFileName = FString::Printf(TEXT("%s") PATH_SEPARATOR TEXT("%s.uxx"), *GSys->CachePath, dGuid.String());		
+		FString IniName = FString::Printf( TEXT("%s") PATH_SEPARATOR TEXT("cache.ini"), *GSys->CachePath);
+		CacheIni.SetString(TEXT("Cache"), dGuid.String(), *Filename, *IniName);
+
+		GLog->Logf(TEXT("Moving udemo.tmp to %s"), *RealFileName);
+		GFileManager->Move(*RealFileName, TEXT("udemo.tmp"), 1, 1);
+	}
 
 	unguard;
 	*(BYTE*)Result = 0;

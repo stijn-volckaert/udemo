@@ -426,6 +426,7 @@ void UAdvancedConnection::UuReceivedRawPacket(void* InData, INT Count)
 			// Manually parse bunches until the first actorchannel bunch is received
 			// v451b and later will send a playerpawn ref in the first actorchannel bunch
 			// v451a and earlier will send the levelinfo from the mapfile first...
+#if 0
 			if (!CheckedFormat)
 			{
 				DWORD PacketId			= 0;
@@ -514,6 +515,7 @@ void UAdvancedConnection::UuReceivedRawPacket(void* InData, INT Count)
 					}
 				}
 			}
+#endif
 			
 			FBitReader Reader( Data, BitSize );
 			ReceivedPacket( Reader );
@@ -563,6 +565,7 @@ void UAdvancedConnection::HandleClientPlayer( APlayerPawn* Pawn )
 			GetDemoDriver()->SoundPlayer = Pawn;
 		GetDemoDriver()->Interface->eventLinkToPlayer(GetDemoDriver()->SoundPlayer,!GetDemoDriver()->Want3rdP&&GetDemoDriver()->SoundPlayer); //give pawn reference!
 		Pawn = GetDemoDriver()->Interface->DemoSpec;
+		State = USOCK_Open;
 		return;
 	}
 	GetDemoDriver()->ClientHandled = true;
