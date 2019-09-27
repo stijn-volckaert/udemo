@@ -127,4 +127,10 @@ v3.0 and below:
   substantial contributions to the original demo manager
 * AnthraX: Started maintaining udemo after v3.0
 
+6) Bugs and feedback
+--------------------
+
+Please use the issue tracker at https://github.com/stijn-volckaert/udemo to
+report bugs.
+
 ===============================================================================
