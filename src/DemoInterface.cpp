@@ -20,7 +20,8 @@ IMPLEMENT_PACKAGE(udemo);
 // Register class - Case sensitive
 IMPLEMENT_CLASS(UDemoInterface);
 IMPLEMENT_CLASS(UuDemoDriver);
-IMPLEMENT_CLASS(UAdvancedConnection);
+IMPLEMENT_CLASS(UuDemoConnection);
+IMPLEMENT_CLASS(UuDemoPackageMap);
 IMPLEMENT_CLASS(Uudnative);
 IMPLEMENT_CLASS(UDReader);
 

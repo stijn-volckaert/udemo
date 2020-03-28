@@ -31,6 +31,7 @@ class UuDemoDriver : public UDemoRecDriver
 	UBOOL Want3rdP;
 	APlayerPawn* SoundPlayer;      // must make this guy have a viewport!
 	UBOOL ClientHandled;           // if client already handled!
+	UBOOL CompatDemos;
 	UuDemoDriver();
 	
 	//custom tick to support time control
@@ -50,23 +51,35 @@ class UuDemoDriver : public UDemoRecDriver
 };
 
 /*-----------------------------------------------------------------------------
-	UAdvancedConnection. - Does little more than a different HandleClientPlayer()
+	UuDemoRecPackageMap. - Overrides the packagemap so we can record in 
+	v436 format
+-----------------------------------------------------------------------------*/
+class UDEMO_API UuDemoPackageMap : public UPackageMapLevel
+{
+	DECLARE_CLASS(UuDemoPackageMap, UPackageMapLevel, CLASS_Config | CLASS_Transient, udemo)
+
+	void Compute();
+	INT LookupDemoGeneration(FPackageInfo& PackageInfo);
+
+	UuDemoPackageMap()
+	{}
+	UuDemoPackageMap(UNetConnection* InConnection)
+		: UPackageMapLevel(InConnection)
+	{}
+};
+
+/*-----------------------------------------------------------------------------
+	UuDemoRecConnection. - Does little more than a different HandleClientPlayer()
 	Also spawns the demo interface for the player.
 -----------------------------------------------------------------------------*/
-class UDEMO_API UAdvancedConnection : public UDemoRecConnection
+class UDEMO_API UuDemoConnection : public UDemoRecConnection
 {
-	DECLARE_CLASS(UAdvancedConnection,UDemoRecConnection,CLASS_Config|CLASS_Transient,Engine)
-	NO_DEFAULT_CONSTRUCTOR(UAdvancedConnection)
+	DECLARE_CLASS(UuDemoConnection,UDemoRecConnection,CLASS_Config|CLASS_Transient,udemo)
+	NO_DEFAULT_CONSTRUCTOR(UuDemoConnection)
 
 	DWORD dwPadding[20];			// (Anth) Compensation for mismatches between v436/440/451 definitions of UNetConnection
-	UBOOL CheckedFormat;			// (Anth) Checked Demo format? (v451b demo compatibility)
-	UBOOL Is451bClient;				// (Anth) Recorded on v4.51b or later?
 
-	void StaticConstructor();
-	UAdvancedConnection( UNetDriver* InDriver, const FURL& InURL );
-	UuDemoDriver* GetDemoDriver(); //convienece function
+	UuDemoConnection(UNetDriver* InDriver, FURL& InURL);
+	UuDemoDriver* GetDemoDriver(); //convenience function
 	void HandleClientPlayer( APlayerPawn* Pawn );
-
-	// (Anth) Reimplemented to handle diff demo formats
-	void UuReceivedRawPacket(void* Data, INT Count);
 };

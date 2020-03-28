@@ -52,6 +52,11 @@ seeking, or any other nice feature of the new demo driver!
 3) Change log
 -------------
 
+v3.5.1:
+* [FIXED] Demo manager no longer hangs while trying to play back truncated demos
+* [FIXED] The camera now correctly follows guided warshells
+* [CHANGED] Minor adjustments to the GUI to work better with v469's GUI scaling
+
 v3.5:
 * [ADDED] Compatibility with Unreal Tournament v469
 * [FIXED] You can now, once again, save downloaded files in the cache folder

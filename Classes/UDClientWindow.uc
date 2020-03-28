@@ -46,7 +46,7 @@ function Created()
     CenterWidth = (WinWidth - 30)/2; //button width
     CenterPos = 10;//(WinWidth - CenterWidth)/2;
     CenterPos2 = WinWidth - CenterWidth - 10; //right position for button
-    ControlOffset = 10;
+    ControlOffset = 5;
 
     super.created();
 
@@ -63,7 +63,7 @@ function Created()
     //hack to use modified list class:
     OldDefault=Class'UwindowComboControl'.default.listclass;
     Class'UwindowComboControl'.default.listclass=class'UDComboList';
-    ControlOffSet+=10;
+    ControlOffSet+=14;
 
     demos = UWindowComboControl(CreateControl(class'UWindowComboControl', CenterPos, ControlOffset, CenterWidth2, 1));
     Class'UwindowComboControl'.default.listclass=OldDefault;

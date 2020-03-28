@@ -58,6 +58,10 @@ var float oldltsoffset;
 var Actor OldViewTarget;
 var bool bWasZooming;
 
+// (Anth) support for following projectiles such as guided warshells	
+var bool bWasFollowingProjectile;
+var vector LocationBeforeProjectileLock;	
+
 //garf interpolation code:
 var float timepassed, totaltimeR, predictiontime;
 var rotator lastrotation, realtargetrotation;
@@ -768,7 +772,7 @@ event PreRender( canvas Canvas )
     if (PlayerLinked!=none)
     {
         if (bLockOn)
-            SetLocation(PlayerLinked.Location);
+			SetLocation(PlayerLinked.Location);
         oldRole=PlayerLinked.Role;
         PlayerLinked.Role = Role_authority;
         PlayerLinked.PreRender(Canvas);
@@ -806,11 +810,12 @@ event RenderOverLays(Canvas Canvas)
     local ENetRole oldRole;
     local Actor Dummy;
     local vector HitLocation, HitNormal;
+	local bool bFollowingProjectile;
 
 	if (OldViewTarget != None)
 	{
-	   ViewTarget = OldViewTarget;
-	   ViewTarget.bHidden = false;
+		ViewTarget = OldViewTarget;
+		ViewTarget.bHidden = false;
 	}
 
     // (Added by Anth) Weapon Rendering was disabled by the code in PreRender
@@ -822,7 +827,7 @@ event RenderOverLays(Canvas Canvas)
         // weapon bobs that occur at high speed collisions
         PlayerPawn(ViewTarget).bCollideWorld = false;
 
-        // Temporaly set ViewTarget.Role to ROLE_AUTHORITY. This allows us to
+        // Temporarily set ViewTarget.Role to ROLE_AUTHORITY. This allows us to
         // call functions that only the server can usually call
         oldRole=PlayerPawn(ViewTarget).Role;
         PlayerPawn(ViewTarget).Role=ROLE_AUTHORITY;
@@ -833,23 +838,51 @@ event RenderOverLays(Canvas Canvas)
         // Calculate the viewrotation of ViewTarget. UTPure will set this to 0,0,0
         // or something random... Either way, UTPure will fuck this value up...
         PlayerCalcView(Dummy,CamLoc,CamRot);
-        if (PlayerPawn(ViewTarget).ViewRotation != CamRot)
-            PlayerPawn(ViewTarget).ViewRotation = CamRot;
+        PlayerPawn(ViewTarget).ViewRotation = CamRot;
 
         // Give weapon back. The weapon was set to none during PreRender
-        if (PlayerPawn(ViewTarget).Weapon == None && oldWeap != None && oldWeap.Owner == PlayerPawn(ViewTarget))
+        if (PlayerPawn(ViewTarget).Weapon == None &&
+			oldWeap != None &&
+		    oldWeap.Owner == PlayerPawn(ViewTarget))
+		{
             PlayerPawn(ViewTarget).Weapon = oldWeap;
+		}
 
-        // Calculate starting location for weapon
-        NewLoc=PlayerPawn(ViewTarget).Location;
-        nLoc=NewLoc;
+		// Check if we're following a projectile such as a GuidedWarShell
+		if (Projectile(PlayerPawn(ViewTarget).ViewTarget) != none)
+		{
+			// Follow the projectile
+			NewLoc=PlayerPawn(ViewTarget).ViewTarget.Location;
+			nLoc=NewLoc;
+			bFollowingProjectile=true;
 
-        // Adjust EyeHeight
-        NewLoc+=(OldEyeH-PlayerPawn(ViewTarget).EyeHeight)*vect(0,0,1);
+			// (Anth) remember viewrot. This doesn't reset automaticatically
+			// when we stop following the projectile			
+			if (!bWasFollowingProjectile)
+			{
+				bWasFollowingProjectile=true;
+				LocationBeforeProjectileLock=PlayerPawn(ViewTarget).Location;
+			}
+		}
+		else
+		{		
+			if (bWasFollowingProjectile)
+			{
+				bWasFollowingProjectile=false;
+				PlayerPawn(ViewTarget).Location = LocationBeforeProjectileLock;
+			}
+			
+			// Calculate starting location for weapon
+			NewLoc=PlayerPawn(ViewTarget).Location;
+			nLoc=NewLoc;
+
+			// Adjust EyeHeight
+			NewLoc+=(OldEyeH-PlayerPawn(ViewTarget).EyeHeight)*vect(0,0,1);			
+		}
 
         // Set the location, Only if not paused!
         // Will cause camera to float away if we do it while paused as well
-        if (Level != None && Level.Pauser == "")
+        if (Level != None && (Level.Pauser == "" || bFollowingProjectile))
             PlayerPawn(ViewTarget).SetLocation(NewLoc);
 
         // Reset PlayerLinked.Role
@@ -883,7 +916,7 @@ event RenderOverLays(Canvas Canvas)
             PlayerPawn(ViewTarget).myHUD.renderoverlays(canvas);
 
         // Restore loc...
-        if (Level != None && Level.Pauser == "")
+        if (Level != None && (Level.Pauser == "" || bFollowingProjectile))
             PlayerPawn(ViewTarget).SetLocation(nLoc);
 
         // Reset bHideWeapon if needed
@@ -926,7 +959,13 @@ event PostRender( canvas Canvas )
         PlayerLinked.ScoringType=ScoringType;
         PlayerLinked.Scoring=Scoring;
         PlayerLinked.GameReplicationInfo=GameReplicationInfo; // hax!
-        ViewTarget=none;
+
+		if (PlayerLinked != none &&
+			WarheadLauncher(PlayerLinked.Weapon) != none &&
+		    GuidedWarShell(PlayerLinked.ViewTarget) != none)
+		{		
+			WarheadLauncher(PlayerLinked.Weapon).GuidedShell = GuidedWarShell(PlayerLinked.ViewTarget);
+		}
 
         if (myhud!=none)
             myhud.setowner(PlayerLinked);
@@ -1177,7 +1216,6 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
                 // Roll might not be 0 for non-recording viewtargets :o
                 if (PTarget != PlayerLinked)
                 {
-                    //Log("### Calculated ViewRot for PTarget:"@PTarget@" ->"@CameraRotation@CameraRotation.Roll);
                     PlayerPawn(PTarget).ViewRotation.Roll = 0;
                     CameraRotation.Roll = 0;
                 }
@@ -1188,7 +1226,9 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
                 ViewActor=ViewTarget;
             }
             else
+			{
                 CameraRotation = PTarget.ViewRotation;
+			}
 
             if (CameraRotation==rot(0,0,0)) //viewing in client demo.. uh.. just make it the normal rotation!
                 CameraRotation = PTarget.Rotation;
@@ -1211,7 +1251,9 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
     CameraLocation = Location;
 
     if( bBehindView ) //up and behind
+	{
         CalcBehindView(CameraLocation, CameraRotation, 150);
+	}
     else
     {
         // First-person view.

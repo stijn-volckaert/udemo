@@ -38,7 +38,7 @@ function Created()
     DLType.Align = TA_Left;
     DLType.SetHelpText("Configure where demos should be saved to.  If saved in main directories, the file will be usable in singleplayer, but may lead to version mismatches in other demos or netplay.");
     DLType.SetFont(F_Normal);
-    DLType.editboxwidth=0.8*DLType.winwidth;
+    DLType.editboxwidth=0.78*DLType.winwidth;
     DLType.SetEditable(False);
     DLType.additem("In Cache Directory");
     DLType.AddItem("In Main Directories");
@@ -56,7 +56,7 @@ function Created()
     for (i=0;i<6;i++)
     {
         Servers[i] = UWindowEditControl(CreateControl(class'UWindowEditControl',CenterPos, ControlOffset, CenterWidth2-5, 1));
-        Servers[i].editboxwidth=0.8*Servers[i].winwidth;
+        Servers[i].editboxwidth=0.78*Servers[i].winwidth;
         Servers[i].SetFont( F_Normal );
         Servers[i].Align = TA_Left;
         Servers[i].SetDelayedNotify(true);

@@ -26,6 +26,9 @@ ULinkerLoad* Linker = NULL;
 -----------------------------------------------------------------------------*/
 UuDemoDriver::UuDemoDriver()
 {	
+	/*UuDemoPackageMap* DemoPackageMap = new UuDemoPackageMap;
+	delete MasterMap;
+	MasterMap = DemoPackageMap;*/
 }
 
 /*-----------------------------------------------------------------------------
@@ -127,6 +130,8 @@ void UuDemoDriver::TickDispatch( FLOAT DeltaTime )
 			AtEnd:
 				ServerConnection->State = USOCK_Closed;
 				DemoEnded = 1;
+				if (FileAr->IsError())
+					debugf(TEXT("udemo: This demo is corrupt!"));
 				//detatch demo link!
 				if (FileAr)
 				{ 
@@ -195,7 +200,6 @@ void UuDemoDriver::TickDispatch( FLOAT DeltaTime )
 			// (Anth) Being called in normal playback mode...
 			CheckActors();
 
-			//((UAdvancedConnection*)ServerConnection)->UuReceivedRawPacket( Data, PacketBytes );
 			ServerConnection->ReceivedRawPacket( Data, PacketBytes );
 
 			TimeSync(ServerPacketTime,Time);
@@ -372,7 +376,7 @@ UBOOL UuDemoDriver::InitConnect( FNetworkNotify* InNotify, FURL& ConnectURL, FSt
 	RealDilation=1;
 	
 	// Playback, local machine is a client, and the demo stream acts "as if" it's the server.
-	ServerConnection					= new UAdvancedConnection( this, ConnectURL );			
+	ServerConnection					= new UuDemoConnection( this, ConnectURL );			
 	ServerConnection->CurrentNetSpeed	= 1000000;
 	ServerConnection->State				= USOCK_Pending;
 
@@ -385,6 +389,18 @@ UBOOL UuDemoDriver::InitConnect( FNetworkNotify* InNotify, FURL& ConnectURL, FSt
 	}
 
 	getTime(); //figure out the time
+	if (FileAr->IsError())
+	{
+		// maybe it's just truncated. Try to recover
+		delete FileAr;
+		FileAr = GFileManager->CreateFileReader(*DemoFilename);
+		if (!FileAr)
+		{
+			Error = FString::Printf(TEXT("Couldn't open demo file %s for reading"), *DemoFilename);//!!localize!!
+			return 0;
+		}
+	}
+	
 	LoopURL				= ConnectURL;
 	Want3rdP			= ConnectURL.HasOption(TEXT("3rdperson")); 
 	TimeBased			= ConnectURL.HasOption(TEXT("timebased"));
@@ -400,154 +416,20 @@ UBOOL UuDemoDriver::InitConnect( FNetworkNotify* InNotify, FURL& ConnectURL, FSt
 }
 
 /*-----------------------------------------------------------------------------
-	UuReceivedRawPacket - (Anth) ReceivedRawPacket Reimplementation. 
-	Super hack to check demo format. Can maybe use this to restore net 
-	compatibility later on... Ideally the demo recording should be modified
-	though! Need some more reversing to fix this.
+	UuDemoConnection
 -----------------------------------------------------------------------------*/
-void UAdvancedConnection::UuReceivedRawPacket(void* InData, INT Count)
+UuDemoConnection::UuDemoConnection(UNetDriver* InDriver, FURL& InURL)
+	: UDemoRecConnection(InDriver, InURL)
 {
-	BYTE* Data = (BYTE*)InData;
-
-	InByteAcc += Count + PacketOverhead;
-	InPktAcc++;
-	if( Count>0 )
-	{
-		BYTE LastByte = Data[Count-1];
-		if( LastByte )
-		{
-			INT BitSize = Count*8-1;
-			while( !(LastByte & 0x80) )
-			{
-				LastByte *= 2;
-				BitSize--;
-			}
-
-			// Manually parse bunches until the first actorchannel bunch is received
-			// v451b and later will send a playerpawn ref in the first actorchannel bunch
-			// v451a and earlier will send the levelinfo from the mapfile first...
-#if 0
-			if (!CheckedFormat)
-			{
-				DWORD PacketId			= 0;
-				BYTE IsAck				= 0;
-				BYTE IsControlChannel	= 0;
-				BYTE ShouldOpenChannel	= 0;
-				BYTE ShouldCloseChannel	= 0;
-				BYTE ReliableBunch		= 0;
-				INT ChannelId			= 0;
-				INT ChannelSequence		= 0;
-				INT ChannelType			= 0;
-				INT BunchSize			= 0;
-			
-				FBitReader TempReader( Data, BitSize );
-				PacketId = TempReader.ReadInt(MAX_PACKETID);				
-				IsAck = TempReader.ReadBit();				
-				IsControlChannel = TempReader.ReadBit();				
-				if (IsControlChannel)
-				{
-					ShouldOpenChannel  = TempReader.ReadBit();
-					ShouldCloseChannel = TempReader.ReadBit();
-				}
-				ReliableBunch = TempReader.ReadBit();				
-				ChannelId = TempReader.ReadInt(MAX_CHANNELS);
-				if (ReliableBunch)				
-					ChannelSequence = TempReader.ReadInt(MAX_CHSEQUENCE);								
-				if (ShouldOpenChannel || ReliableBunch)				
-					ChannelType = TempReader.ReadInt(CHTYPE_MAX);									
-				BunchSize = TempReader.ReadInt(MaxPacket*8);
-
-				if (ChannelType == CHTYPE_Actor)
-				{
-					CheckedFormat = 1;
-
-					BYTE IsDynamic = TempReader.ReadBit();
-					INT Index = TempReader.ReadInt(PackageMap->GetMaxObjectIndex());
-
-					if (Index >= PackageMap->List(0).ObjectCount)
-					{
-						GLog->Logf(TEXT("udemo: demo was recorded by UTv451b or later."));
-						Is451bClient = 1;
-
-
-						// Attempted fix. Works to fix PackageMaps but doesn't really help with ClassNetCaches
-						// Need some serious changes to make this work
-						/*
-						for (INT i = 0; i < PackageMap->List.Num(); ++i)
-						{							
-							if (appStrcmp(PackageMap->List(i).Guid.String(), TEXT("D18A7B9211D38F04100067B9F6F8975A")) == 0)		// Engine
-							{
-								if (PackageMap->List(i).ObjectCount < 5421)
-								{
-									GLog->Logf(TEXT("udemo: Using udemo SuperDuperHack to modify Engine.ObjectCount/NameCount: %d/%d => %d/%d"), 
-										PackageMap->List(i).ObjectCount, PackageMap->List(i).NameCount, 5421, 3390);
-									PackageMap->List(i).ObjectCount = 5421;
-									PackageMap->List(i).NameCount	= 3390;
-								}
-							}
-							else if (appStrcmp(PackageMap->List(i).Guid.String(), TEXT("4770B88411D38E3E100067B9F6F8975A")) == 0)	// Core
-							{
-								if (PackageMap->List(i).ObjectCount < 674)
-								{
-									GLog->Logf(TEXT("udemo: Using udemo SuperDuperHack to modify Core.ObjectCount/NameCount: %d/%d => %d/%d"), 
-										PackageMap->List(i).ObjectCount, PackageMap->List(i).NameCount, 674, 333);
-									PackageMap->List(i).ObjectCount = 674;
-									PackageMap->List(i).NameCount	= 333;
-								}
-							}
-						}
-
-						// Recalc bases
-						INT NameBase = 0, ObjectBase = 0;
-						GLog->Logf(TEXT("udemo: Recalculating bases..."));
-						for (INT i = 0; i < PackageMap->List.Num(); ++i)
-						{
-							PackageMap->List(i).NameBase	= NameBase;
-							PackageMap->List(i).ObjectBase	= ObjectBase;
-							NameBase	+= PackageMap->List(i).NameCount;
-							ObjectBase	+= PackageMap->List(i).ObjectCount;	
-							GLog->Logf(TEXT("udemo: PackageMap[%02d] -> %s:%s - %d:%d - %d:%d"), i, PackageMap->List(i).Guid.String(), *PackageMap->List(i).Linker->Filename, 
-								PackageMap->List(i).ObjectBase, PackageMap->List(i).ObjectCount, PackageMap->List(i).NameBase, PackageMap->List(i).NameCount);
-						}
-
-						GLog->Logf(TEXT("udemo: Done!"));
-						*/
-					}
-				}
-			}
-#endif
-			
-			FBitReader Reader( Data, BitSize );
-			ReceivedPacket( Reader );
-		}
-	}
-}
-
-/*-----------------------------------------------------------------------------
-	StaticConstructor
------------------------------------------------------------------------------*/
-void UAdvancedConnection::StaticConstructor()
-{
-	guard(UAdvancedConnection::StaticConstructor);
-	unguard;
-}
-
-/*-----------------------------------------------------------------------------
-	Constructor
------------------------------------------------------------------------------*/
-UAdvancedConnection::UAdvancedConnection( UNetDriver* InDriver, const FURL& InURL )
-: UDemoRecConnection( InDriver, InURL )
-{
-	guard(UAdvancedConnection::UAdvancedConnection);	
-	CheckedFormat	= 0;
-	Is451bClient	= 0;
-	unguard;
+	/*UuDemoPackageMap* DemoPackageMap = new(this) UuDemoPackageMap(this);
+	delete PackageMap;
+	PackageMap = DemoPackageMap;*/
 }
 
 /*-----------------------------------------------------------------------------
 	GetDemoDriver
 -----------------------------------------------------------------------------*/
-UuDemoDriver* UAdvancedConnection::GetDemoDriver() //new driver reading
+UuDemoDriver* UuDemoConnection::GetDemoDriver() //new driver reading
 {
 	return (UuDemoDriver *)Driver;
 }
@@ -555,7 +437,7 @@ UuDemoDriver* UAdvancedConnection::GetDemoDriver() //new driver reading
 /*-----------------------------------------------------------------------------
 	HandleClientPlayer
 -----------------------------------------------------------------------------*/
-void UAdvancedConnection::HandleClientPlayer( APlayerPawn* Pawn )
+void UuDemoConnection::HandleClientPlayer( APlayerPawn* Pawn )
 {
 	guard(UAdvancedConnection::HandleClientPlayer);
 	UViewport* Viewport = NULL;
@@ -648,6 +530,109 @@ void UAdvancedConnection::HandleClientPlayer( APlayerPawn* Pawn )
 	check(Pawn->XLevel->Engine->Client->Viewports.Num());
 
 	unguard;
+}
+
+/*-----------------------------------------------------------------------------
+	UuDemoRecPackageMap
+-----------------------------------------------------------------------------*/
+
+void UuDemoPackageMap::Compute()
+{
+	guard(UuDemoPackageMap::Compute);
+	for (INT i = 0; i < List.Num(); i++)
+		check(List(i).Linker);
+	NameIndices.Empty(FName::GetMaxNames());
+	NameIndices.Add(FName::GetMaxNames());
+	for (INT i = 0; i < NameIndices.Num(); i++)
+		NameIndices(i) = -1;
+	LinkerMap.Empty();
+	MaxObjectIndex = 0;
+	MaxNameIndex = 0;
+	FString	Ver = UTexture::__Client->Viewports(0)->Actor->Level->EngineVersion;
+	INT iVer = strtol(TCHAR_TO_ANSI(*Ver), NULL, 10);
+
+	{for (INT i = 0; i < List.Num(); i++)
+	{
+		FPackageInfo& Info = List(i);
+		Info.ObjectBase = MaxObjectIndex;
+		Info.NameBase = MaxNameIndex;
+		Info.ObjectCount = Info.Linker->ExportMap.Num();
+		Info.NameCount = Info.Linker->NameMap.Num();
+
+		TArray<FGenerationInfo>* Generations = (iVer < 469) ?
+			reinterpret_cast<TArray<FGenerationInfo>*>(reinterpret_cast<unsigned long>(&Info.Linker->Summary.Guid) + sizeof(FGuid)) :
+			*reinterpret_cast<TArray<FGenerationInfo>**>(reinterpret_cast<unsigned long>(&Info.Linker->Summary.Guid) + sizeof(FGuid));
+
+		Info.LocalGeneration = Generations->Num();
+		if (Info.RemoteGeneration == 0)
+			Info.RemoteGeneration = Info.LocalGeneration;
+
+		Info.RemoteGeneration = LookupDemoGeneration(Info);
+		if (Info.RemoteGeneration < Info.LocalGeneration)
+		{
+			Info.ObjectCount = Min(Info.ObjectCount, (*Generations)(Info.RemoteGeneration - 1).ExportCount);
+			Info.NameCount = Min(Info.NameCount, (*Generations)(Info.RemoteGeneration - 1).NameCount);
+			Info.LocalGeneration = Info.RemoteGeneration;
+		}
+		MaxObjectIndex += Info.ObjectCount;
+		MaxNameIndex += Info.NameCount;
+
+		for (INT j = 0; j < Min(Info.Linker->NameMap.Num(), Info.NameCount); j++)
+			if (NameIndices(Info.Linker->NameMap(j).GetIndex()) == -1)
+				NameIndices(Info.Linker->NameMap(j).GetIndex()) = Info.NameBase + j;
+		LinkerMap.Set(Info.Linker, i);
+	}}
+	unguard;
+}
+
+INT UuDemoPackageMap::LookupDemoGeneration(FPackageInfo& PackageInfo)
+{
+	// Botpack
+	if (PackageInfo.Guid == FGuid(0x1c696576, 0x11d38f44, 0x100067b9, 0xf6f8975a))
+		return 14;
+	// Core
+	if (PackageInfo.Guid == FGuid(0x4770b884, 0x11d38e3e, 0x100067b9, 0xf6f8975a))
+		return 10;
+	// Editor
+	if (PackageInfo.Guid == FGuid(0x4770b886, 0x11d38e3e, 0x100067b9, 0xf6f8975a))
+		return 11;
+	// Engine
+	if (PackageInfo.Guid == FGuid(0xd18a7b92, 0x11d38f04, 0x100067b9, 0xf6f8975a))
+		return 17;
+	// Fire
+	if (PackageInfo.Guid == FGuid(0x4770b888, 0x11d38e3e, 0x100067b9, 0xf6f8975a))
+		return 10;
+	// IpDrv
+	if (PackageInfo.Guid == FGuid(0x4770b889, 0x11d38e3e, 0x100067b9, 0xf6f8975a))
+		return 10;
+	// IpServer
+	if (PackageInfo.Guid == FGuid(0x4770b88f, 0x11d38e3e, 0x100067b9, 0xf6f8975a))
+		return 11;
+	// UBrowser
+	if (PackageInfo.Guid == FGuid(0x4770b88b, 0x11d38e3e, 0x100067b9, 0xf6f8975a))
+		return 10;
+	// UTBrowser
+	if (PackageInfo.Guid == FGuid(0x4770b893, 0x11d38e3e, 0x100067b9, 0xf6f8975a))
+		return 10;
+	// UTMenu
+	if (PackageInfo.Guid == FGuid(0x1c696577, 0x11d38f44, 0x100067b9, 0xf6f8975a))
+		return 11;
+	// UTServerAdmin
+	if (PackageInfo.Guid == FGuid(0x4770b891, 0x11d38e3e, 0x100067b9, 0xf6f8975a))
+		return 10;
+	// UWeb
+	if (PackageInfo.Guid == FGuid(0x4770b88a, 0x11d38e3e, 0x100067b9, 0xf6f8975a))
+		return 10;
+	// UWindow
+	if (PackageInfo.Guid == FGuid(0x4770b887, 0x11d38e3e, 0x100067b9, 0xf6f8975a))
+		return 10;
+	// UnrealI
+	if (PackageInfo.Guid == FGuid(0x4770b88d, 0x11d38e3e, 0x100067b9, 0xf6f8975a))
+		return 1;
+	// UnrealShare
+	if (PackageInfo.Guid == FGuid(0x4770b88c, 0x11d38e3e, 0x100067b9, 0xf6f8975a))
+		return 1;
+	return PackageInfo.RemoteGeneration;
 }
 
 /*-----------------------------------------------------------------------------
