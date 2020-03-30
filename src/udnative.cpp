@@ -15,6 +15,11 @@
 	Includes/Definitions
 -----------------------------------------------------------------------------*/
 #include "udemoprivate.h"
+#ifndef WIN32
+#include <sys/stat.h>
+#include <sys/types.h>
+#include "FFileManagerLinux.h"
+#endif
 
 /*-----------------------------------------------------------------------------
 	Global vars
@@ -107,9 +112,17 @@ void Uudnative::execBasePath (FFrame& Stack, RESULT_DECL)
 #ifndef __LINUX_X86__
 	*(FString*)Result = appBaseDir();
 #else
-	char cCurrentPath[FILENAME_MAX];
-	if (getcwd(cCurrentPath, sizeof(cCurrentPath)))
-		*(FString*)Result = ANSI_TO_TCHAR(cCurrentPath);
+	FFileManagerLinux* FileMan = dynamic_cast<FFileManagerLinux*>(GFileManager);
+	if (FileMan && FileMan->BaseDir.Len() > 0)
+	{
+		*(FString*)Result = FileMan->BaseDir;
+	}
+	else
+	{
+		char cCurrentPath[FILENAME_MAX];
+		if (getcwd(cCurrentPath, sizeof(cCurrentPath)))
+			*(FString*)Result = ANSI_TO_TCHAR(cCurrentPath);
+	}
 #endif
 	unguard;
 }

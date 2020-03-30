@@ -116,14 +116,17 @@ function Notify(UWindowDialogControl C, byte E)
     local string str, str2;
     local bool bLinux;
     local string PathSeperator;
+	local string FirstChar;
 
     Super.Notify(C, E);
 
     if (!DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).bInitialized)
         return;
 
-    if (Left(DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).UserWindow.DemReader.BasePath(), 1) == "\\"
-        || Left(DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).UserWindow.DemReader.BasePath(), 1) == "/")
+	FirstChar = Left(DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).UserWindow.DemReader.BasePath(), 1);
+    if (FirstChar == "\\" || 
+	   FirstChar == "/" ||
+	   FirstChar == "~")
     {
         bLinux = true;
         PathSeperator = "/";
@@ -163,7 +166,7 @@ function Notify(UWindowDialogControl C, byte E)
                     for (j = 0; j<Len(Str); j++)
                     {
                         //USE reads bad!              Note that ":" is legal dir path, just not legal file name.
-                        if (InStr("* .?<>\"|", Mid(str, j, 1)) != -1)
+                        if (InStr("* ?<>\"|", Mid(str, j, 1)) != -1)
                             continue;
                         else if (InStr("/", Mid(str, j, 1)) != -1 && !bLinux)
                             str2 = str2 $ PathSeperator;
