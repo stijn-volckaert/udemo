@@ -27,7 +27,7 @@ void UUZHandler::execAppend (FFrame& Stack, RESULT_DECL)
 	if (!UzAr)
 	{
 		GLog->Logf(TEXT("Creating temporary file: udemouz.tmp"));
-		UzAr = (INT) GFileManager->CreateFileWriter( TEXT("udemouz.tmp"), FILEWRITE_NoFail, GError );
+		UzAr = GFileManager->CreateFileWriter( TEXT("udemouz.tmp"), FILEWRITE_NoFail, GError );
 	}	
 	// Append
 	((FArchive*)UzAr)->Serialize(B, Count);
@@ -102,9 +102,9 @@ void UUZHandler::execSaveFile (FFrame& Stack, RESULT_DECL)
 	// Create filewriter for decompressed file and decompress
 	guard(Decompress);
 	if (bCache)
-		UzDeCompAr = (INT) GFileManager->CreateFileWriter(TEXT("udemo.tmp"), FILEWRITE_NoFail, GError);
+		UzDeCompAr = GFileManager->CreateFileWriter(TEXT("udemo.tmp"), FILEWRITE_NoFail, GError);
 	else
-		UzDeCompAr = (INT) GFileManager->CreateFileWriter( *FilenameFull, FILEWRITE_NoFail, GError );	
+		UzDeCompAr = GFileManager->CreateFileWriter( *FilenameFull, FILEWRITE_NoFail, GError );	
 	Codec.Decode( *Reader, *(FArchive*)UzDeCompAr );
 	delete (FArchive*)UzDeCompAr;
     delete Reader; 

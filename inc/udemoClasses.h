@@ -4,7 +4,7 @@
     DO NOT modify this manually! Edit the corresponding .uc files instead!
 ===========================================================================*/
 #if ((_MSC_VER) || (HAVE_PRAGMA_PACK))
-#pragma pack (push,4)
+#pragma pack (push,OBJECT_ALIGNMENT)
 #endif
 
 #ifndef UDEMO_API
@@ -27,8 +27,8 @@ AUTOGENERATE_NAME(NetPacketReceived)
 class UDEMO_API UUZHandler : public UObject
 {
 public:
-    INT UzAr GCC_PACK(4);
-    INT UzDeCompAr;
+    void* UzAr;
+    void* UzDeCompAr;
     FStringNoInit Filename;
     FGuid FileGUID;
     INT FileGen;
@@ -59,7 +59,7 @@ struct Uudnative_eventPackageRequired_Parms
 class UDEMO_API Uudnative : public UObject
 {
 public:
-    class UDemoRecDriver* DemoDriver GCC_PACK(4);
+    class UDemoRecDriver* DemoDriver;
     FStringNoInit DemoURL;
     DECLARE_FUNCTION(execDispatchTick);
     DECLARE_FUNCTION(execDemoRead);
@@ -109,14 +109,14 @@ struct UDemoInterface_eventLinkToPlayer_Parms
 class UDEMO_API UDemoInterface : public UObject
 {
 public:
-    class APlayerPawn* DemoSpec GCC_PACK(4);
+    class APlayerPawn* DemoSpec;
     class UuDemoDriver* DemoDriver;
     FLOAT mySpeed;
     BYTE PlayBackMode;
-    BITFIELD bDoingMessagePlay:1 GCC_PACK(4);
-    FLOAT ltsoffset GCC_PACK(4);
+    BITFIELD bDoingMessagePlay:1 GCC_PACK(INT_ALIGNMENT);
+    FLOAT ltsoffset;
     FStringNoInit IllegalActors[20];
-    BITFIELD bDebug:1 GCC_PACK(4);
+    BITFIELD bDebug:1;
     BITFIELD bAnthDebug:1;
     DECLARE_FUNCTION(execGetStartTime);
     DECLARE_FUNCTION(execSetPlayBackMode);
@@ -185,20 +185,20 @@ AUTOGENERATE_FUNCTION(UDemoInterface,-1,execSetSpeed);
 #endif
 
 #ifdef VERIFY_CLASS_SIZES
-//VERIFY_CLASS_OFFSET_NODIE(U,UZHandler,UzAr)
-//VERIFY_CLASS_OFFSET_NODIE(U,UZHandler,UzDeCompAr)
-//VERIFY_CLASS_OFFSET_NODIE(U,UZHandler,Filename)
-//VERIFY_CLASS_OFFSET_NODIE(U,UZHandler,FileGUID)
-//VERIFY_CLASS_OFFSET_NODIE(U,UZHandler,FileGen)
+VERIFY_CLASS_OFFSET_NODIE(U,UZHandler,UzAr)
+VERIFY_CLASS_OFFSET_NODIE(U,UZHandler,UzDeCompAr)
+VERIFY_CLASS_OFFSET_NODIE(U,UZHandler,Filename)
+VERIFY_CLASS_OFFSET_NODIE(U,UZHandler,FileGUID)
+VERIFY_CLASS_OFFSET_NODIE(U,UZHandler,FileGen)
 VERIFY_CLASS_SIZE_NODIE(UUZHandler)
-//VERIFY_CLASS_OFFSET_NODIE(U,udnative,DemoDriver)
-//VERIFY_CLASS_OFFSET_NODIE(U,udnative,DemoURL)
+VERIFY_CLASS_OFFSET_NODIE(U,udnative,DemoDriver)
+VERIFY_CLASS_OFFSET_NODIE(U,udnative,DemoURL)
 VERIFY_CLASS_SIZE_NODIE(Uudnative)
-//VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,DemoSpec)
-//VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,DemoDriver)
-//VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,mySpeed)
-//VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,PlayBackMode)
-//VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,ltsoffset)
-//VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,IllegalActors)
+VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,DemoSpec)
+VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,DemoDriver)
+VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,mySpeed)
+VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,PlayBackMode)
+VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,ltsoffset)
+VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,IllegalActors)
 VERIFY_CLASS_SIZE_NODIE(UDemoInterface)
 #endif // VERIFY_CLASS_SIZES

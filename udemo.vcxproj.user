@@ -5,10 +5,22 @@
     <LocalDebuggerCommandArguments>-nosound</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommand>UnrealTournament.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments>-nosound</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>H:\GameDev\utpg\System64\</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerCommand>UnrealTournament.exe</LocalDebuggerCommand>
     <LocalDebuggerCommandArguments>-nosound</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerWorkingDirectory>H:\GameDev\UnrealTournament436\SystemNew\</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerCommand>UnrealTournament.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments>-nosound</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>H:\GameDev\utpg\System64\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
 </Project>

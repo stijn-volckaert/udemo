@@ -257,6 +257,7 @@ void UDemoInterface::execJumpBack (FFrame& Stack, RESULT_DECL)
 	GLog->Logf(TEXT("UDEMO: Calculating Channel Positions..."));
 
 	// (Anth) New uber hack here. This was fun to figure out.
+#if !BUILD_64
 	if (iVer > 436 && iVer < 469)
 	{
 		// Must be UTPG patch...
@@ -293,6 +294,17 @@ void UDemoInterface::execJumpBack (FFrame& Stack, RESULT_DECL)
 		OpenChannels	= (TArray<UChannel*>*)				( (DWORD)DemoDriver->ServerConnection + 0x3E80 );
 		ActorChannels	= (TMap<AActor*, UActorChannel*>*)	( (DWORD)DemoDriver->ServerConnection + 0x3E98 );
 	}
+#else
+	InPacketId = &DemoDriver->ServerConnection->InPacketId;
+	OutPacketId = &DemoDriver->ServerConnection->OutPacketId;
+	OutAckPacketId = &DemoDriver->ServerConnection->OutAckPacketId;
+	Channels = DemoDriver->ServerConnection->Channels;
+	OutReliable = DemoDriver->ServerConnection->OutReliable;
+	OutReliable = DemoDriver->ServerConnection->OutReliable;
+	InReliable = DemoDriver->ServerConnection->InReliable;
+	OpenChannels = &DemoDriver->ServerConnection->OpenChannels;
+	ActorChannels = &DemoDriver->ServerConnection->ActorChannels;
+#endif
 
 	// Destroy ALL actor channels (but not control channel!!!)
 	GLog->Logf(TEXT("UDEMO: Destroying Channels..."));
