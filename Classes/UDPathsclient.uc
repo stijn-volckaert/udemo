@@ -166,7 +166,7 @@ function Notify(UWindowDialogControl C, byte E)
                     for (j = 0; j<Len(Str); j++)
                     {
                         //USE reads bad!              Note that ":" is legal dir path, just not legal file name.
-                        if (InStr("* ?<>\"|", Mid(str, j, 1)) != -1)
+                        if (InStr("*?<>\"|", Mid(str, j, 1)) != -1)
                             continue;
                         else if (InStr("/", Mid(str, j, 1)) != -1 && !bLinux)
                             str2 = str2 $ PathSeperator;
