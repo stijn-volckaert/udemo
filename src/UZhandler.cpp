@@ -10,6 +10,9 @@
 	Includes/Definitions
 -----------------------------------------------------------------------------*/
 #include "udemoprivate.h"
+#if UNREAL_TOURNAMENT_UTPG
+#include "FCodec.h"
+#endif
 IMPLEMENT_CLASS(UUZHandler);
 
 /*-----------------------------------------------------------------------------
@@ -91,6 +94,7 @@ void UUZHandler::execSaveFile (FFrame& Stack, RESULT_DECL)
 	GLog->Logf(TEXT("Target File: %s"),*FilenameFull);
 	
 	// Init the codec - Original codec broken in VC++ .NET
+#if !UNREAL_TOURNAMENT_UTPG
 	FFCodecFull Codec; 
 	Codec.AddCodec(new FFCodecRLE); 
 	Codec.AddCodec(new FFCodecBWT); 
@@ -98,6 +102,15 @@ void UUZHandler::execSaveFile (FFrame& Stack, RESULT_DECL)
 	if( NewVer ) 
 		Codec.AddCodec(new FFCodecRLE); 
 	Codec.AddCodec(new FFCodecHuffman); 
+#else
+	FCodecFull Codec; 
+	Codec.AddCodec(new FCodecRLE); 
+	Codec.AddCodec(new FCodecBWT); 
+	Codec.AddCodec(new FCodecMTF); 
+	if( NewVer ) 
+		Codec.AddCodec(new FCodecRLE); 
+	Codec.AddCodec(new FCodecHuffman); 
+#endif
   
 	// Create filewriter for decompressed file and decompress
 	guard(Decompress);

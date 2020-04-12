@@ -294,10 +294,16 @@ FTime UuDemoDriver::ReadTo(FTime GoalTime, UBOOL bPacketRead)
 		OldTime = ServerPacketTime;
 		*FileAr << ServerFrameNum;
 		if (FileAr->AtEnd() || FileAr->IsError())
+		{
+			debugf(TEXT("udemo: seekto failed - requested %lf - now at %lf - atend %d - iserror %d"), GoalTime.GetDouble(), ServerPacketTime.GetDouble(), FileAr->AtEnd(), FileAr->IsError());
 			return ServerPacketTime;
+		}
 		*FileAr << ServerPacketTime;
 		if (FileAr->AtEnd() || FileAr->IsError())
+		{
+			debugf(TEXT("udemo: seekto failed - requested %lf - now at %lf - atend %d - iserror %d"), GoalTime.GetDouble(), ServerPacketTime.GetDouble(), FileAr->AtEnd(), FileAr->IsError());
 			return ServerPacketTime;
+		}
 		if(ServerPacketTime > GoalTime)
 		{
 			FTime OutTime = ServerPacketTime;
@@ -308,14 +314,21 @@ FTime UuDemoDriver::ReadTo(FTime GoalTime, UBOOL bPacketRead)
 			}
 			Time = ServerPacketTime;			//synch everything on jumps!
 			FrameNum=ServerFrameNum;
+//			debugf(TEXT("udemo: seekto succeeded - requested %lf - now at %lf - atend %d - iserror %d"), GoalTime.GetDouble(), ServerPacketTime.GetDouble(), FileAr->AtEnd(), FileAr->IsError());
 			return OutTime;
 		}
 		*FileAr << PacketBytes;
 		if (FileAr->AtEnd() || FileAr->IsError())
+		{
+			debugf(TEXT("udemo: seekto failed - requested %lf - now at %lf - atend %d - iserror %d"), GoalTime.GetDouble(), ServerPacketTime.GetDouble(), FileAr->AtEnd(), FileAr->IsError());
 			return ServerPacketTime;
+		}
 		seekTo=FileAr->Tell() + PacketBytes;
 		if (seekTo>FileAr->TotalSize()) //stops crashes on truncated demos
+		{
+			debugf(TEXT("udemo: seekto failed - possible truncated demo - requested %lf - now at %lf - atend %d - iserror %d"), GoalTime.GetDouble(), ServerPacketTime.GetDouble(), FileAr->AtEnd(), FileAr->IsError());
 			return ServerPacketTime;
+		}
 		if (!bPacketRead)
 			FileAr->Seek(seekTo); //move ahead by packetbytes
 		else
@@ -325,6 +338,8 @@ FTime UuDemoDriver::ReadTo(FTime GoalTime, UBOOL bPacketRead)
 			ServerConnection->ReceivedRawPacket( Data, PacketBytes );
 		}
 	}
+
+	debugf(TEXT("udemo: seekto failed - requested %lf - now at %lf - atend %d - iserror %d"), GoalTime.GetDouble(), ServerPacketTime.GetDouble(), FileAr->AtEnd(), FileAr->IsError());
 	return ServerPacketTime;
 	unguard;
 }

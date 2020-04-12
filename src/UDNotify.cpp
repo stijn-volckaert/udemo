@@ -21,26 +21,6 @@ UDReader::UDReader( UEngine* InEngine, const FURL& InURL, Uudnative * Control )
 	guard(UDReader::UDReader);
 	Controller=Control;
 
-#ifdef __LINUX_X86__	
-	FString newFile = TEXT("");
-	FString DemoFilename = Control->DemoURL;
-	INT optIndex 	= DemoFilename.InStr(TEXT("?"));
-	if (optIndex != -1)
-	{
-		newFile += DemoFilename.Left(optIndex);
-		if (newFile.Right(4).Caps() != TEXT(".DEM"))
-			newFile += TEXT(".dem");
-	}
-	else
-	{
-		newFile += DemoFilename;
-		if (newFile.Right(4).Caps() != TEXT(".DEM"))
-			newFile += TEXT(".dem");
-	}
-	const_cast<FURL*>(&InURL)->Map = newFile;
-	GLog->Logf(TEXT("UDEMO: InURL.Map = %s"), *InURL.Map);
-#endif
-
 	// Try to create demo playback driver.
 	UClass* DemoDriverClass = StaticLoadClass( UNetDriver::StaticClass(), NULL, TEXT("Engine.DemoRecDriver"), NULL, LOAD_NoFail, NULL );
 	DemoRecDriver = ConstructObject<UNetDriver>( DemoDriverClass );

@@ -109,7 +109,7 @@ void Uudnative::execBasePath (FFrame& Stack, RESULT_DECL)
 { 
 	guard (Uudnative::execBasePath); 
 	P_FINISH;
-#ifndef __LINUX_X86__
+#if !__LINUX_X86__ && !MACOSX
 	*(FString*)Result = appBaseDir();
 #else
 	FFileManagerLinux* FileMan = dynamic_cast<FFileManagerLinux*>(GFileManager);
@@ -172,26 +172,7 @@ void Uudnative::execDemoRead (FFrame& Stack, RESULT_DECL)
 	P_FINISH;
 
 	FURL URL(NULL, *myfile, TRAVEL_Absolute);
-	URL.Map += TEXT(".dem");
-
-#ifdef __LINUX_X86__
-	FString newFile = TEXT("");
-	INT optIndex 	= myfile.InStr(TEXT("?"));
-	if (optIndex != -1)
-	{
-		newFile += myfile.Left(optIndex);
-		if (newFile.Right(4).Caps() != TEXT(".DEM"))
-			newFile += TEXT(".dem");
-	}
-	else
-	{
-		newFile += myfile;
-		if (newFile.Right(4).Caps() != TEXT(".DEM"))
-			newFile += TEXT(".dem");
-	}
-	URL.Map = newFile;
-#endif
-		
+	URL.Map += TEXT(".dem");		
 	debugf( TEXT("Opening demo driver to read demo file '%s'"), *URL.Map );
 	
 	//UGameEngine* GameEngine = CastChecked<UGameEngine>( mylevel->Engine );

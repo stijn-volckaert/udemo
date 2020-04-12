@@ -28,7 +28,12 @@ IMPLEMENT_CLASS(UDReader);
 // Register names & functions
 #define NAMES_ONLY
 // Redefinition of AUTOGENERATE_NAME
+#if __STATIC_LINK
+// stijn: in statically linked builds we get this super awesome stack explosion if we initialize the names during startup
+#define AUTOGENERATE_NAME(name) UDEMO_API FName UDEMO_##name;
+#else
 #define AUTOGENERATE_NAME(name) UDEMO_API FName UDEMO_##name=FName(TEXT(#name));
+#endif
 // Redefinition of AUTOGENERATE_FUNCTION (auto implement)
 #define AUTOGENERATE_FUNCTION(cls,idx,name) IMPLEMENT_FUNCTION(cls,idx,name)
 // Reinclude classes header for name registration
