@@ -62,6 +62,9 @@ var bool bWasZooming;
 var bool bWasFollowingProjectile;
 var vector LocationBeforeProjectileLock;	
 
+// (Sp0ngeb0b) Speedup acceleration factor
+var float AccelFactor;
+
 //garf interpolation code:
 var float timepassed, totaltimeR, predictiontime;
 var rotator lastrotation, realtargetrotation;
@@ -330,6 +333,18 @@ exec function ViewPlayerNum(optional int num)
     }
 
     FixFov();
+}
+
+// =============================================================================
+// (Added by Sp0ngeb0b) SetAccel ~ Allows to move faster in demoplayback
+// =============================================================================
+exec function SetAccel(float value) { 
+		AirControl   = Default.AirControl * value;
+		JumpZ        = Default.JumpZ * value;
+		GroundSpeed  = Default.GroundSpeed * value;
+		WaterSpeed   = Default.WaterSpeed * value;
+		AirSpeed     = Default.AirSpeed * value;
+		AccelFactor  = value; 
 }
 
 // For some weird reason, the original FixFOV sets it to 90 sometimes, wtf is the purpose of that?
@@ -608,6 +623,22 @@ state CheatFlying
         // DLO Gameclass to get hud & sb
         else if (PlayerLinked == None && HudType==none)
             GenRef();
+
+    }
+    
+    // (Sp0ngeb0b)
+    function ProcessMove(float DeltaTime, vector NewAccel, eDodgeDir DodgeMove, rotator DeltaRot)	
+    {
+      Acceleration = Normal(NewAccel);
+      Velocity = Normal(NewAccel) * 300 * AccelFactor;
+      AutonomousPhysics(DeltaTime);
+    }
+    
+    // (Sp0ngeb0b)
+    function BeginState()
+    {
+      AccelFactor = 1.0;
+      super.BeginState();
     }
 }
 
@@ -1216,6 +1247,7 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
                 // Roll might not be 0 for non-recording viewtargets :o
                 if (PTarget != PlayerLinked)
                 {
+
                     PlayerPawn(PTarget).ViewRotation.Roll = 0;
                     CameraRotation.Roll = 0;
                 }
