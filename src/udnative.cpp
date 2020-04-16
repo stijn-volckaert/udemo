@@ -171,11 +171,17 @@ void Uudnative::execDemoRead (FFrame& Stack, RESULT_DECL)
 	P_GET_OBJECT(ULevel,mylevel); //xlevel
 	P_FINISH;
 
-	FURL URL(NULL, *myfile, TRAVEL_Absolute);
+	UGameEngine* GameEngine = CastChecked<UGameEngine>( mylevel->Engine );
+	FURL BaseURL;
+	if (GameEngine)
+		BaseURL = GameEngine->LastURL;
+	else
+		BaseURL.LoadURLConfig( TEXT("DefaultPlayer"), TEXT("User") );
+
+	FURL URL(&BaseURL, *myfile, TRAVEL_Absolute);
 	URL.Map += TEXT(".dem");		
 	debugf( TEXT("Opening demo driver to read demo file '%s'"), *URL.Map );
 	
-	//UGameEngine* GameEngine = CastChecked<UGameEngine>( mylevel->Engine );
 	if (DemoDriver)
 	{
 		DemoDriver->LowLevelDestroy();
