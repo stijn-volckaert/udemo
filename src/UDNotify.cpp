@@ -90,7 +90,7 @@ void UDReader::NotifyReceivedText( UNetConnection* Connection, const TCHAR* Text
 {
 	guard(UDPlayPendingLevel::NotifyReceivedText);
 
-	//GLog->Logf(TEXT("Received Text: %s from Connection %s"),Text,Connection->GetFullName());
+	GLog->Logf(TEXT("Received Text: %s from Connection %s"),Text,Connection->GetFullName());
 
 	if( ParseCommand( &Text, TEXT("USES") ) )
 	{

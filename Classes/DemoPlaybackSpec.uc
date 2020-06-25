@@ -31,9 +31,6 @@ var FlagInfo FI[64];
 // (Added by Anth) Weaponshow fix
 var Weapon oldWeap;
 
-// (Added by Anth) SmartCTF hack ZzZzz
-var Actor smartCTFStatsThingie;
-
 var DemoInterface Driver;       // not the actual driver, but the interface to control it.
 var PlayerPawn PlayerLinked;    // player I am linked to for hud, etc. info.... (none in server demos!)
 var PlayerPawn OldPlayerLinked; // debug only
@@ -60,7 +57,9 @@ var bool bWasZooming;
 
 // (Anth) support for following projectiles such as guided warshells	
 var bool bWasFollowingProjectile;
-var vector LocationBeforeProjectileLock;	
+var vector LocationBeforeProjectileLock;
+
+var bool bShowSmartCTFScores;
 
 // (Sp0ngeb0b) Speedup acceleration factor
 var float AccelFactor;
@@ -88,24 +87,65 @@ exec function Now() { clientmessage("Level.TimeSeconds="@Level.TimeSeconds@Playe
 // (Added by Anth) Stats hax
 exec function ToggleStats()
 {
-    local class<Actor> actorClass;
+	local Actor A;
+	local ScoreBoard SB;
+	local Actor GRI;
+	local Actor PRI;
+	
+	bShowSmartCTFScores = !bShowSmartCTFScores;
 
-    if (smartCTFStatsThingie == none)
+    foreach Level.AllActors(class'Actor',A)
     {
-        actorClass = class<Actor>(DynamicLoadObject("udemoStatsThingie.StatsThingie",class'class'));
-        smartCTFStatsThingie = Level.Spawn(actorClass);
-    }
+		if (InStr(""$A.class, ".Smart") != -1 &&
+		    InStr(""$A.class, "PlayerReplicationInfo") != -1)
+		{
+		    A.Role = ROLE_Authority;
+  		    A.SetPropertyText("bViewingStats", ""$bShowSmartCTFScores);
+			if (A.Owner == PlayerLinked.PlayerReplicationInfo)
+			    PRI = A;
+		}
+		else if (InStr(""$A.class, ".Smart") != -1 &&
+		         InStr(""$A.class, "GameReplicationInfo") != -1)
+		{
+			if (A.Owner == PlayerLinked || A.Owner == None)
+			    GRI = A;
+		}
+	}
 
-    if (smartCTFStatsThingie == none)
+	foreach Level.AllActors(class'ScoreBoard',SB)
+	{
+		if (InStr(""$SB.class, ".Smart") != -1)
+		{
+			SB.Role = ROLE_Authority;
+			// SB.SetOwner(self);
+			if (SB.Owner == PlayerLinked)
+			{
+			    SB.SetPropertyText("PlayerOwner", "\""$self$"\"");
+			    if (GRI != none)
+			        SB.SetPropertyText("SCTFGame", "\""$GRI$"\"");
+			    if (PRI != none)
+			        SB.SetPropertyText("OwnerStats", "\""$PRI$"\"");
+				SB.SetPropertyText("pPRI", "\""$PlayerLinked.PlayerReplicationInfo$"\"");
+				SB.SetPropertyText("pTGRI", "\""$PlayerLinked.GameReplicationInfo$"\"");
+
+			    if (bShowSmartCTFScores)
+			        PlayerLinked.Scoring = SB;
+			    else
+				    PlayerLinked.SetPropertyText("Scoring", SB.GetPropertyText("NormalScoreBoard"));
+			}
+		}
+	}
+
+/*
+    if (!ChallengeHUD(myHUD).ServerInfo.IsA('SmartCTFServerInfo'))
     {
-        ClientMessage("udemo couldn't spawn statsthingie");
-        return;
+         SI = Level.Spawn(class'SmartCTFServerInfo',spec);
+         SI.PlayerOwner = self;
+         SI.SCTFGame = GRI;
+         SI.MyFonts = FontInfo(spawn(Class<Actor>(DynamicLoadObject(class'ChallengeHUD'.default.FontInfoClass, class'Class'))));
+         ChallengeHUD(myHUD).ServerInfo = SI;
     }
-
-    if (smartCTFStatsThingie.GetPropertyText("showScores") == "1")
-        smartCTFStatsThingie.SetPropertyText("showScores","0");
-    else
-        smartCTFStatsThingie.SetPropertyText("showScores","1");
+*/
 
     ClientMessage("SmartCTF stats toggled");
 }
@@ -405,17 +445,22 @@ function FixPRIArray()
             {
                 PlayerReplicationInfo = zzMyPRI;
             }
-            else
+			else if (zzMYPRI.Owner == PlayerLinked)
+			{
+				PlayerLinked.PlayerReplicationInfo = zzMyPRI;
+			}
+			
+            if (zzMyPRI.Owner != None &&
+			    zzMyPRI.Owner.IsA('Pawn') &&
+				!zzMyPRI.Owner.IsA('Spectator') &&
+				Pawn(zzMyPRI.Owner).Weapon != None)
             {
-                if (zzMyPRI.Owner != None && zzMyPRI.Owner.IsA('Pawn') && !zzMyPRI.Owner.IsA('Spectator') && Pawn(zzMyPRI.Owner).Weapon != None)
-                {
-                    PI[j].P = Pawn(zzMyPRI.Owner);
-                    PI[j++].PRI = zzMyPRI;
-                }
-
-                if (zzMyPRI.Owner == None || !zzMyPRI.Owner.IsA('Spectator'))
-                    GameReplicationInfo.PRIArray[i++] = zzMyPRI;
+                PI[j].P = Pawn(zzMyPRI.Owner);
+                PI[j++].PRI = zzMyPRI;
             }
+
+            if (zzMyPRI.Owner == None || !zzMyPRI.Owner.IsA('Spectator'))
+                GameReplicationInfo.PRIArray[i++] = zzMyPRI;
         }
 
         // Set the rest of the array to none!
@@ -614,6 +659,10 @@ state CheatFlying
         if (SeekTick>0)
             SeekTick--;
 
+		// (Anth) Fix for broken HUD in server-side demos
+		if (PlayerLinked != None && PlayerLinked.IsA('DemoRecSpectator'))
+		    PlayerLinked = None;
+
         // (Anth) Changed this so that it only steals the refs if playerlinked has changed...
         if (PlayerLinked != None && PlayerLinked!=OldPlayerLinked)
         {
@@ -699,9 +748,10 @@ function StealRef()
         ScoringType = PlayerLinked.ScoringType;
     PlayerLinked.ScoringType=none; //set to none: utpure hack!
 
-    if (PlayerLinked.myhud==none || PlayerLinked.myHud.class!=class'InterCeptHud')
+    if (PlayerLinked.myhud==none || PlayerLinked.myHud.class!=class'InterceptHUD')
     {
         h=spawn(class'InterceptHUD',PlayerLinked);
+		h.SetOwner(PlayerLinked);
         h.Real=self;
         PlayerLinked.MyHud=h;
     }
@@ -715,6 +765,8 @@ function GenRef()
     if (GameReplicationInfo==none)
         foreach AllActors(class'GameReplicationInfo',GameReplicationInfo)
             break;
+
+	log("GenRef"@GameReplicationInfo);
 
     if (GameReplicationInfo!=none && GameReplicationInfo.GameClass!="")
     {
@@ -964,7 +1016,7 @@ event PostRender( canvas Canvas )
     local PlayerReplicationInfo PRI;
 	local vector HitLocation, HitNormal, StartTrace, EndTrace;
 	local actor Other;
-	
+
     FixPRIArray();
 
     // (Added by Anth) new 3.3 fix
@@ -976,6 +1028,15 @@ event PostRender( canvas Canvas )
         foreach ViewTarget.Childactors(class'ut_shieldbelteffect', belt)
             belt.bhidden=false;
     }
+
+	// smartctf hack
+	if (bShowSmartCTFScores)
+	{
+		if (PlayerLinked != none && PlayerLinked.Scoring != none)
+		{
+			PlayerLinked.Scoring.SetPropertyText("PlayerOwner", "\""$self$"\"");
+		}
+	}
 
     if (bLockOn)
     {
@@ -1013,7 +1074,14 @@ event PostRender( canvas Canvas )
     if ( myHUD != none && ChallengeHUD(myHUD).bShowInfo && ChallengeHUD(myHUD).ServerInfo != none)
         ChallengeHUD(myHUD).ServerInfo.RenderInfo(Canvas);
     else
-        super.PostRender(Canvas); // Call postrender on hud or create hud
+	{
+		if (ChallengeHUD(myHUD) != none)
+		{
+			ChallengeHUD(myHUD).PawnOwner = PlayerLinked;
+			ChallengeHUD(myHUD).PlayerOwner = PlayerLinked;
+		}
+        Super.PostRender(Canvas); // Call postrender on hud or create hud
+	}
 
     //super-ugly hack!  (ADD OPTIONS???????)
     if (!bLockOn && PlayerLinked!=none && PlayerLinked==ViewTarget

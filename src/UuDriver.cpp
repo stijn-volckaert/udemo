@@ -57,8 +57,8 @@ void UuDemoDriver::TimeSync(FTime NewTime, FTime OldTime)
 		Interface->DemoSpec && 
 		Interface->DemoSpec->GameReplicationInfo)
 	{
-		if (GetLevel()->GetLevelInfo()->Pauser == TEXT("")
-			&& GetLevel()->GetLevelInfo()->TimeSeconds + Interface->ltsoffset - Interface->DemoSpec->GameReplicationInfo->SecondCount > RealDilation)
+		if (GetLevel()->GetLevelInfo()->Pauser == TEXT("") && 
+			GetLevel()->GetLevelInfo()->TimeSeconds + Interface->ltsoffset - Interface->DemoSpec->GameReplicationInfo->SecondCount > RealDilation)
 		{
 			Interface->DemoSpec->GameReplicationInfo->ElapsedTime++;
 			if (Interface->DemoSpec->GameReplicationInfo->RemainingMinute != 0)
@@ -199,8 +199,8 @@ void UuDemoDriver::TickDispatch( FLOAT DeltaTime )
 
 			// (Anth) Being called in normal playback mode...
 			CheckActors();
-
-			ServerConnection->ReceivedRawPacket( Data, PacketBytes );
+			
+			UuReceivedRawPacket( Data, PacketBytes );
 
 			TimeSync(ServerPacketTime,Time);
 
@@ -266,6 +266,156 @@ void UuDemoDriver::CheckActors()
 }
 
 /*-----------------------------------------------------------------------------
+	ReceivedRawPacket
+-----------------------------------------------------------------------------*/
+void UuDemoDriver::UuReceivedRawPacket(void* InData, INT Count)
+{
+	BYTE* Data = (BYTE*)InData;
+	
+	ServerConnection->InByteAcc += Count + ServerConnection->PacketOverhead;
+	ServerConnection->InPktAcc++;
+	if (Count > 0)
+	{
+		BYTE LastByte = Data[Count - 1];
+		if (LastByte)
+		{
+			INT BitSize = Count * 8 - 1;
+			while (!(LastByte & 0x80))
+			{
+				LastByte *= 2;
+				BitSize--;
+			}
+			FBitReader Reader(Data, BitSize);
+			UuReceivedPacket(Reader);
+		}
+	}
+}
+
+/*-----------------------------------------------------------------------------
+	ReceivedPacket
+-----------------------------------------------------------------------------*/
+void UuDemoDriver::UuReceivedPacket(FBitReader& Reader)
+{
+	if (Reader.IsError())	
+		return;
+
+	if (!ServerConnection->Channels[0] || !ServerConnection->Channels[0]->Closing)
+		ServerConnection->LastReceiveTime = Time;
+
+	const INT PacketId = MakeRelative(Reader.ReadInt(MAX_PACKETID), ServerConnection->InPacketId, MAX_PACKETID);
+	if (PacketId > ServerConnection->InPacketId)
+	{
+		ServerConnection->InLossAcc += PacketId - ServerConnection->InPacketId - 1;
+		ServerConnection->InPacketId = PacketId;
+	}
+	else ServerConnection->InOrdAcc++;
+
+	ServerConnection->SendAck(PacketId);
+
+	while (!Reader.AtEnd() && ServerConnection->State != USOCK_Closed)
+	{
+		UBOOL IsAck = Reader.ReadBit();
+		if (Reader.IsError())
+			return;
+
+		if (IsAck)
+		{
+			INT AckPacketId = MakeRelative(Reader.ReadInt(MAX_PACKETID), ServerConnection->OutAckPacketId, MAX_PACKETID);
+			if (Reader.IsError())
+				return;
+
+			if (AckPacketId > ServerConnection->OutAckPacketId)
+			{
+				for (INT NakPacketId = ServerConnection->OutAckPacketId + 1; NakPacketId < AckPacketId; NakPacketId++, ServerConnection->OutLossAcc++)
+					ServerConnection->ReceivedNak(NakPacketId);
+				ServerConnection->OutAckPacketId = AckPacketId;
+			}
+
+			for (INT i = ServerConnection->OpenChannels.Num() - 1; i >= 0; i--)
+			{
+				UChannel* Channel = ServerConnection->OpenChannels(i);
+				for (FOutBunch* Out = Channel->OutRec; Out; Out = Out->Next)
+				{
+					if (Out->PacketId == AckPacketId)
+					{
+						Out->ReceivedAck = 1;
+						if (Out->bOpen)
+							Channel->OpenAcked = 1;
+					}
+				}
+				if (Channel->OpenPacketId == AckPacketId) 
+					Channel->OpenAcked = 1;
+				Channel->ReceivedAcks();
+			}
+		}
+		else
+		{
+			FInBunch Bunch(ServerConnection);
+			BYTE bControl = Reader.ReadBit();
+			Bunch.PacketId = PacketId;
+			Bunch.bOpen = bControl ? Reader.ReadBit() : 0;
+			Bunch.bClose = bControl ? Reader.ReadBit() : 0;
+			Bunch.bReliable = Reader.ReadBit();
+			Bunch.ChIndex = Reader.ReadInt(UNetConnection::MAX_CHANNELS);
+			Bunch.ChSequence = Bunch.bReliable ? MakeRelative(Reader.ReadInt(MAX_CHSEQUENCE), ServerConnection->InReliable[Bunch.ChIndex], MAX_CHSEQUENCE) : 0;
+			Bunch.ChType = (Bunch.bReliable || Bunch.bOpen) ? Reader.ReadInt(CHTYPE_MAX) : CHTYPE_None;
+			INT BunchDataBits = Reader.ReadInt(ServerConnection->MaxPacket * 8);
+			if (Reader.IsError())
+				return;
+			Bunch.SetData(Reader, BunchDataBits);
+			if (Reader.IsError())
+				return;
+
+			if (!ServerConnection->Channels[Bunch.ChIndex] && !ServerConnection->Channels[0] && (Bunch.ChIndex != 0 || Bunch.ChType != CHTYPE_Control))
+				return;
+
+			UChannel* Channel = ServerConnection->Channels[Bunch.ChIndex];
+
+			// stijn: demo manager hax. Do not create actor channels for bNetTemporary actors if we're just seeking
+			if (Seeking && !Bunch.bReliable /*&& !Channel*/)
+				continue;
+
+			if (Bunch.bReliable && Bunch.ChSequence <= ServerConnection->InReliable[Bunch.ChIndex])
+				continue;
+
+			if (!Bunch.bReliable && (!Bunch.bOpen || !Bunch.bClose) && (!Channel || Channel->OpenPacketId == INDEX_NONE))
+				continue;
+
+			if (!Channel)
+			{
+				if (!UChannel::IsKnownChannelType(Bunch.ChType))
+					return;
+
+				Channel = ServerConnection->CreateChannel((EChannelType)Bunch.ChType, 0, Bunch.ChIndex);
+
+				if (!Notify->NotifyAcceptingChannel(Channel))
+				{
+					FOutBunch CloseBunch(Channel, 1);
+					check(!CloseBunch.IsError());
+					check(CloseBunch.bClose);
+					CloseBunch.bReliable = 1;
+					Channel->SendBunch(&CloseBunch, 0);
+					ServerConnection->FlushNet();
+					delete Channel;
+					if (Bunch.ChIndex == 0)
+						ServerConnection->State = USOCK_Closed;
+					continue;
+				}
+			}
+
+			if (Bunch.bOpen)
+			{
+				Channel->OpenAcked = 1;
+				Channel->OpenPacketId = PacketId;
+			}
+
+			Channel->ReceivedRawBunch(Bunch);
+			ServerConnection->InBunAcc++;
+		}
+	}
+}
+
+/*-----------------------------------------------------------------------------
 	GetLevel - Not used?
 -----------------------------------------------------------------------------*/
 ULevel* UuDemoDriver::GetLevel() 
@@ -288,6 +438,7 @@ FTime UuDemoDriver::ReadTo(FTime GoalTime, UBOOL bPacketRead)
 	int oldFrame;
 	BYTE Data[520]; //512+8
 	check(ServerConnection);
+	Seeking = TRUE;
 	while (!FileAr->AtEnd() && !FileAr->IsError() )
 	{  
 		oldFrame = ServerFrameNum;
@@ -296,12 +447,14 @@ FTime UuDemoDriver::ReadTo(FTime GoalTime, UBOOL bPacketRead)
 		if (FileAr->AtEnd() || FileAr->IsError())
 		{
 			debugf(TEXT("udemo: seekto failed - requested %lf - now at %lf - atend %d - iserror %d"), GoalTime.GetDouble(), ServerPacketTime.GetDouble(), FileAr->AtEnd(), FileAr->IsError());
+			Seeking = FALSE;
 			return ServerPacketTime;
 		}
 		*FileAr << ServerPacketTime;
 		if (FileAr->AtEnd() || FileAr->IsError())
 		{
 			debugf(TEXT("udemo: seekto failed - requested %lf - now at %lf - atend %d - iserror %d"), GoalTime.GetDouble(), ServerPacketTime.GetDouble(), FileAr->AtEnd(), FileAr->IsError());
+			Seeking = FALSE;
 			return ServerPacketTime;
 		}
 		if(ServerPacketTime > GoalTime)
@@ -315,18 +468,21 @@ FTime UuDemoDriver::ReadTo(FTime GoalTime, UBOOL bPacketRead)
 			Time = ServerPacketTime;			//synch everything on jumps!
 			FrameNum=ServerFrameNum;
 //			debugf(TEXT("udemo: seekto succeeded - requested %lf - now at %lf - atend %d - iserror %d"), GoalTime.GetDouble(), ServerPacketTime.GetDouble(), FileAr->AtEnd(), FileAr->IsError());
+			Seeking = FALSE;
 			return OutTime;
 		}
 		*FileAr << PacketBytes;
 		if (FileAr->AtEnd() || FileAr->IsError())
 		{
 			debugf(TEXT("udemo: seekto failed - requested %lf - now at %lf - atend %d - iserror %d"), GoalTime.GetDouble(), ServerPacketTime.GetDouble(), FileAr->AtEnd(), FileAr->IsError());
+			Seeking = FALSE;
 			return ServerPacketTime;
 		}
 		seekTo=FileAr->Tell() + PacketBytes;
 		if (seekTo>FileAr->TotalSize()) //stops crashes on truncated demos
 		{
 			debugf(TEXT("udemo: seekto failed - possible truncated demo - requested %lf - now at %lf - atend %d - iserror %d"), GoalTime.GetDouble(), ServerPacketTime.GetDouble(), FileAr->AtEnd(), FileAr->IsError());
+			Seeking = FALSE;
 			return ServerPacketTime;
 		}
 		if (!bPacketRead)
@@ -340,6 +496,7 @@ FTime UuDemoDriver::ReadTo(FTime GoalTime, UBOOL bPacketRead)
 	}
 
 	debugf(TEXT("udemo: seekto failed - requested %lf - now at %lf - atend %d - iserror %d"), GoalTime.GetDouble(), ServerPacketTime.GetDouble(), FileAr->AtEnd(), FileAr->IsError());
+	Seeking = FALSE;
 	return ServerPacketTime;
 	unguard;
 }
@@ -392,7 +549,7 @@ UBOOL UuDemoDriver::InitConnect( FNetworkNotify* InNotify, FURL& ConnectURL, FSt
 	
 	// Playback, local machine is a client, and the demo stream acts "as if" it's the server.
 	ServerConnection					= new UuDemoConnection( this, ConnectURL );			
-	ServerConnection->CurrentNetSpeed	= 1000000;
+	ServerConnection->CurrentNetSpeed	= 0x7fffffff;
 	ServerConnection->State				= USOCK_Pending;
 
 	// Start stream
@@ -456,6 +613,11 @@ void UuDemoConnection::HandleClientPlayer( APlayerPawn* Pawn )
 {
 	guard(UAdvancedConnection::HandleClientPlayer);
 	UViewport* Viewport = NULL;
+
+	UClass* C = StaticLoadClass(AActor::StaticClass(), NULL, TEXT("Engine.DemoRecSpectator"), NULL, LOAD_NoFail, NULL);
+	if (C && Pawn->IsA(C) && !GetDriver()->ClientThirdPerson)
+		return;
+
 	if (GetDemoDriver()->ClientHandled)
 	{
 		if (!GetDriver()->ClientThirdPerson) //when not server demo!

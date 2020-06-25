@@ -59,7 +59,7 @@ class UDEMO_API UDReader : public ULevelBase
 	// FNetworkNotify interface.
 	EAcceptConnection NotifyAcceptingConnection() { return ACCEPTC_Reject; }
 	void NotifyAcceptedConnection( class UNetConnection* Connection ) {}
-	UBOOL NotifyAcceptingChannel( class UChannel* Channel ) { return 1; }
+	UBOOL NotifyAcceptingChannel(class UChannel* Channel) { return 1; }
 	ULevel* NotifyGetLevel();
 	void NotifyReceivedText( UNetConnection* Connection, const TCHAR* Text );
 	void NotifyReceivedFile( UNetConnection* Connection, INT PackageIndex, const TCHAR* Error, UBOOL Skipped ) {}
@@ -95,7 +95,8 @@ class UDEMO_API UuDemoDriver : public UDemoRecDriver
 	UBOOL Want3rdP;
 	APlayerPawn* SoundPlayer;      // must make this guy have a viewport!
 	UBOOL ClientHandled;           // if client already handled!
-	UBOOL CompatDemos;
+	UBOOL Seeking;					// ignore bNetTemporary actors when seeking
+	DOUBLE AccumulatedTime;
 	UuDemoDriver();
 	
 	//custom tick to support time control
@@ -112,6 +113,10 @@ class UDEMO_API UuDemoDriver : public UDemoRecDriver
 	
 	// (Anth) Spawnnotification-like routine for destroying UTDC etc...
 	void CheckActors();
+
+	// Seeking hax
+	void UuReceivedRawPacket(void* Data, INT Count);
+	void UuReceivedPacket(FBitReader& Reader);
 };
 
 /*-----------------------------------------------------------------------------
@@ -145,7 +150,7 @@ class UDEMO_API UuDemoConnection : public UDemoRecConnection
 
 	UuDemoConnection(UNetDriver* InDriver, FURL& InURL);
 	UuDemoDriver* GetDemoDriver(); //convenience function
-	void HandleClientPlayer( APlayerPawn* Pawn );
+	void HandleClientPlayer( APlayerPawn* Pawn );	
 };
 
 #if __STATIC_LINK
