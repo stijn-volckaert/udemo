@@ -289,16 +289,7 @@ void Uudnative::execIsMisMatch (FFrame& Stack, RESULT_DECL)
 	// Generations mismatch => recompiled but conformed files?
 	else
 	{
-#if _MSC_VER && !BUILD_64
-		FString	Ver = UTexture::__Client->Viewports(0)->Actor->Level->EngineVersion;
-		INT iVer = strtol(TCHAR_TO_ANSI(*Ver), NULL, 10);
-
-		TArray<FGenerationInfo>* Generations = (iVer < 469) ? 
-			reinterpret_cast<TArray<FGenerationInfo>*>(reinterpret_cast<PTRINT>(&Linker->Summary.Guid) + sizeof(FGuid)) :
-			*reinterpret_cast<TArray<FGenerationInfo>**>(reinterpret_cast<PTRINT>(&Linker->Summary.Guid) + sizeof(FGuid));
-#else
 		TArray<FGenerationInfo>* Generations = &Linker->Summary.Generations;
-#endif
 
 		if (Generations->Num() < Gen)
 		{

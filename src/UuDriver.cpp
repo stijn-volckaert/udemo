@@ -736,16 +736,7 @@ void UuDemoPackageMap::Compute()
 		Info.ObjectCount = Info.Linker->ExportMap.Num();
 		Info.NameCount = Info.Linker->NameMap.Num();
 
-#if _MSC_VER && !BUILD_64
-		FString	Ver = UTexture::__Client->Viewports(0)->Actor->Level->EngineVersion;
-		INT iVer = strtol(TCHAR_TO_ANSI(*Ver), NULL, 10);
-
-		TArray<FGenerationInfo>* Generations = (iVer < 469) ?
-			reinterpret_cast<TArray<FGenerationInfo>*>(reinterpret_cast<PTRINT>(&Linker->Summary.Guid) + sizeof(FGuid)) :
-			*reinterpret_cast<TArray<FGenerationInfo>**>(reinterpret_cast<PTRINT>(&Linker->Summary.Guid) + sizeof(FGuid));
-#else
 		TArray<FGenerationInfo>* Generations = &Linker->Summary.Generations;
-#endif
 
 		Info.LocalGeneration = Generations->Num();
 		if (Info.RemoteGeneration == 0)
