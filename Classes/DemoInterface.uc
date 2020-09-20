@@ -117,8 +117,3 @@ event LinkToPlayer (PlayerPawn p, bool LockOn)
 }
 
 event NetPacketReceived(); //called each packet if message grabbing
-
-defaultproperties
-{
-    bDebug=true
-}
