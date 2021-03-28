@@ -29,6 +29,53 @@ var string              last;          // to add new demos found later...
 var byte                ShotTime;      // shot timer
 var byte                LastInstalled; // speed
 var localized string    Spechelp;      // save file size
+var localized string	LocDemos;
+var localized string	LocDemosHelp;
+var localized string	LocPlayDemo;
+var localized string	LocPlayDemoHelp;
+var localized string	LocRecordDemo;
+var localized string	LocRecordDemoHelp;
+var localized string	LocStopDemo;
+var localized string	LocStopDemoHelp;
+var localized string	LocRenameDemoFile;
+var localized string	LocRenameDemoFileHelp;
+var localized string	LocDeleteDemoFile;
+var localized string	LocDeleteDemoFileHelp;
+var localized string	LocWriteDemoSummary;
+var localized string	LocWriteDemoSummaryHelp;
+var localized string	LocSelectAdditionalOptions;
+var localized string	LocAOTiming;
+var localized string	LocAOTimingHelp;
+var localized string	LocAOTimingFrameBased;
+var localized string	LocAOTimingTimeBased;
+var localized string	LocAOTimingFastAsPossible;
+var localized string	LocAOSpectate;
+var localized string	LocDemoUsesOutdatedVersionsWarning;
+var localized string	LocDemoUsesOutdatedVersionsPrefix;
+var localized string	LocDemoUsesOutdatedVersionsSuffix;
+var localized string	LocDemoUsesOutdatedVersionsSuffix2;
+var localized string	LocDemoCannotPlay;
+var localized string	LocDemoCannotPlayPrefix;
+var localized string	LocDemoCannotPlaySuffix;
+var localized string	LocDemoCannotPlaySuffix2;
+var localized string	LocDemoCannotPlaySuffix3;
+var localized string	LocDemoCannotPlaySuffix4;
+var localized string	LocDemoCannotPlaySuffix5;
+var localized string	LocCannotRecordADemoTitle;
+var localized string	LocCannotRecordADemoMessage;
+var localized string	LocFailedToRemoveTitle;
+var localized string	LocFailedToRemoveMessagePrefix;
+var localized string	LocFailedToRemoveMessageSuffix;
+var localized string	LocRenameDemoTitle;
+var localized string	LocDemoSummarySuccessTitle;
+var localized string	LocDemoSummarySuccessPrefix;
+var localized string	LocDemoSummarySuccessSuffix;
+var localized string	LocDemoSummaryErrorTitle;
+var localized string	LocDemoSummaryErrorMessage;
+var localized string	LocDeleteDemoTitle;
+var localized string	LocDeleteDemoMessagePrefix;
+var localized string	LocDeleteDemoMessageSuffix;
+var localized string	LocThirdPersonAlwaysTrue;
 
 // =============================================================================
 // Created ~
@@ -52,7 +99,7 @@ function Created()
 
     Ctrl_dem = UWindowLabelControl(CreateControl(class'UWindowLabelControl', CenterPos, ControlOffset, CenterWidth, 16));
     Ctrl_dem.SetFont( F_Bold );
-    Ctrl_dem.SetText("Demos:");
+    Ctrl_dem.SetText(LocDemos);
 
     demreader = new class'DemoReader'; //create native reader object.
     demreader.control=DemoMainClientWindow(GetParent(class'DemoMainClientWindow'));   //link to main!
@@ -69,7 +116,7 @@ function Created()
     Class'UwindowComboControl'.default.listclass=OldDefault;
     demos.SetButtons(True);
     demos.Align = TA_Left;
-    demos.SetHelpText("Select the demo that you wish to play.");
+    demos.SetHelpText(LocDemosHelp);
     demos.SetFont(F_Normal);
     demos.SetEditable(False);
     demos.editboxwidth=CenterWidth2;
@@ -77,56 +124,56 @@ function Created()
 
     Play = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos2, ControlOffset, CenterWidth, 16));
     Play.SetFont(F_bold);
-    Play.SetText("PLAY");
-    Play.sethelptext("Click here to play the selected demo!  Note that your current game/demo will end.");
+    Play.SetText(LocPlayDemo);
+    Play.sethelptext(LocPlayDemoHelp);
 
     Record = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos, ControlOffset, CenterWidth, 16));
-    Record.SetText("RECORD DEMO");
-    Record.sethelptext("Click here to start recording a demo!");
+    Record.SetText(LocRecordDemo);
+    Record.sethelptext(LocRecordDemoHelp);
 
     stopb = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos, ControlOffset, CenterWidth, 16));
     stopb.SetFont(F_bold);
-    stopb.SetText("STOP");
-    stopb.sethelptext("Click here to stop playing/recording");
+    stopb.SetText(LocStopDemo);
+    stopb.sethelptext(LocStopDemoHelp);
     //next buttons row
     ControlOffset+=20;
 
     Rename = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos, ControlOffset, CenterWidth, 16));
-    Rename.SetText("Rename file");
-    Rename.sethelptext("Click here to rename this demo!");
+    Rename.SetText(LocRenameDemoFile);
+    Rename.sethelptext(LocRenameDemoFileHelp);
 //  ControlOffset+=20;
 
     Delete = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos2, ControlOffset, CenterWidth, 16));
-    Delete.SetText("Delete file");
-    Delete.sethelptext("Click here to remove this demo from existance!");
+    Delete.SetText(LocDeleteDemoFile);
+    Delete.sethelptext(LocDeleteDemoFileHelp);
     ControlOffset+=20;
 
     Write = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos, ControlOffset, CenterWidth2, 1));
-    Write.SetText("Write demo summary");
-    Write.sethelptext("Click here to cause a demo summary TXT file to be written.");
+    Write.SetText(LocWriteDemoSummary);
+    Write.sethelptext(LocWriteDemoSummaryHelp);
     ControlOffset+=25;
 
     Ctrl = UWindowLabelControl(CreateControl(class'UWindowLabelControl', CenterPos, ControlOffset, CenterWidth2, 1));
     Ctrl.SetFont( F_Bold );
-    Ctrl.SetText("Select additional options");
+    Ctrl.SetText(LocSelectAdditionalOptions);
     ControlOffset+=18;
 
     timing = UWindowComboControl(CreateControl(class'UWindowComboControl',CenterPos, ControlOffset, CenterWidth2, 1));
     timing.SetButtons(True);
-    timing.SetText("Timing");
+    timing.SetText(LocAOTiming);
     timing.Align = TA_Left;
-    timing.SetHelpText("Configure how playback timing should occur.  Normal means FPS will slow to Recorder's, timing causes the file to be read only when enough time has passed, and Fast AS Possible causes file reading every tick.");
+    timing.SetHelpText(LocAOTimingHelp);
     timing.SetFont(F_Normal);
     timing.SetEditable(False);
     timing.editboxwidth=0.7*timing.winwidth;
-    timing.additem("Frame Based (normal)");
-    timing.AddItem("Time Based (?timebased)");
-    timing.AddItem("Fast As possible (?noframecap)");
+    timing.additem(LocAOTimingFrameBased);
+    timing.AddItem(LocAOTimingTimeBased$" (?timebased)");
+    timing.AddItem(LocAOTimingFastAsPossible$" (?noframecap)");
     timing.setselectedindex(class'DemoSettings'.default.Timing); //FIX ME! SAVED ITEM!
     ControlOffset+=19;
 
     Spectate=UWindowCheckBox(CreateControl(class'UWindowCheckBox', CenterPos, ControlOffset, CenterWidth2, 16));
-    Spectate.SetText("3rdPerson (Spectate)");
+    Spectate.SetText(LocAOSpectate);
     Spectate.SetHelpText(spechelp);
     Spectate.bChecked=Class'DemoSettings'.default.SpecDemo;
     ControlOffset+=18;
@@ -296,27 +343,27 @@ function PlayDemo(optional bool noInstallCheck)
 
                 case 1:
                     if (root.FindChildWindow(class'DownloadFramedWindow') == none)
-                        doDlMsg = MessageBox("Warning", "'"$demos.getvalue()$"' is using outdated versions of some files that MAY result in semi-corrupt playback.\\nShould Unreal Tournament Demo Manager attempt to download updated versions from master servers?\\n(Clicking no will play the demo immediately)", MB_YesNo, MR_No, MR_None);
+                        doDlMsg = MessageBox(LocDemoUsesOutdatedVersionsWarning, LocDemoUsesOutdatedVersionsPrefix$" '"$demos.getvalue()$"' "$LocDemoUsesOutdatedVersionsSuffix, MB_YesNo, MR_No, MR_None);
                     else
-                        doGenWarnMsg = MessageBox("Warning", "'"$demos.getvalue()$"' is using outdated versions of some files that MAY result in semi-corrupt playback.\\nAs a file download is currently occuring, you will need to terminate it to begin download of updated files if destired.\\nContinue to play demo without updating?", MB_YesNo, MR_No, MR_None);
+                        doGenWarnMsg = MessageBox(LocDemoUsesOutdatedVersionsWarning, LocDemoUsesOutdatedVersionsPrefix$" '"$demos.getvalue()$"' "$LocDemoUsesOutdatedVersionsSuffix2, MB_YesNo, MR_No, MR_None);
                     return;
 
                 case 2:
                     if (root.FindChildWindow(class'DownloadFramedWindow')==none)
-                        doDlMsg = MessageBox("Cannot Play", "Warning: '"$demos.getvalue()$"' is using files that will cause a version mismatch with the demo.\\nShould Unreal Tournament Demo Manager attempt to download the appropriate versions from master servers?\\n(Note: this will cause exising file to be moved into cache!)", MB_YesNo, MR_No, MR_None);
+                        doDlMsg = MessageBox(LocDemoCannotPlay, LocDemoCannotPlayPrefix$" '"$demos.getvalue()$"' "$LocDemoCannotPlaySuffix, MB_YesNo, MR_No, MR_None);
                     else
-                        MessageBox("Cannot Play", "Warning: '"$demos.getvalue()$"' is using files that will cause a version mismatch with the demo.\\nIf you wish to download correct files for this demo, please abort current download", MB_OK, MR_OK, MR_OK);
+                        MessageBox(LocDemoCannotPlay, LocDemoCannotPlayPrefix$" '"$demos.getvalue()$"' "$LocDemoCannotPlaySuffix2, MB_OK, MR_OK, MR_OK);
                     return;
 
                 case 3:
-                    MessageBox("Cannot Play", "Warning: a file '"$demos.getvalue()$"' uses will not load and udemo does not know what to do!  Please report this error to 'stidzjene@hotmail.com' immediately!", MB_OK, MR_OK, MR_OK);
+                    MessageBox(LocDemoCannotPlay, LocDemoCannotPlayPrefix$" '"$demos.getvalue()$"' "$LocDemoCannotPlaySuffix3, MB_OK, MR_OK, MR_OK);
                     return;
 
                 case 4:
                     if (root.FindChildWindow(class'DownloadFramedWindow')==none)
-                        doDlMsg = MessageBox("Cannot Play", "Warning: '"$demos.getvalue()$"' is missing files that are required for playback.\\nShould Unreal Tournament Demo Manager attempt to download needed files from master servers?", MB_YesNo, MR_No, MR_None);
+                        doDlMsg = MessageBox(LocDemoCannotPlay, LocDemoCannotPlayPrefix$" '"$demos.getvalue()$"' "$LocDemoCannotPlaySuffix4, MB_YesNo, MR_No, MR_None);
                     else
-                        MessageBox("Cannot Play", "Warning: '"$demos.getvalue()$"' is missing files that are required for playback.\\nIf you wish to download needed files for this demo, please abort current download", MB_OK, MR_OK, MR_OK);
+                        MessageBox(LocDemoCannotPlay, LocDemoCannotPlayPrefix$" '"$demos.getvalue()$"' "$LocDemoCannotPlaySuffix5, MB_OK, MR_OK, MR_OK);
                     return;
             }
         }
@@ -355,7 +402,7 @@ function RecordDemo()
             class'DemoSettings'.static.GetDemoName(GetPlayerOwner(),UWindowComboListItem(LastDemoItem.Sentinel))); //set to autorecord thing!
     }
     else //error
-        MessageBox("ERROR!", "Cannot record a demo in the entry level.", MB_OK, MR_OK, MR_OK);
+        MessageBox(LocCannotRecordADemoTitle, LocCannotRecordADemoMessage, MB_OK, MR_OK, MR_OK);
 }
 
 // =============================================================================
@@ -372,7 +419,7 @@ function DeleteDemo()
         demos.setselectedindex(max(0,i-1)); //move list back.
     }
     else //failed!
-        MessageBox("WARNING!", "FAILED TO REMOVE"@demos.getvalue()$".dem \\n Be sure that you are not currently playing this demo.", MB_OK, MR_OK, MR_OK);
+        MessageBox(LocFailedToRemoveTitle, LocFailedToRemoveMessagePrefix$" "@demos.getvalue()$".dem\\n"$LocFailedToRemoveMessageSuffix, MB_OK, MR_OK, MR_OK);
 }
 
 // =============================================================================
@@ -386,7 +433,7 @@ function RenameDemo()
     GetParent(class'UWindowFramedWindow').ShowModal(temp); //show it.
     UDnameclient(UWindowFramedWindow(temp).clientarea).demreader=demreader; //when demreader!=none renaming occurs.
     UDnameclient(UWindowFramedWindow(temp).clientarea).NameEdit.SetValue(demos.getValue()); //requested by someone! ;p
-    Uwindowframedwindow(temp).WindowTitle="Rename Demo";
+    Uwindowframedwindow(temp).WindowTitle=LocRenameDemoTitle;
 }
 
 // =============================================================================
@@ -439,9 +486,9 @@ function Notify(UWindowDialogControl C, byte E)
                         return;
 
                     if (DemReader.SaveInfo())
-                        MessageBox("SUCCESS!", "Saved Demo Summary as"@BaseDirReplace(LastDemoItem)$LastDemoItem.Value$"Info.TXT", MB_OK, MR_OK, MR_OK);
+                        MessageBox(LocDemoSummarySuccessTitle, LocDemoSummarySuccessPrefix@" "@BaseDirReplace(LastDemoItem)$LastDemoItem.Value$"Info.TXT"$LocDemoSummarySuccessSuffix, MB_OK, MR_OK, MR_OK);
                     else
-                        MessageBox("Unknown Error", "Could not write demo summary.", MB_OK, MR_OK, MR_OK);
+                        MessageBox(LocDemoSummaryErrorTitle, LocDemoSummaryErrorMessage, MB_OK, MR_OK, MR_OK);
                     break;
 
                 case stopb:      //stop demo
@@ -451,7 +498,7 @@ function Notify(UWindowDialogControl C, byte E)
                     break;
 
                 case Delete:
-                    DeleteMSG = MessageBox("Confirm delete", "Are you sure you want to remove "$demos.getvalue()$" permanently?", MB_YesNo, MR_No, MR_None);
+                    DeleteMSG = MessageBox(LocDeleteDemoTitle, LocDeleteDemoMessagePrefix$" "$demos.getvalue()$" "$LocDeleteDemoMessageSuffix, MB_YesNo, MR_No, MR_None);
                     break;
 
                 case Rename:
@@ -516,7 +563,7 @@ function Tick(float delta)
         {
             Spectate.bdisabled=true;
             Spectate.bchecked=true;
-            Spectate.SetHelpText("3rd person mode is always true when recorded on a dedicated server");
+            Spectate.SetHelpText(LocThirdPersonAlwaysTrue);
         }
 
         if (ShotTime==0)
@@ -548,4 +595,51 @@ function Tick(float delta)
 defaultproperties
 {
     SpecHelp="If checked, you will be able to fly around the level when playing a demo"
+	LocDemos="Demos:"
+	LocDemosHelp="Select the demo that you wish to play."
+	LocPlayDemo="PLAY"
+	LocPlayDemoHelp="Click here to play the selected demo!  Note that your current game/demo will end."
+	LocRecordDemo="RECORD DEMO"
+	LocRecordDemoHelp="Click here to start recording a demo!"
+	LocStopDemo="STOP"
+	LocStopDemoHelp="Click here to stop playing/recording"
+	LocRenameDemoFile="Rename file"
+	LocRenameDemoFileHelp="Click here to rename this demo!"
+	LocDeleteDemoFile="Delete file"
+	LocDeleteDemoFileHelp="Click here to remove this demo from existance!"
+	LocWriteDemoSummary="Write demo summary"
+	LocWriteDemoSummaryHelp="Click here to cause a demo summary TXT file to be written."
+	LocSelectAdditionalOptions="Select additional options"
+	LocAOTiming="Timing"
+	LocAOTimingHelp="Configure how playback timing should occur. Normal means FPS will slow to Recorder's, timing causes the file to be read only when enough time has passed, and Fast as Possible causes file reading every tick."
+	LocAOTimingFrameBased="Frame Based (normal)"
+	LocAOTimingTimeBased="Time Based"
+	LocAOTimingFastAsPossible="Fast as Possible"
+	LocAOSpectate="3rdPerson (Spectate)"
+	LocDemoUsesOutdatedVersionsWarning="Warning"
+	LocDemoUsesOutdatedVersionsPrefix="The demo file"
+	LocDemoUsesOutdatedVersionsSuffix="is using outdated versions of some files that MAY result in semi-corrupt playback.\\nShould Unreal Tournament Demo Manager attempt to download updated versions from master servers?\\n(Clicking no will play the demo immediately)"
+	LocDemoUsesOutdatedVersionsSuffix2="is using outdated versions of some files that MAY result in semi-corrupt playback.\\nAs a file download is currently occuring, you will need to terminate it to begin download of updated files if destired.\\nContinue to play demo without updating?"
+	LocDemoCannotPlay="Cannot Play"
+	LocDemoCannotPlayPrefix="Warning: The demo file"
+	LocDemoCannotPlaySuffix="is using files that will cause a version mismatch with the demo.\\nShould Unreal Tournament Demo Manager attempt to download the appropriate versions from master servers?\\n(Note: this will cause exising file to be moved into cache!)"
+	LocDemoCannotPlaySuffix2="is using files that will cause a version mismatch with the demo.\\nIf you wish to download correct files for this demo, please abort current download"
+	LocDemoCannotPlaySuffix3="uses a file that will not load and udemo does not know what to do!  Please report this error to 'stidzjene@hotmail.com' immediately!"
+	LocDemoCannotPlaySuffix4="is missing files that are required for playback.\\nShould Unreal Tournament Demo Manager attempt to download needed files from master servers?"
+	LocDemoCannotPlaySuffix5="is missing files that are required for playback.\\nIf you wish to download needed files for this demo, please abort current download"
+	LocCannotRecordADemoTitle="ERROR!"
+	LocCannotRecordADemoMessage="Cannot record a demo in the entry level."
+	LocFailedToRemoveTitle="WARNING!"
+	LocFailedToRemoveMessagePrefix="FAILED TO REMOVE"
+	LocFailedToRemoveMessageSuffix="Be sure that you are not currently playing this demo."
+	LocRenameDemoTitle="Rename Demo"
+	LocDemoSummarySuccessTitle="SUCCESS!"
+	LocDemoSummarySuccessPrefix="Saved Demo Summary as"
+	LocDemoSummarySuccessSuffix=""
+	LocDemoSummaryErrorTitle="Unknown Error"
+	LocDemoSummaryErrorMessage="Could not write demo summary."
+	LocDeleteDemoTitle="Confirm delete"
+	LocDeleteDemoMessagePrefix="Are you sure you want to remove"
+	LocDeleteDemoMessageSuffix="permanently?"
+	LocThirdPersonAlwaysTrue="3rd person mode is always true when recorded on a dedicated server"
 }
