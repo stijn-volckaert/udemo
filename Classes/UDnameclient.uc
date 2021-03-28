@@ -13,6 +13,13 @@ class UDnameclient expands UWindowDialogClientWindow;
 var UWindowEditControl  NameEdit;
 var UWindowMessageBox overwrite;
 var DemoReader demreader;          //if !=none then this is meant for use with renamer.
+var localized string LocConfirmFileOverwrite;
+var localized string LocConfirmFileOverwritePrefix;
+var localized string LocConfirmFileOverwriteSuffix;
+var localized string LocFailedToRenameWarning;
+var localized string LocFailedToRenamePrefix;
+var localized string LocFailedToRenameMidfix;
+var localized string LocFailedToRenameSuffix;
 
 // =============================================================================
 // Created ~
@@ -68,7 +75,7 @@ function CheckRec()
     if (i!=-1)
         nameedit.editbox.value=left(nameedit.getvalue(),i);
     if (UDClientWindow(ownerwindow).demos.finditemindex(nameedit.getvalue(),true)!=-1) //prompt user.
-        overwrite=MessageBox("Confirm file Over-write", "Are you sure you wish to over-write "$nameedit.getvalue()$"?", MB_YesNo, MR_No, MR_None);
+        overwrite=MessageBox(LocConfirmFileOverwrite, LocConfirmFileOverwritePrefix$nameedit.getvalue()$LocConfirmFileOverwriteSuffix, MB_YesNo, MR_No, MR_None);
     else
         record();  //record demo
 }
@@ -91,7 +98,7 @@ function DoRename()
         UDClientWindow(ownerwindow).demos.sort(); //resort.
     }
     else
-        MessageBox("WARNING!", "FAILED TO RENAME"@UDClientWindow(ownerwindow).demos.getvalue()$".dem to"@nameedit.getvalue()$".dem\\n Be sure that you are not currently playing this demo.", MB_OK, MR_OK, MR_OK);
+        MessageBox(LocFailedToRenameWarning, LocFailedToRenamePrefix@UDClientWindow(ownerwindow).demos.getvalue()$".dem"$LocFailedToRenameMidfix@nameedit.getvalue()$".dem\\n"$LocFailedToRenameSuffix, MB_OK, MR_OK, MR_OK);
 
     ParentWindow.Close();
 }
@@ -132,4 +139,11 @@ function MessageBoxDone(UWindowMessageBox W, MessageBoxResult Result)
 // =============================================================================
 defaultproperties
 {
+	LocConfirmFileOverwrite="Confirm file overwrite"
+	LocConfirmFileOverwritePrefix="Are you sure you wish to overwrite "
+	LocConfirmFileOverwriteSuffix="?"
+	LocFailedToRenameWarning="WARNING!"
+	LocFailedToRenamePrefix="FAILED TO RENAME "
+	LocFailedToRenameMidfix=" to "
+	LocFailedToRenameSuffix="Be sure that you are not currently playing this demo."
 }

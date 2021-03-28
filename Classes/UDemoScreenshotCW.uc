@@ -7,6 +7,15 @@
 // =============================================================================
 class UDemoScreenshotCW expands UMenuScreenshotCW;
 
+var localized string LocCannotPlayDemoPrefix;
+var localized string LocCannotPlayDemoSuffix;
+var localized string LocPlayingOn;
+var localized string LocPlayTime;
+var localized string LocRecordedOnADedicatedServer;
+var localized string LocRecordedThroughAPlayer;
+var localized string LocPleaseWait;
+var localized string LocReadingInformationFromDemoFile;
+
 // =============================================================================
 // SetUDMap ~
 // =============================================================================
@@ -15,16 +24,16 @@ function SetUDMap(string mapname, bool bServerDemo, int NumFrames, float PlayTim
     SetMap(MapName);
 
     if (DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).Packages.FindPackage(mapname).binstalled==0)
-        MapTitle="Warning: Cannot play demo:"@mapname@"not found!";
+        MapTitle=LocCannotPlayDemoPrefix@" "@mapname@" "@LocCannotPlayDemoSuffix;
     else
-        MapTitle="Playing on"@mapname;
+        MapTitle=LocPlayingOn@" "@mapname;
 
-    MapAuthor="Play Time:"@class'DemoSettings'.static.ParseTime(PlayTime)$","@NumFrames@"Frames (Avg. FPS:"@class'demosettings'.static.FloatString(NumFrames/PlayTime)$")";
+    MapAuthor=LocPlayTime@" "@class'DemoSettings'.static.ParseTime(PlayTime)$","@NumFrames@"Frames (Avg. FPS:"@class'demosettings'.static.FloatString(NumFrames/PlayTime)$")";
 
     if (bServerDemo)
-        IdealPlayerCount="Recorded on a dedicated server (server-side)";
+        IdealPlayerCount=LocRecordedOnADedicatedServer;
     else
-        IdealPlayerCount="Recorded through a player (client-side)";
+        IdealPlayerCount=LocRecordedThroughAPlayer;
 
     DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).Packages.FindPackage(mapname).bpbishows=true;
 }
@@ -35,9 +44,9 @@ function SetUDMap(string mapname, bool bServerDemo, int NumFrames, float PlayTim
 function SetPending()
 {
     Screenshot=none;
-    MapTitle="Please wait...";
+    MapTitle=LocPleaseWait;
     MapAuthor="";
-    IdealPlayerCount="Reading information from demo file.";
+    IdealPlayerCount=LocReadingInformationFromDemoFile;
 }
 
 // =============================================================================
@@ -102,4 +111,12 @@ function Paint(Canvas C, float MouseX, float MouseY)
 // =============================================================================
 defaultproperties
 {
+	LocCannotPlayDemoPrefix="Warning: Cannot play demo:"
+	LocCannotPlayDemoSuffix="not found!"
+	LocPlayingOn="Playing on"
+	LocPlayTime="Play Time:"
+	LocRecordedOnADedicatedServer="Recorded on a dedicated server (server-side)"
+	LocRecordedThroughAPlayer="Recorded through a player (client-side)"
+	LocPleaseWait="Please wait..."
+	LocReadingInformationFromDemoFile="Reading information from demo file."
 }

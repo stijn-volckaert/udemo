@@ -18,7 +18,7 @@ var config byte Timing; //saved timing mode
 var config bool SpecDemo; //3rd person
 
 //paths:
-var config string DemoPaths[5]; //1 of these is setup to be base directory on first load.
+var localized config string DemoPaths[5]; //1 of these is setup to be base directory on first load.
 var config int RecordingDir; //DemoPaths[recordingdir] is where to record.
 
 //Sorting/PBI saved info

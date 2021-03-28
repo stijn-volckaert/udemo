@@ -13,6 +13,13 @@ class UDNetSettingsClient expands UMenuPageWindow;
 var UWindowEditControl Servers[6];
 var UWindowComboControl DLType;
 var localized string Empty;
+var localized string LocSaveType;
+var localized string LocSaveTypeHelp;
+var localized string LocInCacheDirectory;
+var localized string LocInMainDirectories;
+// var localized string LocInMainDirectoriesWithINT;
+var localized string LocUZRedirectServers;
+var localized string LocUZRedirectServersHelp;
 
 // =============================================================================
 // Created ~
@@ -34,22 +41,22 @@ function Created()
     ControlOffset = 10;
 
     DLType = UWindowComboControl(CreateControl(class'UWindowComboControl',CenterPos, ControlOffset, CenterWidth2, 1));
-    DLType.SetText("Save Type:");
+    DLType.SetText(LocSaveType);
     DLType.Align = TA_Left;
-    DLType.SetHelpText("Configure where demos should be saved to.  If saved in main directories, the file will be usable in singleplayer, but may lead to version mismatches in other demos or netplay.");
+    DLType.SetHelpText(LocSaveTypeHelp);
     DLType.SetFont(F_Normal);
     DLType.editboxwidth=0.78*DLType.winwidth;
     DLType.SetEditable(False);
-    DLType.additem("In Cache Directory");
-    DLType.AddItem("In Main Directories");
-//    DLType.AddItem("Main Directories w/ INT Installing");
+    DLType.additem(LocInCacheDirectory);
+    DLType.AddItem(LocInMainDirectories);
+//    DLType.AddItem(LocInMainDirectoriesWithINT);
     DLType.setselectedindex(class'DemoSettings'.default.DownloadType);
     ControlOffset += 22;
 
     Info = UWindowLabelControl(CreateControl(class'UWindowLabelControl', CenterPos, ControlOffset, CenterWidth2, 1));
     Info.Align = TA_Left;
     Info.setfont(F_Bold);
-    Info.SetText("UZ redirect Servers:");
+    Info.SetText(LocUZRedirectServers);
     ControlOffset += 15;
 
     //generate stuff:
@@ -62,7 +69,7 @@ function Created()
         Servers[i].SetDelayedNotify(true);
         Servers[i].SetValue(class'DemoSettings'.default.RedirectServers[i]);
         Servers[i].SetText("#"$i+1@"HTTP://");
-        Servers[i].SetHelpText("Enter in an HTTP Unreal UZ redirect server to use.");
+        Servers[i].SetHelpText(LocUZRedirectServersHelp);
         ControlOffset += 20;
     }
 }
@@ -95,4 +102,11 @@ function WindowHidden()
 defaultproperties
 {
   Empty="(Empty)"
+  LocSaveType="Save Type:"
+  LocSaveTypeHelp="Configure where demos should be saved to.  If saved in main directories, the file will be usable in singleplayer, but may lead to version mismatches in other demos or netplay."
+  LocInCacheDirectory="In Cache Directory"
+  LocInMainDirectories="In Main Directories"
+//  LocInMainDirectoriesWithINT="Main Directories w/ INT Installing"
+  LocUZRedirectServers="UZ redirect Servers:"
+  LocUZRedirectServersHelp="Enter in an HTTP Unreal UZ redirect server to use."
 }

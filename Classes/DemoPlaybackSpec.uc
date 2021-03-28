@@ -46,7 +46,6 @@ var float SeekTime;
 var bool bSeeking;              // true when seeking = ignore messages!
 var bool bInitGRI;              // (Anth) did we steal GRI ref?
 var bool oldPaused;             // restore pause state after seeking has finished!
-var localized string Seeking;
 var Weapon OldWeapon;           // for sound hacking!
 var bool oldShHide;             // if true must unhide belt!
 var Ammo DummyAmmo;             // hack!
@@ -70,19 +69,59 @@ var rotator lastrotation, realtargetrotation;
 var int updatetimes, pitchdiff, yawdiff, tmppitch, tmpyaw;
 var float pitchrate, yawrate;
 
+var localized string Seeking;
+var localized string LocCurrentlyAt;
+var localized string LocCurrentlyAtFrame;
+var localized string LocDemoIsPrefix;
+var localized string LocDemoIsSuffix;
+var localized string LocDemoConsistsOfPrefix;
+var localized string LocDemoConsistsOfSuffix;
+var localized string LocDemoInitialTimestamp;
+var localized string LocSmartCTFToggled;
+var localized string LocCannotGoToFPSMode;
+var localized string LocDemoIsNowPlayingBackPrefix;
+var localized string LocDemoIsNowPlayingBackSuffix;
+var localized string LocServerDemosHaveNoPlayerRecorders;
+
 // =============================================================================
 // EXEC COMMANDS:   (debug, etc.)
 // =============================================================================
 
-exec function SloMo( float T ) { Driver.SetSpeed(T); }
-exec function CurTime() { clientmessage("Currently at"@Driver.GetCurrentTime()@"s"); }
-exec function CurFrame() { clientmessage("Currently at frame #"@Driver.GetCurrentFrame()); }
-exec function TotalTime() { clientmessage("Demo is"@Driver.GetTotalTime()$"s long"); }
-exec function TotalFrames() { clientmessage("Demo consists of"@Driver.GetTotalFrames()@"frames"); }
-exec function StartTime() { clientmessage("Demo's initial timestamp is "@Driver.GetStartTime()); }
-exec function SeekTo(float T) { SetSeek(T); }
-exec function TeamSay( string Msg ) { Say(Msg); }
-exec function Now() { clientmessage("Level.TimeSeconds="@Level.TimeSeconds@PlayerLinked.Level.TimeSeconds@Driver.ltsoffset@GameReplicationInfo.ElapsedTime@GameReplicationInfo.RemainingMinute@GameReplicationInfo.RemainingTime); }
+exec function SloMo( float T ) {
+	Driver.SetSpeed(T);
+}
+
+exec function CurTime() {
+	clientmessage(LocCurrentlyAt$" "$Driver.GetCurrentTime()$"s");
+}
+
+exec function CurFrame() {
+	clientmessage(LocCurrentlyAtFrame$" #"$Driver.GetCurrentFrame());
+}
+
+exec function TotalTime() {
+	clientmessage(LocDemoIsPrefix$" "$Driver.GetTotalTime()$" "$LocDemoIsSuffix);
+}
+
+exec function TotalFrames() {
+	clientmessage(LocDemoConsistsOfPrefix$" "$Driver.GetTotalFrames()$" "$LocDemoConsistsOfSuffix);
+}
+
+exec function StartTime() {
+	clientmessage(LocDemoInitialTimestamp$" "$Driver.GetStartTime());
+}
+
+exec function SeekTo(float T) {
+	SetSeek(T);
+}
+
+exec function TeamSay( string Msg ) {
+	Say(Msg);
+}
+
+exec function Now() {
+	clientmessage("Level.TimeSeconds="@Level.TimeSeconds@PlayerLinked.Level.TimeSeconds@Driver.ltsoffset@GameReplicationInfo.ElapsedTime@GameReplicationInfo.RemainingMinute@GameReplicationInfo.RemainingTime);
+}
 
 // (Added by Anth) Stats hax
 exec function ToggleStats()
@@ -147,7 +186,7 @@ exec function ToggleStats()
     }
 */
 
-    ClientMessage("SmartCTF stats toggled");
+    ClientMessage(LocSmartCTFToggled);
 }
 
 // Demo Pausing
@@ -174,14 +213,14 @@ exec function FirstPerson()
     if (PlayerLinked!=none)
         bLockOn=true;
     else
-        clientmessage("Cannot go to first person mode in server demos!");
+        clientmessage(LocCannotGoToFPSMode);
 }
 
 // switch playback modes (framebased, timebased, noframecap)
 exec function PlayBack(byte a)
 {
     Driver.SetPlayBackMode(a);
-    clientmessage("Demo is now playing back with type"@Driver.PlayBackMode);
+    clientmessage(LocDemoIsNowPlayingBackPrefix$" "$Driver.PlayBackMode$" "$LocDemoIsNowPlayingBackSuffix);
 }
 
 // set behindview stuff (duh?)
@@ -218,7 +257,7 @@ exec function ViewRecorder()
     if (PlayerLinked!=none)
         ViewTarget=PlayerLinked;
     else
-        clientmessage("Server demos have no player recorders!");
+        clientmessage(LocServerDemosHaveNoPlayerRecorders);
 }
 
 // TNSe's code -> Lock cam on the last target we pointed at (with the crosshair...)
@@ -1668,7 +1707,19 @@ defaultproperties
     bAdmin=true
     HUDType=none
     oldEyeH=27
-    Seeking="SEEKING"
     balwaystick=true //screw level.pauser ;p
     ViewTargetID=-1
+    Seeking="SEEKING"
+	LocCurrentlyAt="Currently at"
+	LocCurrentlyAtFrame="Currently at frame"
+	LocDemoIsPrefix="Demo is"
+	LocDemoIsSuffix="seconds long"
+	LocDemoConsistsOfPrefix="Demo consists of"
+	LocDemoConsistsOfSuffix="frames"
+	LocDemoInitialTimestamp="Demo's initial timestamp is"
+	LocSmartCTFToggled="SmartCTF stats toggled"
+	LocCannotGoToFPSMode="Cannot go to first person mode in server demos!"
+	LocDemoIsNowPlayingBackPrefix="Demo is now playing back with type"
+	LocDemoIsNowPlayingBackSuffix=""
+	LocServerDemosHaveNoPlayerRecorders="Server demos have no player recorders!"
 }
