@@ -321,6 +321,16 @@ function CheckPBI(PackageBasicInfoCW PBI){
       PBI.Bp4INS=(binstalled==2);
       bPBISHows=true;
       break;
+     // Rocket Arena ///
+     Case "RocketArena":
+     Case "RocketArenaMedia":
+     Case "RocketArenaMultimesh":
+     Case "xutfx":
+     //end rocket arena///
+      PBI.UsesRA=true;
+      PBI.RAINS=(binstalled==2);
+      bPBISHows=true;
+      break;
    }
 }
 

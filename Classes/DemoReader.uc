@@ -76,6 +76,8 @@ if (Control.PBI.UsesBp1)
   Save=Save$N$"-Bonus Pack 1";
 if (Control.PBI.UsesBp4)
   Save=Save$N$"-Bonus Pack 4";
+if (Control.PBI.UsesRA)
+  Save=Save$N$"-Rocket Arena";
 for (Package=DemoList(control.Packages.Next);Package!=none;Package=DemoList(Package.Next))
   if (!Package.bPBIShows)
     Save=Save$N$Package.PackageName@"(cached as '"$GUIDstring(Package.PackageGUID)$".uxx') -size: "$Package.PackageSize@"bytes";
