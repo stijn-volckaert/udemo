@@ -231,38 +231,7 @@ void UuDemoDriver::TickDispatch( FLOAT DeltaTime )
 -----------------------------------------------------------------------------*/
 void UuDemoDriver::CheckActors()
 {
-	if (Interface)
-	{		
-		for( INT i=0; i<Interface->DemoSpec->XLevel->Actors.Num(); i++ )
-		{			
-			if (Interface->DemoSpec->XLevel->Actors(i) && Interface->DemoSpec->XLevel->Actors(i)->Tag != TEXT("UDEMO"))
-			{
-				bool bNoTag = false;
-				FString ActorName = Interface->DemoSpec->XLevel->Actors(i)->GetName();
-
-				for ( INT j=0; j<20; j++)
-				{
-					// Check if actor is illegal!
-					if (Interface->IllegalActors[j] != TEXT("") && ActorName.InStr(Interface->IllegalActors[j]) != -1 )
-					{
-						bNoTag = true;
-						
-						if (Interface->DemoSpec->XLevel->Actors(i)->bDeleteMe)
-						{
-							Interface->DemoSpec->XLevel->DestroyActor(Interface->DemoSpec->XLevel->Actors(i),1);
-							Interface->DemoSpec->XLevel->CleanupDestroyed(true);
-							bNoTag=false;
-						}
-						else
-							Interface->DemoSpec->XLevel->Actors(i)->bDeleteMe = true;
-					}
-				}
-
-				if (!bNoTag)
-					Interface->DemoSpec->XLevel->Actors(i)->Tag = TEXT("UDEMO");
-			}
-		}
-	}
+	// disabled for 469 (which can fix actor issues on the engine side)
 }
 
 /*-----------------------------------------------------------------------------
@@ -401,6 +370,8 @@ void UuDemoDriver::UuReceivedPacket(FBitReader& Reader)
 						ServerConnection->State = USOCK_Closed;
 					continue;
 				}
+
+				// anth: TODO: check for illegal actor channels here maybe?
 			}
 
 			if (Bunch.bOpen)
