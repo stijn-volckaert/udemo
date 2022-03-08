@@ -15,6 +15,8 @@ var bool                UsesBp1;    // Demo uses bonuspack 1?
 var bool                Bp1INS;     // Bonuspack 1 installed by viewer?
 var bool                UsesBP4;    // Demo uses bonuspack 4?
 var bool                BP4INS;     // Bonuspack 4 installed by viewer?
+var bool                UsesRA;    // Demo uses rocket arena?
+var bool                RAINS;     // Rocket Arena installed by viewer?
 var bool                CSHPIns;    // Cheatprotection installed by viewer?
 var UWindowEditControl  CSHPVer;    // Cheatprotection used by demo
 var UWindowComboControl PkgSelect;  //
@@ -47,6 +49,10 @@ function Paint(Canvas C, float X, float Y)
     WriteTextCheck(C,LocInstalled,TA_Right,Y,Bp4INS,true,!UsesBp4);
 
     Y+=4;
+    WriteTextCheck(C,"Rocket Arena Required",TA_Left,Y,UsesRA);
+    WriteTextCheck(C,"Installed",TA_Right,Y,RAINS,true,!UsesRA);
+
+    Y+=4;
     CSHPVer.WinTop=Y;
     WriteTextCheck(C,LocInstalled,TA_Right,Y,CSHPIns,true,CSHPVer.GetValue()=="None");
     PkgSelect.WinTop=Y+4;
@@ -61,6 +67,8 @@ function Reset()
     BP1INS  = false;
     UsesBP4 = false;
     BP4INS  = false;
+    UsesRA = false;
+    RAINS  = false;
     CSHPINS = false;
     CSHPVer.SetValue(LocNone);
 }

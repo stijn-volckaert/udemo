@@ -28,6 +28,7 @@ var localized string LocDemoSummaryCachedAs;
 var localized string LocDemoSummaryFileRequirements;
 var localized string LocDemoSummaryBonusPack1;
 var localized string LocDemoSummaryBonusPack4;
+var localized string LocDemoSummaryRocketArena;
 var localized string LocDemoSummarySize;
 var localized string LocDemoSummaryBytes;
 
@@ -93,6 +94,9 @@ function bool SaveInfo(){
 	if (Control.PBI.UsesBp4)
 	  Save=Save$N$"- "$LocDemoSummaryBonusPack4;
 
+  if (Control.PBI.UsesRA)
+    Save=Save$N$"- "$LocDemoSummaryRocketArena;
+
 	for (Package=DemoList(control.Packages.Next);Package!=none;Package=DemoList(Package.Next))
 	  if (!Package.bPBIShows)
 		Save=Save$N$Package.PackageName$"("$LocDemoSummaryCachedAs$" '"$GUIDstring(Package.PackageGUID)$".uxx') - "$LocDemoSummarySize$": "$Package.PackageSize$LocDemoSummaryBytes;
@@ -117,6 +121,7 @@ defaultproperties {
 	LocDemoSummaryFileRequirements="File Requirements:"
 	LocDemoSummaryBonusPack1="Bonus Pack 1"
 	LocDemoSummaryBonusPack4="Bonus Pack 4"
+  LocDemoSummaryRocketArena="Rocket Arena"
 	LocDemoSummarySize="size"
 	LocDemoSummaryBytes="bytes"
 }
