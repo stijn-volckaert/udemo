@@ -43,7 +43,7 @@ function Created()
     path = UWindowLabelControl(CreateControl(class'UWindowLabelControl', CenterPos, ControlOffset, CenterWidth2, 1));
     path.Align = TA_Left;
     path.setfont(F_Bold);
-    path.SetText(LocBasedDirectory);
+    path.SetText(LocBaseDirectory);
     ControlOffset += 15;
 
     BaseDir = UWindowLabelControl(CreateControl(class'UWindowLabelControl', CenterPos, ControlOffset, CenterWidth2, 1));
@@ -274,7 +274,7 @@ function WindowHidden()
 defaultproperties
 {
   Empty="Empty"
-  LocBasedDirectory="Base directory:"
+  LocBaseDirectory="Base directory:"
   LocDemoPaths="Demo Paths:"
   LocRecordingDir="Recording Dir?"
   LocDemFilesAreStoredHelp="Enter in the directory path where .dem files are stored."

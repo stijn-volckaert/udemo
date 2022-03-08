@@ -23,7 +23,7 @@ var UDClientwindow UserWindow;
 
 var bool bInitialized; //on init.
 
-var localized strong LocAutoRecord;
+var localized string LocAutoRecord;
 var localized string LocPaths;
 var localized string LocDownloading;
 

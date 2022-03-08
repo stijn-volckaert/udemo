@@ -31,6 +31,7 @@ var UWindowMessageBox             BadFile;
 var localized string			  LocUnknownState;
 var localized string			  LocNoCurrentActivity;
 var localized string			  LocConnectingToPrefix;
+var localized string              LocConnectingToSuffix;
 var localized string			  LocDownloadTransferOf;
 var localized string			  LocDownloadTransferComplete;
 var localized string			  LocDownloadTransferETR;
@@ -306,7 +307,7 @@ function SavedFile (int retCode)
       break;
     case 3:
       xLog ("Warning!"@Cur.PackageName$curext@" is invalid.");
-      BadFile = MessageBox(LocDownloadErrorTitle, LocDownloadErrorMessagePrefix$" '"$Cur.PackageName$curext$$"' "$LocDownloadErrorMessageSuffix, MB_YesNoCancel, MR_Cancel, MR_No);
+      BadFile = MessageBox(LocDownloadErrorTitle, LocDownloadErrorMessagePrefix$" '"$Cur.PackageName$curext$"' "$LocDownloadErrorMessageSuffix, MB_YesNoCancel, MR_Cancel, MR_No);
       lastsize=0;
       break;
    }
@@ -508,10 +509,10 @@ defaultproperties
 	LocFailureMessageSuffix=". Demo will be unable to play. :("
 	LocDownloadWarningTitle="Download Warning"
 	LocDownloadWarningMessagePrefix="Downloaded file"
-	LocDownloadWarningMessageSuffix="is an older version than the one the demo uses.  Demo playback may contain errors.\nUse File anyway?"
+	LocDownloadWarningMessageSuffix="is an older version than the one the demo uses.  Demo playback may contain errors.\\nUse File anyway?"
 	LocDownloadErrorTitle="Download Error"
 	LocDownloadErrorMessagePrefix="Downloaded file"
-	LocDownloadErrorMessageSuffix="may be corrupted. \nClick Yes to attempt to redownload it, No to try a new location, or cancel to abort downloading."
+	LocDownloadErrorMessageSuffix="may be corrupted. \\nClick Yes to attempt to redownload it, No to try a new location, or cancel to abort downloading."
 	LocDecompressingAndSavingPrefix="Decompressing and Saving"
 	LocDecompressingAndSavingSuffix=""
 	LocDecompressingAndSavingReceivedPrefix="Received"
