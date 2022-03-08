@@ -23,6 +23,10 @@ var UDClientwindow UserWindow;
 
 var bool bInitialized; //on init.
 
+var localized strong LocAutoRecord;
+var localized string LocPaths;
+var localized string LocDownloading;
+
 function Created()
 {
   local UMenuPageControl pages;
@@ -67,9 +71,9 @@ function Created()
   Pages.SetMultiLine(true); //change?
   VSplitterL.TopClientWindow=Pages;
   UserWindow=UDClientwindow(Pages.AddPage("Start", class'UDClientwindow').Page);
-  Pages.AddPage("Auto-Record", class'UDFeaturesClient');
-  Pages.AddPage("Paths", class'UDPathsClient');
-  Pages.AddPage("Downloading", class'UDNetSettingsClient');
+  Pages.AddPage(LocAutoRecord, class'UDFeaturesClient');
+  Pages.AddPage(LocPaths, class'UDPathsClient');
+  Pages.AddPage(LocDownloading, class'UDNetSettingsClient');
   bInitialized=true;
 }
 //called when reopened:
@@ -83,4 +87,7 @@ function Paint(Canvas C, float X, float Y)
 }
 
 defaultproperties {
+	LocAutoRecord="Auto-Record"
+	LocPaths="Paths"
+	LocDownloading="Downloading"
 }

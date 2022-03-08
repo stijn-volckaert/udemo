@@ -20,6 +20,16 @@ var bool                RAINS;     // Rocket Arena installed by viewer?
 var bool                CSHPIns;    // Cheatprotection installed by viewer?
 var UWindowEditControl  CSHPVer;    // Cheatprotection used by demo
 var UWindowComboControl PkgSelect;  //
+var localized string	LocBonusPack1Required;
+var localized string	LocBonusPack4Required;
+var localized string	LocInstalled;
+var localized string	LocNone;
+var localized string	LocCheatProtection;
+var localized string	LocTableMode;
+var localized string	LocTableModeHelp;
+var localized string	LocTableAllRequiredPackages;
+var localized string	LocTableCustomPackages;
+var localized string	LocTableAllMissingPackages;
 
 // =============================================================================
 // Paint ~
@@ -31,12 +41,12 @@ function Paint(Canvas C, float X, float Y)
     C.Font=root.fonts[F_Normal];
 
     Y=4;
-    WriteTextCheck(C,"Bonus Pack 1 Required",TA_Left,Y,UsesBp1);
-    WriteTextCheck(C,"Installed",TA_Right,Y,Bp1INS,true,!UsesBp1);
+    WriteTextCheck(C,LocBonusPack1Required,TA_Left,Y,UsesBp1);
+    WriteTextCheck(C,LocInstalled,TA_Right,Y,Bp1INS,true,!UsesBp1);
 
     Y+=4;
-    WriteTextCheck(C,"Bonus Pack 4 Required",TA_Left,Y,UsesBp4);
-    WriteTextCheck(C,"Installed",TA_Right,Y,Bp4INS,true,!UsesBp4);
+    WriteTextCheck(C,LocBonusPack4Required,TA_Left,Y,UsesBp4);
+    WriteTextCheck(C,LocInstalled,TA_Right,Y,Bp4INS,true,!UsesBp4);
 
     Y+=4;
     WriteTextCheck(C,"Rocket Arena Required",TA_Left,Y,UsesRA);
@@ -44,7 +54,7 @@ function Paint(Canvas C, float X, float Y)
 
     Y+=4;
     CSHPVer.WinTop=Y;
-    WriteTextCheck(C,"Installed",TA_Right,Y,CSHPIns,true,CSHPVer.GetValue()=="None");
+    WriteTextCheck(C,LocInstalled,TA_Right,Y,CSHPIns,true,CSHPVer.GetValue()=="None");
     PkgSelect.WinTop=Y+4;
 }
 
@@ -60,7 +70,7 @@ function Reset()
     UsesRA = false;
     RAINS  = false;
     CSHPINS = false;
-    CSHPVer.SetValue("None");
+    CSHPVer.SetValue(LocNone);
 }
 
 // =============================================================================
@@ -114,21 +124,21 @@ function Created()
     CSHPVer = UWindowEditControl(CreateControl(class'UWindowEditControl', 5, 50, 2*winwidth/3-10, 1));
     CSHPVer.editboxwidth=0.45*CSHPVer.winwidth;
     CSHPVer.Align = TA_Left;
-    CSHPVer.SetValue("None");
-    CSHPVer.SetText("Cheat Protection");
+    CSHPVer.SetValue(LocNone);
+    CSHPVer.SetText(LocCheatProtection);
     CSHPVer.EditBox.bCanEdit=false;
 
     PkgSelect = UWindowComboControl(CreateControl(class'UWindowComboControl', 5, 65, winwidth-10, 1));
     PkgSelect.SetButtons(True);
-    PkgSelect.SetText("Table Mode");
+    PkgSelect.SetText(LocTableMode);
     PkgSelect.Align = TA_Left;
-    PkgSelect.SetHelpText("Configure what packages the demo requirements table to the left should show.");
+    PkgSelect.SetHelpText(LocTableModeHelp);
     PkgSelect.SetFont(F_Normal);
     PkgSelect.SetEditable(False);
     PkgSelect.editboxwidth=0.7*PkgSelect.winwidth;
-    PkgSelect.additem("All Required Packages");
-    PkgSelect.AddItem("Custom Packages");
-    PkgSelect.AddItem("All Missing Packages");
+    PkgSelect.additem(LocTableAllRequiredPackages);
+    PkgSelect.AddItem(LocTableCustomPackages);
+    PkgSelect.AddItem(LocTableAllMissingPackages);
     PKgSelect.SetSelectedIndex(class'DemoSettings'.default.DisplayMode);
 }
 
@@ -156,4 +166,14 @@ function Notify(UWindowDialogControl C, byte E)
 // =============================================================================
 defaultproperties
 {
+	LocBonusPack1Required="Bonus Pack 1 Required"
+	LocBonusPack4Required="Bonus Pack 4 Required"
+	LocInstalled="Installed"
+	LocNone="None"
+	LocCheatProtection="Cheat Protection"
+	LocTableMode="Table Mode"
+	LocTableModeHelp="Configure what packages the demo requirements table to the left should show."
+	LocTableAllRequiredPackages="All Required Packages"
+	LocTableCustomPackages="Custom Packages"
+	LocTableAllMissingPackages="All Missing Packages"
 }
