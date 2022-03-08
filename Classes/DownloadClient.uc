@@ -28,6 +28,29 @@ var string                        ETR;              // x:y remaining
 var int                           LastSize;         // for guid/gen mismatch.. don't download same file!
 var UWindowMessageBox             GenMismatch;
 var UWindowMessageBox             BadFile;
+var localized string			  LocUnknownState;
+var localized string			  LocNoCurrentActivity;
+var localized string			  LocConnectingToPrefix;
+var localized string			  LocDownloadTransferOf;
+var localized string			  LocDownloadTransferComplete;
+var localized string			  LocDownloadTransferETR;
+var localized string			  LocFullSuccessTitle;
+var localized string			  LocFullSuccessMessage;
+var localized string			  LocFailureTitle;
+var localized string			  LocFailureMessagePrefix;
+var localized string			  LocFailureMessageSuffix;
+var localized string			  LocDownloadWarningTitle;
+var localized string			  LocDownloadWarningMessagePrefix;
+var localized string			  LocDownloadWarningMessageSuffix;
+var localized string			  LocDownloadErrorTitle;
+var localized string			  LocDownloadErrorMessagePrefix;
+var localized string			  LocDownloadErrorMessageSuffix;
+var localized string			  LocDecompressingAndSavingPrefix;
+var localized string			  LocDecompressingAndSavingSuffix;
+var localized string			  LocDecompressingAndSavingReceivedPrefix;
+var localized string			  LocDecompressingAndSavingReceivedSuffix;
+var localized string			  LocCancel;
+var localized string			  LocCancelHelp;
 
 // =============================================================================
 // LMouseDown ~ Movement not allowed
@@ -71,8 +94,8 @@ function DoUpdates()
   
     if (Downloader==none)
     {
-        Floc="Unknown State";
-        Transfered="No current activity";
+        Floc=LocUnknownState;
+        Transfered=LocNoCurrentActivity;
         ETR="";
         return;
     }
@@ -81,7 +104,7 @@ function DoUpdates()
     
     if (DownLoader.Downloaded<=0)
     {
-        Transfered="Connecting to http://"$DownLoader.ServerAddr;
+        Transfered=LocConnectingToPrefix$" http://"$DownLoader.ServerAddr$LocConnectingToSuffix;
         Etr="";
         return;
     }
@@ -91,8 +114,8 @@ function DoUpdates()
     
     if (Downloader.TotalSize!=-1)
     {
-        Transfered=Transfered$" of"@Downloader.totalSize/1024@"kb @ "$class'demosettings'.static.FloatString(speed/1024.0)@"kb/s ("$int(100*float(Downloader.Downloaded)/DownLoader.TotalSize)$"% complete)";
-        ETR="Estimated Time Remaining:"@class'DemoSettings'.static.parseTime((Downloader.totalSize-Downloader.Downloaded)/speed);
+        Transfered=Transfered$" "$LocDownloadTransferOf$" "$Downloader.totalSize/1024$"kb @ "$class'demosettings'.static.FloatString(speed/1024.0)$"kb/s ("$int(100*float(Downloader.Downloaded)/DownLoader.TotalSize)$"% "$LocDownloadTransferComplete$")";
+        ETR=LocDownloadTransferETR$" "$class'DemoSettings'.static.parseTime((Downloader.totalSize-Downloader.Downloaded)/speed);
     }
     else
         Transfered=Transfered@"@ "$class'demosettings'.static.FloatString(speed/1024.0)@"kb/s";
@@ -129,7 +152,7 @@ function xLog(string text)
 event FullSuccess()
 {
     xlog("UT Demo Manager sucessfully downloaded all necessary files for Demo!");
-    MessageBox("SUCCESS!","UT Demo Manager sucessfully downloaded all necessary files for Demo! :)", MB_OK, MR_OK, MR_OK);
+    MessageBox(LocFullSuccessTitle,LocFullSuccessMessage, MB_OK, MR_OK, MR_OK);
     Close();
 }
 
@@ -139,7 +162,7 @@ event FullSuccess()
 event GiveUp()
 {
     xlog("Sorry, UT Demo Manager was unable to locate (correct version of)'"$Cur.PackageName$"'. Demo will be unable to play.");
-    MessageBox("FAILURE","Sorry, UT Demo Manager was unable to locate (correct version of)'"$Cur.PackageName$"'. Demo will be unable to play. :(", MB_OK, MR_OK, MR_OK);
+    MessageBox(LocFailureTitle,LocFailureMessagePrefix$" '"$Cur.PackageName$"'"$LocFailureMessageSuffix, MB_OK, MR_OK, MR_OK);
     Close();
 }
 
@@ -273,7 +296,7 @@ function SavedFile (int retCode)
       else{
         xLog ("Warning!"@Cur.PackageName$curext@"is an older version than the one the demo uses.  Demo playback may contain errors.");
         TempSaver=Downloader.Saver;
-        GenMismatch = MessageBox("Download Warning", "Downloaded file '"$Cur.PackageName$curext$"' is an older version than the one the demo uses.  Demo playback may contain errors.\nUse File anyway?", MB_YesNo, MR_No, MR_Yes);
+        GenMismatch = MessageBox(LocDownloadWarningTitle, LocDownloadWarningMessagePrefix$" '"$Cur.PackageName$curext$"' "$LocDownloadWarningMessageSuffix, MB_YesNo, MR_No, MR_Yes);
       }
       break;
     case 2:
@@ -283,8 +306,7 @@ function SavedFile (int retCode)
       break;
     case 3:
       xLog ("Warning!"@Cur.PackageName$curext@" is invalid.");
-      BadFile = MessageBox("Download Error", "Downloaded file '"$Cur.PackageName$curext$"' may be corrupted. \nClick Yes to attempt to redownload it, No to try a new location, or cancel to abort downloading"
-       , MB_YesNoCancel, MR_Cancel, MR_No);
+      BadFile = MessageBox(LocDownloadErrorTitle, LocDownloadErrorMessagePrefix$" '"$Cur.PackageName$curext$$"' "$LocDownloadErrorMessageSuffix, MB_YesNoCancel, MR_Cancel, MR_No);
       lastsize=0;
       break;
    }
@@ -317,8 +339,8 @@ function DlSuccess (int level)
       break;
     Case 3:
       xLog ("Successfully downloaded:"@Cur.PackageName$curext$".uz ("$Downloader.Downloaded/1024@"kb)");
-      Floc="Decompressing and Saving '"$Cur.PackageName$curext$"'";
-      Transfered="Received"@Downloader.Downloaded/1024@"kb";
+      Floc=LocDecompressingAndSavingPrefix$" '"$Cur.PackageName$curext$"' "$LocDecompressingAndSavingSuffix;
+      Transfered=LocDecompressingAndSavingReceivedPrefix$Downloader.Downloaded/1024$"kb"$LocDecompressingAndSavingReceivedSuffix;
       Etr="";
       lastsize=Downloader.Downloaded;
       break;
@@ -423,8 +445,8 @@ function Created()
   eLog = UWindowConsoleTextAreaControl(CreateWindow(class'UWindowConsoleTextAreaControl', 0, WinHeight-35, WinWidth, WinHeight));
   Cancel = UWindowSmallButton(CreateControl(class'UWindowSmallButton', 70, WinHeight-57, (winwidth-70)/2, 16));
   Cancel.SetFont(F_bold);
-  Cancel.SetText("CANCEL");
-  Cancel.sethelptext("Clicking this button will terminate file downloading sequence");
+  Cancel.SetText(LocCancel);
+  Cancel.sethelptext(LocCancelHelp);
 }
 
 // =============================================================================
@@ -472,4 +494,28 @@ function Notify(UWindowDialogControl C, byte E)  //control notification.
 // =============================================================================
 defaultproperties
 {
+	LocUnknownState="Unknown State"
+	LocNoCurrentActivity="No current activity"
+	LocConnectingToPrefix="Connecting to"
+	LocConnectingToSuffix=""
+	LocDownloadTransferOf="of"
+	LocDownloadTransferComplete="complete"
+	LocDownloadTransferETR="Estimated Time Remaining:"
+	LocFullSuccessTitle="SUCCESS!"
+	LocFullSuccessMessage="UT Demo Manager sucessfully downloaded all necessary files for Demo! :)"
+	LocFailureTitle="FAILURE"
+	LocFailureMessagePrefix="Sorry, UT Demo Manager was unable to locate (correct version of)"
+	LocFailureMessageSuffix=". Demo will be unable to play. :("
+	LocDownloadWarningTitle="Download Warning"
+	LocDownloadWarningMessagePrefix="Downloaded file"
+	LocDownloadWarningMessageSuffix="is an older version than the one the demo uses.  Demo playback may contain errors.\nUse File anyway?"
+	LocDownloadErrorTitle="Download Error"
+	LocDownloadErrorMessagePrefix="Downloaded file"
+	LocDownloadErrorMessageSuffix="may be corrupted. \nClick Yes to attempt to redownload it, No to try a new location, or cancel to abort downloading."
+	LocDecompressingAndSavingPrefix="Decompressing and Saving"
+	LocDecompressingAndSavingSuffix=""
+	LocDecompressingAndSavingReceivedPrefix="Received"
+	LocDecompressingAndSavingReceivedSuffix=""
+	LocCancel="CANCEL"
+	LocCancelHelp="Clicking this button will terminate file downloading sequence."
 }

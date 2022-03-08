@@ -14,6 +14,11 @@ var UWindowEditControl Paths[5];
 var UWindowCheckBox RecordPath[5];
 var UWindowLabelControl BaseDir;
 var localized string Empty;
+var localized string LocBaseDirectory;
+var localized string LocDemoPaths;
+var localized string LocRecordingDir;
+var localized string LocDemFilesAreStoredHelp;
+var localized string LocShouldDemosBeRecorded;
 
 // =============================================================================
 // Created
@@ -38,7 +43,7 @@ function Created()
     path = UWindowLabelControl(CreateControl(class'UWindowLabelControl', CenterPos, ControlOffset, CenterWidth2, 1));
     path.Align = TA_Left;
     path.setfont(F_Bold);
-    path.SetText("Base directory:");
+    path.SetText(LocBasedDirectory);
     ControlOffset += 15;
 
     BaseDir = UWindowLabelControl(CreateControl(class'UWindowLabelControl', CenterPos, ControlOffset, CenterWidth2, 1));
@@ -48,12 +53,12 @@ function Created()
 
     path = UWindowLabelControl(CreateControl(class'UWindowLabelControl', CenterPos, ControlOffset, CenterWidth2, 1));
     path.SetFont( F_Bold );
-    path.SetText("Demo Paths:");
+    path.SetText(LocDemoPaths);
 
     rec = UMenuLabelControl(CreateWindow(class'UMenuLabelControl', CenterPos - 8, ControlOffset,CenterWidth2, 1));
     rec.Align = TA_Right;
     rec.SetFont( F_Bold );
-    rec.SetText("Recording Dir?");
+    rec.SetText(LocRecordingDir);
     ControlOffset += 15;
 
     //generate stuff:
@@ -70,10 +75,10 @@ function Created()
             bOneSet=true;
 
         Paths[i].SetText("#"$i+1);
-        Paths[i].SetHelpText("Enter in the directory path where .dem files are stored.");
+        Paths[i].SetHelpText(LocDemFilesAreStoredHelp);
         RecordPath[i]=UWindowCheckBox(CreateControl(class'UWindowCheckBox', WinWidth - 56 , ControlOffset+1, 50, 1));
         RecordPath[i].bdisabled=(Paths[i].GetValue()==Empty);
-        RecordPath[i].SetHelpText("Should demos be recorded into this directory?");
+        RecordPath[i].SetHelpText(LocShouldDemosBeRecorded);
         ControlOffset += 20;
     }
 
@@ -269,4 +274,9 @@ function WindowHidden()
 defaultproperties
 {
   Empty="Empty"
+  LocBasedDirectory="Base directory:"
+  LocDemoPaths="Demo Paths:"
+  LocRecordingDir="Recording Dir?"
+  LocDemFilesAreStoredHelp="Enter in the directory path where .dem files are stored."
+  LocShouldDemosBeRecorded="Should demos be recorded into this directory?"
 }

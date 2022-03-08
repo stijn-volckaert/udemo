@@ -13,6 +13,9 @@ class DemoGrid expands UWindowGrid;
 var UWindowGridColumn InstalledColumn;
 var int               InstallWidth;
 var localized string  InstallType[3];
+var localized string  LocPackageName;
+var localized string  LocFileSize;
+var localized string  LocInstalled;
 
 // =============================================================================
 // Created ~
@@ -23,10 +26,10 @@ function Created()
 
     RowHeight = 12;
 
-    AddColumn("Package Name", 150);
-    AddColumn("File Size", 50);
+    AddColumn(LocPackageName, 150);
+    AddColumn(LocFileSize, 50);
 
-    InstalledColumn=AddColumn("Installed?", winwidth-214);
+    InstalledColumn=AddColumn(LocInstalled, winwidth-214);
     InstallWidth=winwidth-214;
 
     //setup install string
@@ -146,4 +149,7 @@ function SelectRow(int Row)
 // =============================================================================
 defaultproperties
 {
+	LocPackageName="Package Name"
+	LocFileSize="File Size"
+	LocInstalled="Installed?"
 }
