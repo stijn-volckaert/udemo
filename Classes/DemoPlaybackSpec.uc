@@ -1328,7 +1328,7 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
            SetPlayer(PTarget,(PlayerLinked!=none && PlayerLinked.ViewTarget==PTarget));
 
         // Are we the demorecorder ineyes ?
-        if (PTarget==PlayerLinked
+        if (PTarget==PlayerLinked && PTarget != self
         && ( (PlayerLinked.viewtarget==none && !bBehindView && !PlayerLinked.IsInState('dying') && !PlayerLinked.IsInState('GameEnded')) ||bLockOn)
         )
         {
@@ -1344,7 +1344,7 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
         }
         if ( PTarget != None )
         {
-            if ( PTarget.bIsPlayer &&
+            if ( PTarget.bIsPlayer && PTarget != self &&
 			   PlayerPawn(PTarget) != none)
             {
                 // (Changed by Anth) Also calculate if viewtarget != demorecorder!!!
