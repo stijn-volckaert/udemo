@@ -19,7 +19,8 @@ const h = 340;
 function Execute()
 {
     if (!OpenOldWindow())
-        MenuItem.Owner.Root.CreateWindow(class'UDframedwindow', MenuItem.Owner.Root.winwidth/2-w/2, MenuItem.Owner.Root.winheight/2-h/2, w, h);
+        MenuItem.Owner.Root.CreateWindow(class'UDframedwindow',
+	        Max(0, MenuItem.Owner.Root.winwidth/2 - w/2), Max(15, MenuItem.Owner.Root.winheight/2 - h/2), w, h);
 }
 
 // =============================================================================
@@ -76,7 +77,7 @@ function Setup()
     }
 
     log("Startup hack successful!",'Udemo');
-    UFW = Root.CreateWindow(class'UDframedwindow', Root.winwidth/2-w/2, Root.winheight/2-h/2, w, h);
+    UFW = Root.CreateWindow(class'UDframedwindow', Max(0, Root.winwidth/2 - w/2), Max(15, Root.winheight/2 - h/2), w, h);
     UFW.Close();
 }
 
