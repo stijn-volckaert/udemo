@@ -114,7 +114,7 @@ function record()
         ownerwindow.GetParent(class'UWindowFramedWindow').Close();
         Root.Console.CloseUWindow();
         getplayerowner().consolecommand("stopdemo"); //stop any current demo
-        getplayerowner().consolecommand("demorec "$class'DemoSettings'.static.GetRecordingDir()$nameedit.getvalue());
+        getplayerowner().consolecommand("demorec \""$class'DemoSettings'.static.GetRecordingDir()$nameedit.getvalue()$"\"");
     }
 }
 
