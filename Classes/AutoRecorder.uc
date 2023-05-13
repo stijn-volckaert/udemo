@@ -50,7 +50,8 @@ function NotifyLevelChange()
     bIsPlaying = (Udemo.DemReader.DemoActive(GetPlayerOwner().XLevel) > 0);
 
     // Where else would you get the playername eh?
-    GetPlayerOwner().PlayerReplicationInfo.PlayerName = GetPlayerOwner().GetDefaultURL("name");
+    if (GetPlayerOwner().PlayerReplicationInfo != None)
+	    GetPlayerOwner().PlayerReplicationInfo.PlayerName = GetPlayerOwner().GetDefaultURL("name");
 
     // Check if we have to start the demorec!
     // (Anth) Added option to prevent recording when spectating
