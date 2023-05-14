@@ -1082,7 +1082,8 @@ event PostRender( canvas Canvas )
         if (Scoring == None && ScoringType != None)
         {
             Scoring = Spawn(ScoringType,PlayerLinked);
-            Scoring.OwnerHUD = myHUD;
+	    if (Scoring != None)
+            	Scoring.OwnerHUD = myHUD;
         }
 
         PlayerLinked.bShowScores=bShowScores;
