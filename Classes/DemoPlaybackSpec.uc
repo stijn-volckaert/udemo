@@ -964,8 +964,7 @@ event RenderOverLays(Canvas Canvas)
 
         // Give weapon back. The weapon was set to none during PreRender
         if (PlayerPawn(ViewTarget).Weapon == None &&
-			oldWeap != None &&
-		    oldWeap.Owner == PlayerPawn(ViewTarget))
+			oldWeap != None)
 		{
             PlayerPawn(ViewTarget).Weapon = oldWeap;
 		}
