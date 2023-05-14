@@ -108,7 +108,7 @@ void UDReader::NotifyReceivedText( UNetConnection* Connection, const TCHAR* Text
 		Parse( Text, TEXT("GEN="), Gen);
 		UBOOL Installed=appFindPackageFile( PackageName, &Guid, Filename );
 		if (FName==TEXT("")||FName.Right(4)==TEXT(".uxx")) //old version or cache file
-			FName=(TEXT("%s"),PackageName);	
+			FName = PackageName;
 		Controller->eventPackageRequired(FName,FileSize,Installed,Guid,Gen,appStrstr(Filename,TEXT(".uxx"))!=NULL);
 		//note: filename out returns file path!  if it is in cache, there is no .uxx at end and gives Guid!
 	}
