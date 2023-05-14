@@ -342,14 +342,14 @@ function PlayDemo(optional bool noInstallCheck)
 
                 case 1:
                     if (root.FindChildWindow(class'DownloadFramedWindow') == none)
-                        doDlMsg = MessageBox(LocDemoUsesOutdatedVersionsWarning, LocDemoUsesOutdatedVersionsPrefix$" '"$demos.getvalue()$"' "$LocDemoUsesOutdatedVersionsSuffix, MB_YesNo, MR_No, MR_None);
+                        doDlMsg = MessageBox(LocDemoUsesOutdatedVersionsWarning, LocDemoUsesOutdatedVersionsPrefix$" '"$demos.getvalue()$"' "$LocDemoUsesOutdatedVersionsSuffix, MB_YesNoCancel, MR_No, MR_None);
                     else
                         doGenWarnMsg = MessageBox(LocDemoUsesOutdatedVersionsWarning, LocDemoUsesOutdatedVersionsPrefix$" '"$demos.getvalue()$"' "$LocDemoUsesOutdatedVersionsSuffix2, MB_YesNo, MR_No, MR_None);
                     return;
 
                 case 2:
                     if (root.FindChildWindow(class'DownloadFramedWindow')==none)
-                        doDlMsg = MessageBox(LocDemoCannotPlay, LocDemoCannotPlayPrefix$" '"$demos.getvalue()$"' "$LocDemoCannotPlaySuffix, MB_YesNo, MR_No, MR_None);
+                        doDlMsg = MessageBox(LocDemoCannotPlay, LocDemoCannotPlayPrefix$" '"$demos.getvalue()$"' "$LocDemoCannotPlaySuffix, MB_YesNoCancel, MR_No, MR_None);
                     else
                         MessageBox(LocDemoCannotPlay, LocDemoCannotPlayPrefix$" '"$demos.getvalue()$"' "$LocDemoCannotPlaySuffix2, MB_OK, MR_OK, MR_OK);
                     return;
@@ -532,7 +532,7 @@ function MessageBoxDone(UWindowMessageBox W, MessageBoxResult Result)
         }
     }
 
-    if (Result == MR_No && LastInstalled == 1 && W == doDlMsg)
+    if (Result == MR_No && (LastInstalled == 1 || LastInstalled == 2) && W == doDlMsg)
         PlayDemo(true);
 }
 
