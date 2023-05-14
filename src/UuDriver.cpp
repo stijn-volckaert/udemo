@@ -696,8 +696,8 @@ void UuDemoPackageMap::Compute()
 	LinkerMap.Empty();
 	MaxObjectIndex = 0;
 	MaxNameIndex = 0;
-	FString	Ver = UTexture::__Client->Viewports(0)->Actor->Level->EngineVersion;
-	INT iVer = strtol(TCHAR_TO_ANSI(*Ver), NULL, 10);
+	//FString	Ver = UTexture::__Client->Viewports(0)->Actor->Level->EngineVersion;
+	//INT iVer = strtol(TCHAR_TO_ANSI(*Ver), NULL, 10);
 
 	{for (INT i = 0; i < List.Num(); i++)
 	{
