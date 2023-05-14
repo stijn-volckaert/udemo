@@ -373,13 +373,14 @@ function PlayDemo(optional bool noInstallCheck)
 
         getplayerowner().consolecommand("stopdemo"); //needed?
 
-        assembled="demoplay "$demos.getvalue2()$demos.getvalue();     //assemble command with options
+        assembled="demoplay \""$demos.getvalue2()$demos.getvalue();     //assemble command with options
         if (Spectate.bchecked)
             assembled=assembled$"?3rdperson";
         if (timing.GetSelectedIndex() == 1)
             assembled=assembled$"?timebased";
         else if (timing.GetSelectedIndex() == 2)
             assembled=assembled$"?noframecap";
+        assembled=assembled$"\"";
 
         // (Anth) Linux FURL is fucked so we need to store the assembled URL somewhere and restore it in the native...
         demreader.DemoURL = assembled;

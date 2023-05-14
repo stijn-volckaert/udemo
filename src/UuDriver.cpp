@@ -139,7 +139,7 @@ void UuDemoDriver::TickDispatch( FLOAT DeltaTime )
 					FileAr = NULL;
 				}
 				if( Loop || MessagePlay)
-					GetLevel()->Exec( *(FString(TEXT("DEMOPLAY "))+(*LoopURL.String())), *GLog );
+					GetLevel()->Exec( *FString::Printf(TEXT("DEMOPLAY \"%ls\""), *LoopURL.String()), *GLog );
 				return;
 			}
 			// Update frames and time

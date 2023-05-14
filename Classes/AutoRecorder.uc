@@ -61,7 +61,7 @@ function NotifyLevelChange()
     }
     if (class'DemoSettings'.static.ShouldRecord(GetLevel()))
     {
-        DemoCmd = "demorec "$class'DemoSettings'.static.GetRecordingDir()$class'DemoSettings'.static.GetDemoName(GetPlayerOwner(),UWindowComboListItem(Udemo.Demos.List.Items));
+        DemoCmd = "demorec \""$class'DemoSettings'.static.GetRecordingDir()$class'DemoSettings'.static.GetDemoName(GetPlayerOwner(),UWindowComboListItem(Udemo.Demos.List.Items))$"\"";
         Log("UDEMO: Level changed. Auto-Recording started:"@DemoCmd);
         getplayerowner().consolecommand(DemoCmd);
     }
