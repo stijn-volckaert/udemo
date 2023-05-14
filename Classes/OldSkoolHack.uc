@@ -13,6 +13,7 @@ class OldSkoolHack expands Actor;
 // =============================================================================
 var string OldLevel;
 var AutoRecorder Rec;
+var bool bLevelChanged;
 
 // =============================================================================
 // Tick ~
@@ -21,16 +22,20 @@ event Tick( float Delta )
 {
     // Track levelchanges...
     // NOTE: LEVACT_None means that the level hasn't been fully loaded yet!!
-    if (string(Rec.GetLevel()) != OldLevel && Rec.GetLevel().LevelAction==LEVACT_None)
+    if (string(Rec.GetLevel()) != OldLevel)
     {
+    	OldLevel = string(Rec.GetLevel());
+    	bLevelChanged = true;
+    }
+    if (bLevelChanged && Rec.GetLevel().LevelAction==LEVACT_None)
+    {
+    	bLevelChanged = false;
         if (Rec.Hack==self)
             Rec.NotifyLevelChange();
 
         // Keep the class active if a demo is playing/recording in this level
         if (Rec.GetLevel() != Level && class'udnative'.static.DemoActive(Rec.GetPlayerOwner().XLevel) == 0)
             Destroy();
-        else
-            OldLevel = string(Rec.GetLevel());
     }
 }
 
