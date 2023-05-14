@@ -21,6 +21,9 @@ var int Generation; //generation of the file.  user's file should be >= to this
 var bool bIsCSHP; //a Cheat protector package.  (easy access for other windows)
 var bool bIsInt; //if file is an int.. (only during downloading)
 
+var DemoList DemoNext; // preserve demo load order
+var DemoList DemoLast; // sentinel fast access to last in demo chain order
+
 //for the hell of it :)
 static final operator(24) bool  < ( bool A, bool B ){
   return (B&&!A);
@@ -34,8 +37,8 @@ function byte AllInstalled(){  //returns 0 for true, 1 for bad gen, 2 for bad gu
   if (binstalled==0)
     return 4;
   bRetVal = IsMisMatch();
- if (next!=none)
-     bRetVal = max(bRetVal,DemoList(next).AllInstalled());
+ if (DemoNext!=none)
+     bRetVal = max(bRetVal,DemoNext.AllInstalled());
  return bRetVal;
 }
 
@@ -60,6 +63,12 @@ function DemoList FindPackage(string pkgname){
    log ("FindPackage() error: Package '"$pkgname$"' not found!",'UDemo');
 }
 //call only on sentinel!
+function DisconnectList() {
+	Super.DisconnectList();
+	DemoNext = None;
+	DemoLast = self;
+}
+
 function DemoList AddPackage (string NewName, int NewSize, byte NewInstalled, GUID newGUID, int newGen){
   local DemoList NewItem;
   NewItem=DemoList(CreateItem(class));
@@ -69,6 +78,10 @@ function DemoList AddPackage (string NewName, int NewSize, byte NewInstalled, GU
   NewItem.PackageGUID=newGUID;
   NewItem.Generation=newGen;
   MoveItemSorted(NewItem); //in list
+  
+  DemoLast.DemoNext = NewItem;
+  DemoLast = NewItem;
+  
   return NewItem;
 }
 //when refreshing to update menus. call on sentinel.next!
