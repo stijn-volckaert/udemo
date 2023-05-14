@@ -97,11 +97,17 @@ static function string GetDemoName(playerpawn p, UWindowComboListItem List){
       }
       else if (cmd~="%D")
       {
-        OutMsg = OutMsg$level.Day;
+        cmd=string(level.Day);
+        if (len(cmd)==1)
+          cmd="0"$cmd;
+        OutMsg = OutMsg$cmd;
       }
       else if (cmd~="%M")
       {
-        OutMsg = OutMsg$level.Month;
+        cmd=string(level.Month);
+        if (len(cmd)==1)
+          cmd="0"$cmd;
+        OutMsg = OutMsg$cmd;
       }
       else if (cmd~="%Y")
       {
@@ -109,7 +115,10 @@ static function string GetDemoName(playerpawn p, UWindowComboListItem List){
       }
       else if (cmd~="%H")
       {
-        OutMsg = OutMsg$level.Hour;
+        cmd=string(level.Hour);
+        if (len(cmd)==1)
+          cmd="0"$cmd;
+        OutMsg = OutMsg$cmd;
       }
       else if (cmd~="%O")
       {
