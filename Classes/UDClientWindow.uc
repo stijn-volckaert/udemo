@@ -319,7 +319,6 @@ function demochanged()
 function PlayDemo(optional bool noInstallCheck)
 {
     local string assembled;
-    local byte LastInstalled;
     local int i, j;
 
     if (demos.getvalue() != "")
