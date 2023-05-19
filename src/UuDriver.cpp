@@ -92,9 +92,11 @@ void UuDemoDriver::TickDispatch( FLOAT DeltaTime )
 		{
 			if (Interface)
 			{
+				Interface->DemoSpec->Player->ReadInput(DeltaTime);
 				Interface->DemoSpec->eventPlayerInput(DeltaTime);
 				Interface->DemoSpec->eventUpdateEyeHeight(DeltaTime);
 				Interface->DemoSpec->eventPlayerTick(DeltaTime);
+				Interface->DemoSpec->Player->ReadInput(-1.0);
 			}
 			return;		
 		}
