@@ -717,9 +717,16 @@ state CheatFlying
     // (Sp0ngeb0b)
     function ProcessMove(float DeltaTime, vector NewAccel, eDodgeDir DodgeMove, rotator DeltaRot)	
     {
-      Acceleration = Normal(NewAccel);
-      Velocity = Normal(NewAccel) * 300 * AccelFactor;
-      AutonomousPhysics(DeltaTime);
+    	local float OldAirSpeed;
+		Acceleration = Normal(NewAccel);
+		// use AirSpeed instead of hardcoded 300 and not affect by slomo command
+		Velocity = Normal(NewAccel) * (AirSpeed * AccelFactor / Driver.mySpeed);
+		// AirSpeed temp alter for avoid be capped by engine physics code
+		OldAirSpeed = AirSpeed;
+		if (Driver.mySpeed < 1.0)
+			AirSpeed /= Driver.mySpeed;
+		AutonomousPhysics(DeltaTime);
+		AirSpeed = OldAirSpeed;
     }
     
     // (Sp0ngeb0b)
