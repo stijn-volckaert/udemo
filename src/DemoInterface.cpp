@@ -426,6 +426,7 @@ void UDemoInterface::execSetSpeed (FFrame& Stack, RESULT_DECL)
 	guard (UDemoInterface::execSetSpeed);
 	P_GET_FLOAT(newSpeed);
 	P_FINISH;
+	newSpeed = Max(newSpeed, 0.000001f);
 	mySpeed = newSpeed;
 	if (PlayBackMode != 2) //not in timebased!
 		DemoSpec->Level->TimeDilation=newSpeed*(DemoDriver->RealDilation); //ratios own!
