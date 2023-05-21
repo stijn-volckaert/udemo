@@ -186,6 +186,12 @@ function Created()
     Spectate.bChecked=Class'DemoSettings'.default.SpecDemo;
     ControlOffset+=16;
     
+    if (!Class'DemoSettings'.default.bOneTimeUpgrade)
+    {
+    	demreader.SetDemoDriverClass("udemo.uDemoDriver");
+	    Class'DemoSettings'.default.bOneTimeUpgrade = True;
+	}
+    
     drivers = UWindowComboControl(CreateControl(class'UWindowComboControl',CenterPos, ControlOffset, CenterWidth2, 1));
     drivers.SetButtons(True);
     drivers.SetText(LocDrivers);
