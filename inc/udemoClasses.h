@@ -73,6 +73,7 @@ public:
     DECLARE_FUNCTION(execRename);
     DECLARE_FUNCTION(execkill);
     DECLARE_FUNCTION(execgetdemo);
+    DECLARE_FUNCTION(execSetDemoDriverClass);
     void eventDemoReadDone(const FString& Map, BITFIELD bServerDemo, FLOAT Time, INT NumFrames)
     {
         Uudnative_eventDemoReadDone_Parms Parms;
@@ -162,6 +163,7 @@ AUTOGENERATE_FUNCTION(Uudnative,-1,execBasePath);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execRename);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execkill);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execgetdemo);
+AUTOGENERATE_FUNCTION(Uudnative,-1,execSetDemoDriverClass);
 AUTOGENERATE_FUNCTION(UDemoInterface,-1,execGetStartTime);
 AUTOGENERATE_FUNCTION(UDemoInterface,-1,execSetPlayBackMode);
 AUTOGENERATE_FUNCTION(UDemoInterface,-1,execIsPaused);

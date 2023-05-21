@@ -12,6 +12,7 @@ class UDClientWindow expands UMenuPageWindow;
 // =============================================================================
 var UWindowComboControl demos;         // list to select demo
 var UWindowComboControl timing;        // list to select timing
+var UWindowComboControl drivers;       // list to select driver
 var UWindowSmallButton  Record;        // start recording
 var UWindowSmallButton  Play;          // play selected demo
 var UWindowSmallButton  StopB;         // stop playback
@@ -28,6 +29,7 @@ var DemoReader          demreader;     // class that exists in C++ to search for
 var string              last;          // to add new demos found later...
 var byte                ShotTime;      // shot timer
 var byte                LastInstalled; // speed
+var bool                Initialized;   // Init done
 var localized string    Spechelp;      // save file size
 var localized string	LocDemos;
 var localized string	LocDemosHelp;
@@ -50,6 +52,12 @@ var localized string	LocAOTimingFrameBased;
 var localized string	LocAOTimingTimeBased;
 var localized string	LocAOTimingFastAsPossible;
 var localized string	LocAOSpectate;
+var localized string	LocDrivers;
+var localized string	LocDriversHelp;
+var localized string	LocDriversStock;
+var localized string	LocDriversUdemo;
+var localized string	ConfirmSettingsRestartTitle;
+var localized string	ConfirmSettingsRestartText;
 var localized string	LocDemoUsesOutdatedVersionsWarning;
 var localized string	LocDemoUsesOutdatedVersionsPrefix;
 var localized string	LocDemoUsesOutdatedVersionsSuffix;
@@ -151,12 +159,12 @@ function Created()
     Write = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos, ControlOffset, CenterWidth2, 1));
     Write.SetText(LocWriteDemoSummary);
     Write.sethelptext(LocWriteDemoSummaryHelp);
-    ControlOffset+=25;
+    ControlOffset+=20;
 
     Ctrl = UWindowLabelControl(CreateControl(class'UWindowLabelControl', CenterPos, ControlOffset, CenterWidth2, 1));
     Ctrl.SetFont( F_Bold );
     Ctrl.SetText(LocSelectAdditionalOptions);
-    ControlOffset+=18;
+    ControlOffset+=16;
 
     timing = UWindowComboControl(CreateControl(class'UWindowComboControl',CenterPos, ControlOffset, CenterWidth2, 1));
     timing.SetButtons(True);
@@ -176,7 +184,25 @@ function Created()
     Spectate.SetText(LocAOSpectate);
     Spectate.SetHelpText(spechelp);
     Spectate.bChecked=Class'DemoSettings'.default.SpecDemo;
-    ControlOffset+=18;
+    ControlOffset+=16;
+    
+    drivers = UWindowComboControl(CreateControl(class'UWindowComboControl',CenterPos, ControlOffset, CenterWidth2, 1));
+    drivers.SetButtons(True);
+    drivers.SetText(LocDrivers);
+    drivers.Align = TA_Left;
+    drivers.SetHelpText(LocDriversHelp);
+    drivers.SetFont(F_Normal);
+    drivers.SetEditable(False);
+    drivers.EditBoxWidth = 0.7*drivers.WinWidth;
+    drivers.AddItem(LocDriversStock, "Engine.DemoRecDriver");
+    drivers.AddItem("udemo" @ LocDriversUdemo, "udemo.uDemoDriver");
+    i = 0;
+    if (demreader.SetDemoDriverClass("") ~= "udemo.uDemoDriver")
+    	i = 1;
+    drivers.SetSelectedIndex(i); //FIX ME! SAVED ITEM!
+    ControlOffset+=19;
+    
+    Initialized = true;
 }
 
 // =============================================================================
@@ -447,6 +473,14 @@ function string BaseDirReplace(UDComboListItem Demo)
         Return demreader.BasePath();
 }
 
+function DriverChanged()
+{
+	if (!Initialized)
+		return;
+	demreader.SetDemoDriverClass(drivers.GetValue2());
+	MessageBox(ConfirmSettingsRestartTitle, ConfirmSettingsRestartText, MB_OK, MR_OK, MR_OK);
+}
+
 // =============================================================================
 // Notify ~ Control notification
 // =============================================================================
@@ -466,6 +500,10 @@ function Notify(UWindowDialogControl C, byte E)
                 case Spectate:
                     if (!Spectate.bdisabled)
                         class'DemoSettings'.default.specdemo=Spectate.bchecked;
+                    break;
+                    
+                case drivers:
+                    DriverChanged();
                     break;
             }
             break;
@@ -592,6 +630,7 @@ function Tick(float delta)
 // =============================================================================
 // defaultproperties
 // =============================================================================
+
 defaultproperties
 {
     SpecHelp="If checked, you will be able to fly around the level when playing a demo"
@@ -616,6 +655,12 @@ defaultproperties
 	LocAOTimingTimeBased="Time Based"
 	LocAOTimingFastAsPossible="Fast as Possible"
 	LocAOSpectate="3rdPerson (Spectate)"
+	LocDrivers="Demo Driver"
+	LocDriversHelp="Choose which driver to use for demo recording and playback"
+	LocDriversStock="Stock (basic)"
+	LocDriversUdemo="(extended)"
+	ConfirmSettingsRestartTitle="Demo Driver Changed"
+	ConfirmSettingsRestartText="Your updated demo driver setting will take effect after restarting the game."
 	LocDemoUsesOutdatedVersionsWarning="Warning"
 	LocDemoUsesOutdatedVersionsPrefix="The demo file"
 	LocDemoUsesOutdatedVersionsSuffix="is using outdated versions of some files that MAY result in semi-corrupt playback.\\nShould Unreal Tournament Demo Manager attempt to download updated versions from master servers?\\n(Clicking no will play the demo immediately)"

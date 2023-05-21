@@ -34,6 +34,7 @@ UudnativeNativeInfo GudemoUudnativeNatives[] =
 	MAP_NATIVE(Uudnative, execRename)
 	MAP_NATIVE(Uudnative, execkill)
 	MAP_NATIVE(Uudnative, execgetdemo)
+	MAP_NATIVE(Uudnative, execSetDemoDriverClass)
 	{NULL, NULL}
 };
 IMPLEMENT_NATIVE_HANDLER(udemo, Uudnative);
