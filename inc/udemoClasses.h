@@ -63,6 +63,7 @@ public:
     FStringNoInit DemoURL;
     DECLARE_FUNCTION(execDispatchTick);
     DECLARE_FUNCTION(execDemoRead);
+    DECLARE_FUNCTION(execSetDemoDriverClass);
     DECLARE_FUNCTION(execIsMisMatch);
     DECLARE_FUNCTION(execGUIDString);
     DECLARE_FUNCTION(execDemoActive);
@@ -73,7 +74,6 @@ public:
     DECLARE_FUNCTION(execRename);
     DECLARE_FUNCTION(execkill);
     DECLARE_FUNCTION(execgetdemo);
-    DECLARE_FUNCTION(execSetDemoDriverClass);
     void eventDemoReadDone(const FString& Map, BITFIELD bServerDemo, FLOAT Time, INT NumFrames)
     {
         Uudnative_eventDemoReadDone_Parms Parms;
@@ -153,6 +153,7 @@ AUTOGENERATE_FUNCTION(UUZHandler,-1,execSaveFile);
 AUTOGENERATE_FUNCTION(UUZHandler,-1,execAppend);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execDispatchTick);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execDemoRead);
+AUTOGENERATE_FUNCTION(Uudnative,-1,execSetDemoDriverClass);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execIsMisMatch);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execGUIDString);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execDemoActive);
@@ -163,7 +164,6 @@ AUTOGENERATE_FUNCTION(Uudnative,-1,execBasePath);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execRename);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execkill);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execgetdemo);
-AUTOGENERATE_FUNCTION(Uudnative,-1,execSetDemoDriverClass);
 AUTOGENERATE_FUNCTION(UDemoInterface,-1,execGetStartTime);
 AUTOGENERATE_FUNCTION(UDemoInterface,-1,execSetPlayBackMode);
 AUTOGENERATE_FUNCTION(UDemoInterface,-1,execIsPaused);
