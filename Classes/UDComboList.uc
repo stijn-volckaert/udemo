@@ -31,6 +31,7 @@ function AddItem(string Value, optional string Value2, optional int SortWeight)
 
     I = UDComboListItem(Items.Append(class'UDComboListItem'));
     I.Value = Value;
+    I.CapsValue = Caps(I.Value);
     I.Value2 = Value2;
     I.SortWeight = SortWeight;
 }
@@ -44,6 +45,7 @@ function InsertItem(string Value, optional string Value2, optional int SortWeigh
 
     I = UDComboListItem(Items.Insert(class'UDComboListItem'));
     I.Value = Value;
+    I.CapsValue = Caps(I.Value);
     I.Value2 = Value2;
     I.SortWeight = SortWeight;
 }
@@ -57,6 +59,7 @@ function AddSortedItem(string Value, optional string Value2, optional int SortWe
 
     I = UDComboListItem(Items.CreateItem(class'UDComboListItem'));
     I.Value = Value;
+    I.CapsValue = Caps(I.Value);
     I.Value2 = Value2;
     I.SortWeight = SortWeight;
     I.Validated=True; //temp holder.

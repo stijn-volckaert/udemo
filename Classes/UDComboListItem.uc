@@ -18,28 +18,25 @@ var bool     bServerDemo; // server demo?
 var float    PlayTime;    // amount of PlayTime in Demo
 var int      NumFrames;   // amount of frames in demo
 var DemoList Packages;    // points to first real item of packages, NOT ITS SENTINEL!
+var string   CapsValue;
 
 // =============================================================================
 // Compare
 // =============================================================================
 function int Compare(UWindowList T, UWindowList B)
 {
-    local UWindowComboListItem TI, BI;
-    local string TS, BS;
+	local UDComboListItem TI, BI;
 
-    TI = UWindowComboListItem(T);
-    BI = UWindowComboListItem(B);
+	TI = UDComboListItem(T);
+	BI = UDComboListItem(B);
 
-    TS = caps(TI.Value);
-    BS = caps(BI.Value);
+	if (TI.CapsValue > BI.CapsValue)
+		return 1;
 
-    if(TS == BS)
-        return 0;
+	if (TI.CapsValue == BI.CapsValue)
+		return 0;
 
-    if(TS < BS)
-        return -1;
-
-    return 1;
+	return -1;
 }
 
 // =============================================================================
