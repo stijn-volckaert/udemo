@@ -63,6 +63,7 @@ public:
     FStringNoInit DemoURL;
     DECLARE_FUNCTION(execDispatchTick);
     DECLARE_FUNCTION(execDemoRead);
+    DECLARE_FUNCTION(execSetDemoDriverClass);
     DECLARE_FUNCTION(execIsMisMatch);
     DECLARE_FUNCTION(execGUIDString);
     DECLARE_FUNCTION(execDemoActive);
@@ -152,6 +153,7 @@ AUTOGENERATE_FUNCTION(UUZHandler,-1,execSaveFile);
 AUTOGENERATE_FUNCTION(UUZHandler,-1,execAppend);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execDispatchTick);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execDemoRead);
+AUTOGENERATE_FUNCTION(Uudnative,-1,execSetDemoDriverClass);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execIsMisMatch);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execGUIDString);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execDemoActive);

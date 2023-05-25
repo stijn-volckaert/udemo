@@ -306,6 +306,23 @@ void Uudnative::execIsMisMatch (FFrame& Stack, RESULT_DECL)
 }
 
 /*-----------------------------------------------------------------------------
+	execSetDemoDriverClass - Set non-empty value into [Engine.Engine] DemoRecordingDevice and return current value
+-----------------------------------------------------------------------------*/
+void Uudnative::execSetDemoDriverClass(FFrame& Stack, RESULT_DECL)
+{ 
+	guard (Uudnative::execSetDemoDriverClass); 
+	P_GET_STR(ClassName);
+	P_FINISH;	
+	
+	if (ClassName != TEXT(""))
+		GConfig->SetString(TEXT("Engine.Engine"), TEXT("DemoRecordingDevice"), *ClassName);
+	GConfig->GetString(TEXT("Engine.Engine"), TEXT("DemoRecordingDevice"), ClassName);
+	*(FString*)Result = ClassName;
+	
+	unguard;
+}
+
+/*-----------------------------------------------------------------------------
 	execFindViewPort - get the main viewport
 -----------------------------------------------------------------------------*/
 void Uudnative::execFindViewPort (FFrame& Stack, RESULT_DECL)

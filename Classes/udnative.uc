@@ -90,6 +90,10 @@ native final static function string GUIDString(GUID a);
 //
 native static final function byte IsMismatch(string FileName, GUID desiredGUID, int desiredGen/*, out int FileSize*/);
 //
+// Set non-empty value into [Engine.Engine] DemoRecordingDevice and return current value
+//
+native final static function string SetDemoDriverClass(string DemoDriverClass);
+//
 // read demo information
 //
 native final function DemoRead(string file, level XLevel);

@@ -12,6 +12,8 @@
 class DemoSettings expands Object
 config (UDemo);
 
+var config bool      bOneTimeUpgrade;
+
 //play menu:
 var config string LastDemo; //what has the last demo selected?
 var config byte Timing; //saved timing mode
