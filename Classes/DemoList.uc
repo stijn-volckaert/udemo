@@ -43,10 +43,15 @@ function byte AllInstalled(){  //returns 0 for true, 1 for bad gen, 2 for bad gu
 }
 
 function byte IsMisMatch(){ //used by downloader as well!
-//  local int n;
-  if (!IsDefPkg()) //don't check normal pacakges!
-    return class'udNative'.static.IsMismatch(PackageName,PackageGUID,Generation/*,n*/);
-  return 0;
+//	local int n;
+	local int ret;
+	
+	if (IsDefPkg()) //don't check normal pacakges!
+		return 0;
+	ret = class'udNative'.static.IsMismatch(PackageName,PackageGUID,Generation/*,n*/);
+	if (ret == 2 && bInstalled == 1) // ugly hack: assume cached file never make guid mismatch
+		ret = 0;
+	return ret;
 }
 
 //sentinel only!
