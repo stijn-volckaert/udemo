@@ -62,7 +62,6 @@ function AddSortedItem(string Value, optional string Value2, optional int SortWe
     I.CapsValue = Caps(I.Value);
     I.Value2 = Value2;
     I.SortWeight = SortWeight;
-    I.Validated=True; //temp holder.
     Items.MoveItemSorted(I);
 }
 

@@ -184,32 +184,7 @@ function Created()
 // =============================================================================
 function Refresh(optional bool init)
 {
-    local UDComboListItem L;
-
     SetupDemos(!init);
-
-    if (!init)
-    {
-        for (L=UDComboListItem(demos.List.Items.Next); L!=none; L=UDComboListItem(L.next))
-        {
-            if (!L.Validated)
-            {
-                if (L==LastDemoItem)
-                {
-                    init=true;
-                    demos.SetValue("");
-                }
-                L.Remove();
-            }
-            else
-                L.Validated=false;
-        }
-
-        Demos.SetValue(Demos.GetValue(),Demos.GetValue2());  //hack :)
-    }
-
-    if (init && demos.GetValue()=="")
-        Demos.SetSelectedIndex(0);
 }
 
 // =============================================================================
@@ -219,8 +194,16 @@ function SetupDemos(bool Refreshing)
 {
     local string demoinfo, toadd;
     local int pos;
-    local UDComboListItem L;
+    local UDComboList Combo;
+    local UWindowList D, C, T;
     local int i;
+    
+    if (Refreshing) {
+    	Combo = new class'UDComboList';
+    	Combo.bNoKeyboard = true;
+    	Combo.Created();
+    } else
+    	Combo = UDComboList(demos.List);
 
     // Once for each path
     for (i=0; i<5; i++)
@@ -235,35 +218,50 @@ function SetupDemos(bool Refreshing)
                 //log (demoinfo);
                 pos=instr(demoinfo,"/");
                 toadd=left(demoinfo,pos-4);     //commented=size
-                if (!Refreshing)
-                {
-                    demos.additem(toadd,class'demosettings'.static.Path(i,demreader.BasePath()),int(mid(demoinfo,pos+1)));
+                
+                Combo.additem(toadd,class'demosettings'.static.Path(i,demreader.BasePath()),int(mid(demoinfo,pos+1)));
 
-                    if (toadd~=class'demosettings'.default.lastdemo)
-                        demos.SetValue(toadd,class'demosettings'.static.Path(i,demreader.BasePath()));
-                }
-                else
-                {
-                    for (L=UDComboListItem(demos.List.Items.next);L!=none;L=UDComboListItem(L.next))
-                    {
-                        if (L.value==toadd)
-                        {
-                            L.Validated=true;
-                            break;
-                        }
-                    }
-
-                    if (L==none)
-                        UDComboList(demos.List).AddSortedItem(toadd,class'demosettings'.static.Path(i,demreader.BasePath()),int(mid(demoinfo,pos+1))); //must add.
-                }
+                if (!Refreshing && toadd~=class'demosettings'.default.lastdemo)
+                    demos.SetValue(toadd,class'demosettings'.static.Path(i,demreader.BasePath()));
 
                 demoinfo=demreader.getdemo("");
             }
         }
     }
 
-    if (!Refreshing)
-        demos.sort();
+    Combo.sort();
+    if (Refreshing) {
+    	D = demos.List.Items.Next;
+    	C = Combo.Items.Next;
+    	while (D != None || C != None) {
+	    	if (D == None)
+	    		i = 1;
+	    	else if (C == None)
+	    		i = -1;
+	    	else
+	    		i = D.Compare(D, C);
+    		if (i == -1) {
+    			T = D;
+    			D = D.Next;
+    			T.Remove();
+    		} else if (i == 1) {
+    			T = C;
+    			C = C.Next;
+    			demos.List.Items.MoveItemSorted(T);
+    		} else {
+	    		D = D.Next;
+    			C = C.Next;
+    		}
+    	}
+    	if (demos.List.Items.Next == None) {
+	    	Refreshing = false;
+			demos.SetValue("");
+    	}
+    	Demos.SetValue(Demos.GetValue(),Demos.GetValue2());  //hack :)
+
+	    if (!Refreshing && demos.GetValue() == "")
+	        Demos.SetSelectedIndex(0);
+    }
 }
 
 // =============================================================================
