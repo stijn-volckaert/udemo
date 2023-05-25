@@ -25,15 +25,15 @@ function Created()
 // =============================================================================
 // AddItem ~
 // =============================================================================
-function AddItem(string Value, optional string Value2, optional int SortWeight)
+function AddItem2(string Value, string Value2, int SortWeight, string DateTime)
 {
     local UDComboListItem I;
 
     I = UDComboListItem(Items.Append(class'UDComboListItem'));
     I.Value = Value;
-    I.CapsValue = Caps(I.Value);
     I.Value2 = Value2;
     I.SortWeight = SortWeight;
+    I.DateTime = DateTime;
 }
 
 // =============================================================================
@@ -45,7 +45,6 @@ function InsertItem(string Value, optional string Value2, optional int SortWeigh
 
     I = UDComboListItem(Items.Insert(class'UDComboListItem'));
     I.Value = Value;
-    I.CapsValue = Caps(I.Value);
     I.Value2 = Value2;
     I.SortWeight = SortWeight;
 }
@@ -59,7 +58,6 @@ function AddSortedItem(string Value, optional string Value2, optional int SortWe
 
     I = UDComboListItem(Items.CreateItem(class'UDComboListItem'));
     I.Value = Value;
-    I.CapsValue = Caps(I.Value);
     I.Value2 = Value2;
     I.SortWeight = SortWeight;
     Items.MoveItemSorted(I);

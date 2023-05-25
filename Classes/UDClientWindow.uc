@@ -19,8 +19,10 @@ var UWindowSmallButton  StopB;         // stop playback
 var UWindowSmallButton  Delete;        // delete selected demo
 var UWindowSmallButton  Rename;        // rename selected demo
 var UWindowSmallButton  Write;         // write demo summary
+var UWindowCheckBox     OrderByDate;   // tick to order by date
 var UWindowCheckBox     Spectate;      // tick to spectate
 var UMenuLabelControl   sizelabel;     // how large is demo? KB
+var UMenuLabelControl   DateLabel;     // DateTime for demo
 var UWindowMessageBox   DeleteMSG;     // delete warning
 var UWindowMessageBox   doDlMsg;       // corrupted file warning. Asks for Download
 var UWindowMessageBox   doGenWarnMsg;  // generation mismatch. Can't fix this by Download
@@ -52,6 +54,8 @@ var localized string	LocAOTimingFrameBased;
 var localized string	LocAOTimingTimeBased;
 var localized string	LocAOTimingFastAsPossible;
 var localized string	LocAOSpectate;
+var localized string	LocOrderByDate;
+var localized string	LocOrderByDateHelp;
 var localized string	LocDrivers;
 var localized string	LocDriversHelp;
 var localized string	LocDriversStock;
@@ -114,6 +118,12 @@ function Created()
 
     sizelabel=UMenuLabelControl(CreateWindow(class'UMenuLabelControl', CenterPos2, ControlOffset,CenterWidth, 1));
     sizelabel.Align = TA_Right;
+    
+    OrderByDate = UWindowCheckBox(CreateControl(class'UWindowCheckBox', CenterPos2 - CenterWidth/2, ControlOffset - 2, CenterWidth - 35, 16));
+    OrderByDate.SetText(LocOrderByDate);
+    OrderByDate.SetHelpText(LocOrderByDateHelp);
+    OrderByDate.Align = TA_Right;
+    OrderByDate.bChecked = Class'DemoSettings'.default.OrderByDate;
 
     //hack to use modified list class:
     OldDefault=Class'UwindowComboControl'.default.listclass;
@@ -164,6 +174,10 @@ function Created()
     Ctrl = UWindowLabelControl(CreateControl(class'UWindowLabelControl', CenterPos, ControlOffset, CenterWidth2, 1));
     Ctrl.SetFont( F_Bold );
     Ctrl.SetText(LocSelectAdditionalOptions);
+    
+    DateLabel = UMenuLabelControl(CreateWindow(class'UMenuLabelControl', CenterPos2, ControlOffset, CenterWidth, 1));
+    DateLabel.Align = TA_Right;
+    
     ControlOffset+=16;
 
     timing = UWindowComboControl(CreateControl(class'UWindowComboControl',CenterPos, ControlOffset, CenterWidth2, 1));
@@ -224,8 +238,8 @@ function Refresh(optional bool init)
 // =============================================================================
 function SetupDemos(bool Refreshing)
 {
-    local string demoinfo, toadd;
-    local int pos;
+    local string demoinfo, toadd, size;
+    local int pos, pos2;
     local UDComboList Combo;
     local UWindowList D, C, T;
     local int i;
@@ -240,23 +254,24 @@ function SetupDemos(bool Refreshing)
     // Once for each path
     for (i=0; i<5; i++)
     {
-        if (!(Class'DemoSettings'.default.DemoPaths[i]~=class'udpathsclient'.default.Empty))
+        if (!(Class'DemoSettings'.default.DemoPaths[i] ~= class'udpathsclient'.default.Empty))
         {
-            demoinfo=demreader.getdemo(Class'DemoSettings'.default.DemoPaths[i]);
+            demoinfo = demreader.getdemo(Class'DemoSettings'.default.DemoPaths[i]);
 
             //Null string=no more demos.
-            while (demoinfo!="")
+            while (demoinfo != "")
             {
-                //log (demoinfo);
-                pos=instr(demoinfo,"/");
-                toadd=left(demoinfo,pos-4);     //commented=size
+                pos = InStr(demoinfo, "/");
+                toadd = Left(demoinfo, pos - 4);
+                size = Mid(demoinfo, pos + 1);
+                pos2 = InStr(size, "/");
                 
-                Combo.additem(toadd,class'demosettings'.static.Path(i,demreader.BasePath()),int(mid(demoinfo,pos+1)));
+                Combo.AddItem2(toadd, class'demosettings'.static.Path(i, demreader.BasePath()), int(size), Mid(size, pos2 + 1));
 
-                if (!Refreshing && toadd~=class'demosettings'.default.lastdemo)
-                    demos.SetValue(toadd,class'demosettings'.static.Path(i,demreader.BasePath()));
+                if (!Refreshing && toadd ~= class'demosettings'.default.lastdemo)
+                    demos.SetValue(toadd, class'demosettings'.static.Path(i, demreader.BasePath()));
 
-                demoinfo=demreader.getdemo("");
+                demoinfo = demreader.getdemo("");
             }
         }
     }
@@ -312,7 +327,8 @@ function demochanged()
     demreader.control.Packages.DisconnectList();
     LastDemoItem=UDComboList(Demos.List).FindItem(Demos.GetValue());
     shottime=0; //safety.
-    sizelabel.settext(LastDemoItem.sortweight@"kb");
+    sizelabel.SetText(LastDemoItem.sortweight @ "kb");
+    DateLabel.SetText(LastDemoItem.DateTime);
     demreader.control.PBI.Reset();
     demreader.control.ScreenShot.SetPending();
 
@@ -505,6 +521,11 @@ function Notify(UWindowDialogControl C, byte E)
                     if (!Spectate.bdisabled)
                         class'DemoSettings'.default.specdemo=Spectate.bchecked;
                     break;
+                   
+                case OrderByDate:
+                	Class'DemoSettings'.default.OrderByDate = OrderByDate.bChecked;
+                	demos.sort();
+                	break;
                     
                 case drivers:
                     DriverChanged();
@@ -587,6 +608,7 @@ function Close (optional bool bByParent)
 
     class'DemoSettings'.default.Timing=Timing.GetSelectedIndex();
     class'DemoSettings'.default.SpecDemo=Spectate.bchecked;
+    Class'DemoSettings'.default.OrderByDate = OrderByDate.bChecked;
     class'DemoSettings'.default.LastDemo=Demos.GetValue();
     class'DemoSettings'.static.StaticSaveConfig();
 }
@@ -659,6 +681,8 @@ defaultproperties
 	LocAOTimingTimeBased="Time Based"
 	LocAOTimingFastAsPossible="Fast as Possible"
 	LocAOSpectate="3rdPerson (Spectate)"
+	LocOrderByDate="Order by date"
+	LocOrderByDateHelp="If checked, the demo list is sorted by date, otherwise it is sorted by demo name"
 	LocDrivers="Demo Driver"
 	LocDriversHelp="Choose which driver to use for demo recording and playback"
 	LocDriversStock="Stock (basic)"
