@@ -111,7 +111,13 @@ exec function StartTime() {
 	clientmessage(LocDemoInitialTimestamp$" "$Driver.GetStartTime());
 }
 
-exec function SeekTo(float T) {
+exec function SeekTo(string Point) {
+	local float T;
+	local string sign;
+	T = float(Point);
+	sign = Mid(Point, 0, 1);
+	if (sign == "+" || sign == "-")
+		T = FMax(0.0, Driver.GetCurrentTime() + T);
 	SetSeek(T);
 }
 
