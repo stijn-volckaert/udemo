@@ -79,11 +79,12 @@ void UuDemoDriver::TimeSync(FTime NewTime, FTime OldTime)
 	TickDispatch - Tick the netdriver and the demospec etc! Read packets from
 	the ServerConnection and process them
 -----------------------------------------------------------------------------*/
-void UuDemoDriver::TickDispatch( FLOAT DeltaTime )
+void UuDemoDriver::TickDispatch( FLOAT Delta )
 {
 	guard(UuDemoDriver:TickDispatch);	
 	
 	// Calc deltatime
+	FLOAT DeltaTime = Delta;
 	if(ServerConnection)
 	{
 		if (!NoFrameCap)
@@ -92,9 +93,8 @@ void UuDemoDriver::TickDispatch( FLOAT DeltaTime )
 		{
 			if (Interface)
 			{
-				Interface->DemoSpec->eventPlayerInput(DeltaTime);
-				Interface->DemoSpec->eventUpdateEyeHeight(DeltaTime);
-				Interface->DemoSpec->eventPlayerTick(DeltaTime);
+				FLOAT DeltaSeconds = Delta*Interface->DemoSpec->Level->TimeDilation;
+				Interface->DemoSpec->Tick(DeltaSeconds, LEVELTICK_All);
 			}
 			return;		
 		}
