@@ -114,6 +114,12 @@ event LinkToPlayer (PlayerPawn p, bool LockOn)
 
     DemoPlaybackSpec(DemoSpec).PlayerLinked = p;
     DemoPlaybackSpec(DemoSpec).bInit=true; //me is too lazy to re-do headers ;p
+    
+     if (Spectator(p) != None)
+    {
+    	Log("Linked player is Spectator - switched to 3rdperson play.", 'Udemo');
+    	DemoPlaybackSpec(DemoSpec).Spectate();
+    }
 }
 
 event NetPacketReceived(); //called each packet if message grabbing
