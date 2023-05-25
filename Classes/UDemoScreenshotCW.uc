@@ -16,6 +16,8 @@ var localized string LocRecordedThroughAPlayer;
 var localized string LocPleaseWait;
 var localized string LocReadingInformationFromDemoFile;
 
+var string MapAuthor2;
+
 // =============================================================================
 // SetUDMap ~
 // =============================================================================
@@ -28,7 +30,8 @@ function SetUDMap(string mapname, bool bServerDemo, int NumFrames, float PlayTim
     else
         MapTitle=LocPlayingOn@" "@mapname;
 
-    MapAuthor=LocPlayTime@" "@class'DemoSettings'.static.ParseTime(PlayTime)$","@NumFrames@"Frames (Avg. FPS:"@class'demosettings'.static.FloatString(NumFrames/PlayTime)$")";
+    MapAuthor=LocPlayTime@" "@class'DemoSettings'.static.ParseTime(PlayTime)$","@NumFrames@"Frames";
+    MapAuthor2 = "(Avg. FPS:"@class'demosettings'.static.FloatString(NumFrames/PlayTime)$")";
 
     if (bServerDemo)
         IdealPlayerCount=LocRecordedOnADedicatedServer;
@@ -85,8 +88,16 @@ function Paint(Canvas C, float MouseX, float MouseY)
     {
         TextSize(C, IdealPlayerCount, W, H);
         X = (WinWidth - W) / 2;
-        Y = WinHeight - H*2;
+        Y = WinHeight - H*1;
         ClipText(C, X, Y, IdealPlayerCount);
+    }
+    
+    if (MapAuthor2 != "")
+    {
+        TextSize(C, MapAuthor2, W, H);
+        X = (WinWidth - W) / 2;
+        Y = WinHeight - H*2;
+        ClipText(C, X, Y, MapAuthor2);
     }
 
     if(MapAuthor != "")
