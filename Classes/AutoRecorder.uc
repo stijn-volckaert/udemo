@@ -23,6 +23,25 @@ function NotifyBeforeLevelChange()
 {
     Super.NotifyBeforeLevelChange();
 
+	LoadHack();
+}
+
+// =============================================================================
+// NotifyAfterLevelChange ~ Called after the actual levelchange and during first menu load
+// =============================================================================
+function NotifyAfterLevelChange()
+{
+    Super.NotifyAfterLevelChange();
+
+	if (Hack == None)
+		LoadHack();
+}
+
+// =============================================================================
+// LoadHack ~ Make actual load hack and setup it
+// =============================================================================
+function LoadHack()
+{
     // Hack == none
     // --> hack hasn't been spawned before!
     // --> spawn the hack into the entrylevel.
