@@ -29,7 +29,7 @@ function NotifyBeforeLevelChange()
     if (Hack==none)
         Hack=GetEntryLevel().Spawn(class'OldSkoolHack');
     Hack.Rec=self;
-    Hack.OldLevel=string(GetLevel());
+    Hack.OldLevel=string(GetEntryLevel());
 
     // We don't want to record a levelchange o_O
     GetPlayerOwner().ConsoleCommand("stopdemo");
