@@ -778,6 +778,21 @@ INT UuDemoPackageMap::LookupDemoGeneration(FPackageInfo& PackageInfo)
 	// UnrealShare
 	if (PackageInfo.Guid == FGuid(0x4770b88c, 0x11d38e3e, 0x100067b9, 0xf6f8975a))
 		return 1;
+	// De
+	if (PackageInfo.Guid == FGuid(0xfb1eb231, 0x4d8bf569, 0xae12c6bf, 0x1a08a2f7))
+		return 1;
+	// epiccustommodels
+	if (PackageInfo.Guid == FGuid(0x13f8255a, 0x11d3dba0, 0x1000cbb9, 0xf6f8975a))
+		return 2;
+	// multimesh 
+	if (PackageInfo.Guid == FGuid(0x2db53b00, 0x11d3e900, 0x1000d3b9, 0xf6f8975a))
+		return 8;
+	// relics
+	if (PackageInfo.Guid == FGuid(0xd011f66e, 0x11d3e9b8, 0x1000d5b9, 0xf6f8975a))
+		return 9;
+	// relicsbindings
+	if (PackageInfo.Guid == FGuid(0x465ad1fe, 0x11d3df5c, 0x1000cdb9, 0xf6f8975a))
+		return 2;
 	return PackageInfo.RemoteGeneration;
 }
 
