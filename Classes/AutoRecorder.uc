@@ -23,13 +23,32 @@ function NotifyBeforeLevelChange()
 {
     Super.NotifyBeforeLevelChange();
 
+	LoadHack();
+}
+
+// =============================================================================
+// NotifyAfterLevelChange ~ Called after the actual levelchange and during first menu load
+// =============================================================================
+function NotifyAfterLevelChange()
+{
+    Super.NotifyAfterLevelChange();
+
+	if (Hack == None)
+		LoadHack();
+}
+
+// =============================================================================
+// LoadHack ~ Make actual load hack and setup it
+// =============================================================================
+function LoadHack()
+{
     // Hack == none
     // --> hack hasn't been spawned before!
     // --> spawn the hack into the entrylevel.
     if (Hack==none)
         Hack=GetEntryLevel().Spawn(class'OldSkoolHack');
     Hack.Rec=self;
-    Hack.OldLevel=string(GetLevel());
+    Hack.OldLevel=string(GetEntryLevel());
 
     // We don't want to record a levelchange o_O
     GetPlayerOwner().ConsoleCommand("stopdemo");
