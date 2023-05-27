@@ -21,6 +21,8 @@
 #include "FFileManagerLinux.h"
 #endif
 
+#include <time.h>
+
 /*-----------------------------------------------------------------------------
 	Global vars
 -----------------------------------------------------------------------------*/
@@ -148,8 +150,21 @@ void Uudnative::execgetdemo (FFrame& Stack, RESULT_DECL)
 	// Safe to return
 	if (FileList.Num() > ListPos)
 	{
-		INT FileSize = GFileManager->FileSize( *(FilePath+FileList(ListPos)) );		
-		*(FString*)Result = FString::Printf(TEXT("%s/%u"),*FileList(ListPos),(FileSize+512)/1024);		
+		FString Filename = FilePath + FileList(ListPos);
+		INT FileSize = GFileManager->FileSize(*Filename);
+		SQWORD FileTime = GFileManager->GetGlobalTime(*Filename);
+		FString FileDate;
+		
+		time_t ltime = FileTime;
+		char DateTime[100] = {0};
+		struct tm *tmp;
+		tmp = localtime(&ltime);
+		if (tmp && strftime(DateTime, sizeof(DateTime), "%Y-%m-%d %H:%M:%S", tmp) != 0)
+			FileDate = DateTime;
+		else
+			FileDate = FString::Printf(TEXT("%010llu"), FileTime);
+
+		*(FString*)Result = FString::Printf(TEXT("%ls/%u/%ls"), *FileList(ListPos), (FileSize+512)/1024, *FileDate);
 		ListPos++;
 	}
 	else

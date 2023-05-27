@@ -17,7 +17,9 @@ var bool     bServerDemo; // server demo?
 var float    PlayTime;    // amount of PlayTime in Demo
 var int      NumFrames;   // amount of frames in demo
 var DemoList Packages;    // points to first real item of packages, NOT ITS SENTINEL!
-var string   CapsValue;
+var string   DateTime;    // Date time of demo
+var int      OrderDir;    // Direction for sorting, used default, can be 1 for ascending, and -1 for descending, internal
+var string   CapsValue;   // Value for sorting, internal
 
 // =============================================================================
 // Compare
@@ -30,12 +32,12 @@ function int Compare(UWindowList T, UWindowList B)
 	BI = UDComboListItem(B);
 
 	if (TI.CapsValue > BI.CapsValue)
-		return 1;
+		return default.OrderDir;
 
 	if (TI.CapsValue == BI.CapsValue)
 		return 0;
 
-	return -1;
+	return -default.OrderDir;
 }
 
 function UWindowList Middle_(UWindowList Head) {
@@ -91,9 +93,26 @@ function UWindowList Merge_(UWindowList First, UWindowList Second) {
 	return Next;
 }
 
+function PreSort() {
+	local UWindowList Temp;
+	if (CapsValue == string(Class'DemoSettings'.default.OrderByDate))
+		return;	
+	for (Temp = self.Next; Temp.Next != None; Temp = Temp.Next)
+		if (Class'DemoSettings'.default.OrderByDate)
+			UDComboListItem(Temp).CapsValue = UDComboListItem(Temp).DateTime $ ":" $ Caps(UDComboListItem(Temp).Value);
+		else
+			UDComboListItem(Temp).CapsValue = Caps(UDComboListItem(Temp).Value);
+	CapsValue = string(Class'DemoSettings'.default.OrderByDate);
+	if (Class'DemoSettings'.default.OrderByDate)
+		default.OrderDir = -1;
+	else
+		default.OrderDir = 1;
+}
+
 function UWindowList Sort()
 {
 	local UWindowList Temp;
+	PreSort();
 	if (bTreeSort)
 		return Super.Sort();
 
@@ -110,6 +129,8 @@ function UWindowList Sort()
 // =============================================================================
 // defaultproperties
 // =============================================================================
+
 defaultproperties
 {
+	OrderDir=1
 }

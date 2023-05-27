@@ -18,6 +18,7 @@ var config bool      bOneTimeUpgrade;
 var config string LastDemo; //what has the last demo selected?
 var config byte Timing; //saved timing mode
 var config bool SpecDemo; //3rd person
+var config bool OrderByDate; // order demo list by date
 
 //paths:
 var localized config string DemoPaths[5]; //1 of these is setup to be base directory on first load.
