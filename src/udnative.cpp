@@ -152,7 +152,7 @@ void Uudnative::execgetdemo (FFrame& Stack, RESULT_DECL)
 	{
 		FString Filename = FilePath + FileList(ListPos);
 		INT FileSize = GFileManager->FileSize(*Filename);
-		DWORD FileTime = appGetTime(*Filename);
+		SQWORD FileTime = GFileManager->GetGlobalTime(*Filename);
 		FString FileDate;
 		
 		time_t ltime = FileTime;
@@ -162,7 +162,7 @@ void Uudnative::execgetdemo (FFrame& Stack, RESULT_DECL)
 		if (tmp && strftime(DateTime, sizeof(DateTime), "%Y-%m-%d %H:%M:%S", tmp) != 0)
 			FileDate = DateTime;
 		else
-			FileDate = FString::Printf(TEXT("%010u"), FileTime);
+			FileDate = FString::Printf(TEXT("%010llu"), FileTime);
 
 		*(FString*)Result = FString::Printf(TEXT("%ls/%u/%ls"), *FileList(ListPos), (FileSize+512)/1024, *FileDate);
 		ListPos++;
