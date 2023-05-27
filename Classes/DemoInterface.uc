@@ -76,7 +76,8 @@ function GotoFrame (float Time)
         DemoPlaybackSpec(DemoSpec).FixGRI(time-cur); //fix gri times
         ReadCache(Time,class'DemoSettings'.default.TickSize); //now do caching
    }
-
+   
+	SetSpeed(mySpeed);
    DemoPlaybackSpec(DemoSpec).bSeeking=false;
 }
 
