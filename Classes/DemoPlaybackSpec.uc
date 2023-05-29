@@ -116,6 +116,10 @@ exec function SeekTo(string Point) {
 	local string sign;
 	T = float(Point);
 	sign = Mid(Point, 0, 1);
+	while (Right(Point, 1) == " ")
+		Point = Mid(Point, 0, Len(Point) - 1);
+	if (Right(Point, 1) == "%")
+		T = Driver.GetTotalTime()*T/100.0;
 	if (sign == "+" || sign == "-")
 		T = FMax(0.0, Driver.GetCurrentTime() + T);
 	SetSeek(T);
