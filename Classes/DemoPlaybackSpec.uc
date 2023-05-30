@@ -210,6 +210,19 @@ function bool SetPause( bool bPause )
     return true;
 }
 
+exec function SetPauseText(coerce string Text) {
+	if (Player == None || Player.Console == None) {
+		Log("SetPauseText: Active console not found.");
+		return;
+	}
+	if (Text == "") { // restore default
+		Text = Player.Console.default.PausedMessage;
+	} else if (Text ~= "hide") {
+		Text = " ";
+	}
+	Player.Console.PausedMessage = Text;
+}
+
 // Detach cam from playerlinked!
 exec function Spectate()
 {
