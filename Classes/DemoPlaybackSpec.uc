@@ -1036,8 +1036,11 @@ event RenderOverLays(Canvas Canvas)
 
         // Set the location, Only if not paused!
         // Will cause camera to float away if we do it while paused as well
-        if (Level != None && (Level.Pauser == "" || bFollowingProjectile))
+        if (Level != None && (Level.Pauser == "" || bFollowingProjectile)) {
+            if (PlayerPawn(ViewTarget).Weapon != None) // Apply WalkBob
+                NewLoc -= PlayerPawn(ViewTarget).WalkBob;
             PlayerPawn(ViewTarget).SetLocation(NewLoc);
+        }
 
         // Reset PlayerLinked.Role
         PlayerPawn(ViewTarget).Role=oldRole;
@@ -1063,8 +1066,11 @@ event RenderOverLays(Canvas Canvas)
         }
 
         // No call to ViewTarget.RenderOverLays here!!!
-        if (PlayerPawn(ViewTarget).Weapon != None)
+        if (PlayerPawn(ViewTarget).Weapon != None) {
+            PlayerPawn(ViewTarget).Player = Player; // hack: Weapon.Owner.Player must be not None, for prevent clear WalkBob
             PlayerPawn(ViewTarget).Weapon.renderoverlays(canvas);
+            PlayerPawn(ViewTarget).Player = None;
+        }
 
         if (PlayerPawn(ViewTarget).myHUD != None)
             PlayerPawn(ViewTarget).myHUD.renderoverlays(canvas);
@@ -1235,9 +1241,15 @@ event UpdateEyeHeight(float DeltaTime)
     {
         PlayerLinked.EyeHeight=oldEyeH;
         PlayerLinked.ViewShake(DeltaTime);
-        PlayerLinked.UpdateEyeHeight(DeltaTime);
-        GetAxes(PlayerLinked.Rotation,X,Y,Z);
-        PlayerLinked.CheckBob(DeltaTime, sqrt(PlayerLinked.Velocity.X * PlayerLinked.Velocity.X + PlayerLinked.Velocity.Y * PlayerLinked.Velocity.Y), Y);
+        //PlayerLinked.UpdateEyeHeight(DeltaTime);
+        if (PlayerLinked.Base != None && PlayerLinked.GetAnimGroup(PlayerLinked.AnimSequence) != 'Dodge') {
+        	GetAxes(PlayerLinked.Rotation,X,Y,Z);
+        	PlayerLinked.CheckBob(DeltaTime, sqrt(PlayerLinked.Velocity.X * PlayerLinked.Velocity.X + PlayerLinked.Velocity.Y * PlayerLinked.Velocity.Y), Y);
+        } else {
+			PlayerLinked.BobTime = 0;
+			PlayerLinked.WalkBob = PlayerLinked.WalkBob * (1 - FMin(1, 8 * DeltaTime));
+		}
+        WalkBob = PlayerLinked.WalkBob;
         oldEyeH=PlayerLinked.EyeHeight;
 
 		if (!bBehindView)
