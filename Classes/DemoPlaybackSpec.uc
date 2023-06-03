@@ -1133,9 +1133,9 @@ event PostRender( canvas Canvas )
 
         if (myhud!=none)
             myhud.setowner(PlayerLinked);
-
-        PlayerLinked.Player=player;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
     }
+    if (PlayerLinked != None)
+    	 PlayerLinked.Player = player;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
 
     if (!bLockOn && Pawn(ViewTarget)!=none)
         Pawn(ViewTarget).ViewRotation = TargetViewRotation;
