@@ -1184,6 +1184,8 @@ event PostRender( canvas Canvas )
     // (Anth) Pure fix
     if (PlayerLinked != none)
     {
+    	if (PlayerLinked.IsInState('InvalidState'))
+    		PlayerLinked.GotoState('');
         StartTrace = PlayerLinked.Location;
         StartTrace.Z += PlayerLinked.BaseEyeHeight;
         EndTrace = StartTrace + vector(PlayerLinked.ViewRotation) * 10000.0;
