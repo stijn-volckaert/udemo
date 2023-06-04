@@ -238,7 +238,7 @@ function Refresh(optional bool init)
 // =============================================================================
 function SetupDemos(bool Refreshing)
 {
-    local string demoinfo, toadd, size;
+    local string demoinfo, toadd, size, LastDemo, LastDemoPath;
     local int pos, pos2;
     local UDComboList Combo;
     local UWindowList D, C, T;
@@ -268,8 +268,10 @@ function SetupDemos(bool Refreshing)
                 
                 Combo.AddItem2(toadd, class'demosettings'.static.Path(i, demreader.BasePath()), int(size), Mid(size, pos2 + 1));
 
-                if (!Refreshing && toadd ~= class'demosettings'.default.lastdemo)
-                    demos.SetValue(toadd, class'demosettings'.static.Path(i, demreader.BasePath()));
+                if (!Refreshing && toadd ~= class'demosettings'.default.LastDemo) {
+                	LastDemo = toadd;
+                	LastDemoPath = class'demosettings'.static.Path(i, demreader.BasePath());
+                }
 
                 demoinfo = demreader.getdemo("");
             }
@@ -308,7 +310,8 @@ function SetupDemos(bool Refreshing)
 
 	    if (!Refreshing && demos.GetValue() == "")
 	        Demos.SetSelectedIndex(0);
-    }
+    } else if (LastDemo != "")
+		demos.SetValue(LastDemo, LastDemoPath);
 }
 
 // =============================================================================
