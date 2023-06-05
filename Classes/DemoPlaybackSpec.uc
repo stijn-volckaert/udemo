@@ -124,6 +124,12 @@ exec function SeekTo(string Point) {
 	SetSeek(T);
 }
 
+exec function FollowMyCam(bool Follow)
+{
+	class'DemoSettings'.default.FollowMyCam = Follow;
+	class'DemoSettings'.static.StaticSaveConfig();
+}
+
 exec function TeamSay( string Msg ) {
 	Say(Msg);
 }
@@ -677,11 +683,23 @@ state CheatFlying
     {
         local PlayerReplicationInfo PRI;
         local int i, FragAcc;
+        local Actor Cam;
+        local vector CamLoc;
+        local rotator CamRot;
 
         if (SeekTick==3)
             EndSeek();
         if (bSeeking)
             return;
+            
+        if (class'DemoSettings'.default.FollowMyCam) {
+        	PlayerCalcView(Cam, CamLoc, CamRot);
+        	if (Cam != Self) {
+        		SetLocation(CamLoc);
+        		SetRotation(CamRot);
+        		ViewRotation = CamRot;
+        	}
+        }
 
         if (GameReplicationInfo != none)
         {
