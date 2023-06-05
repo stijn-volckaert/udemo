@@ -870,6 +870,7 @@ function GenRef()
 function CheckFx()
 {
     local ut_shieldbelteffect belt;
+    local name WeaponState;
 
     // Belt stuff!
     if (ViewTarget!=none && !bBehindView)
@@ -919,6 +920,9 @@ function CheckFx()
         {
             if (PlayerLinked.Weapon.AnimSequence=='Shake') // main
             {
+            	WeaponState = PlayerLinked.Weapon.GetStateName();
+            	if (WeaponState == '' || WeaponState == PlayerLinked.Weapon.Class.Name || WeaponState == 'ClientFireBlast')
+            		PlayerLinked.Weapon.GoToState('Pickup'); // fix for prevent interrupt anim by TournamentWeapon.AnimEnd
                 PlayerLinked.Weapon.AmbientSound=ImPactHammer(PlayerLinked.Weapon).TensionSound;
                 OldWeapon=PlayerLinked.Weapon;
             }
