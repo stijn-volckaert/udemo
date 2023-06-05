@@ -155,7 +155,7 @@ void Uudnative::execgetdemo (FFrame& Stack, RESULT_DECL)
 		SQWORD FileTime = GFileManager->GetGlobalTime(*Filename);
 		FString FileDate;
 		
-		time_t ltime = FileTime;
+		time_t ltime = FileTime != ~0 ? FileTime : time(NULL);
 		char DateTime[100] = {0};
 		struct tm *tmp;
 		tmp = localtime(&ltime);
