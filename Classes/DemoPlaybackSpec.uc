@@ -17,7 +17,7 @@ struct PlayerInfo
     var PlayerReplicationInfo PRI;
 };
 
-var PlayerInfo PI[64];
+var PlayerInfo PInfo[64];
 
 // (Added by Anth)
 struct FlagInfo
@@ -307,7 +307,7 @@ exec function FollowPlayer()
 exec function FindFlags()
 {
     local int i;
-    local PlayerReplicationInfo LastFC,PRI,FC;
+    local PlayerReplicationInfo LastFC, PRI, FC;
     local PlayerPawn PP;
 
     FC = None;
@@ -315,10 +315,10 @@ exec function FindFlags()
 
     PP = PlayerPawn(ViewTarget);
     i = FindPlayer(PP);
-    if (i!=-1 && PI[i].PRI.HasFlag!=None)
-        LastFC = PI[i].PRI; // Player we're currently following has the flag!
+    if (i != -1 && PInfo[i].PRI.HasFlag != None)
+        LastFC = PInfo[i].PRI; // Player we're currently following has the flag!
 
-    ForEach AllActors(Class'PlayerReplicationInfo',PRI)
+    ForEach AllActors(Class'PlayerReplicationInfo', PRI)
     {
         if (CTFFlag(PRI.HasFlag) != None)
         {
@@ -346,20 +346,18 @@ exec function ViewPlayer( string S )
     local pawn P;
     local int i;
 
-    for (i=0;i<32;++i)
-    {
-        if (PI[i].PRI != None && PI[i].PRI.PlayerName ~= S)
+    for (i=0; i < 32; i++)
+        if (PInfo[i].PRI != None && PInfo[i].PRI.PlayerName ~= S)
         {
-            P = PI[i].P;
+            P = PInfo[i].P;
             break;
         }
-    }
 
-    if ( (P != None) )
+    if (P != None)
     {
-        ClientMessage(ViewingFrom@PI[i].PRI.PlayerName, 'Event', true);
+        ClientMessage(ViewingFrom @ PInfo[i].PRI.PlayerName, 'Event', true);
 
-        if ( P == self)
+        if (P == self)
             ViewTarget = None;
         else
             ViewTarget = P;
@@ -367,8 +365,8 @@ exec function ViewPlayer( string S )
     else
         ClientMessage(FailedView);
 
-    bBehindView = ( ViewTarget != None );   //redo this!
-    if ( bBehindView )
+    bBehindView = ViewTarget != None;   //redo this!
+    if (bBehindView)
         ViewTarget.BecomeViewTarget();
 }
 
@@ -385,26 +383,26 @@ exec function ViewPlayerNum(optional int num)
     bChaseCam = true;
     bBehindView = true;
 
-    if ( !PlayerReplicationInfo.bIsSpectator && !Level.Game.bTeamGame )
+    if (!PlayerReplicationInfo.bIsSpectator && !Level.Game.bTeamGame)
         return;
 
-    if ( num >= 0 )
+    if (num >= 0)
     {
         P = Pawn(ViewTarget);
         i = FindPlayer(P);
-        if ( (P != None) && (i != -1) && (PI[i].PRI.TeamID == num) )
+        if (P != None && i != -1 && PInfo[i].PRI.TeamID == num)
         {
             ViewTarget = None;
             bBehindView = false;
             return;
         }
-        for ( P=Level.PawnList; P!=None; P=P.NextPawn )
+        for (P = Level.PawnList; P != None; P = P.NextPawn)
         {
             i = FindPlayer(P);
 
-            if ( (i!=-1) && (PI[i].PRI != None) && (PI[i].PRI.TeamID == num) )
+            if (i != -1 && PInfo[i].PRI != None && PInfo[i].PRI.TeamID == num)
             {
-                if ( P != self )
+                if (P != self)
                 {
                     ViewTarget = P;
                     bBehindView = true;
@@ -414,30 +412,30 @@ exec function ViewPlayerNum(optional int num)
         }
         return;
     }
-    if ( Role == ROLE_Authority )
+    if (Role == ROLE_Authority)
     {
         // Only switch if the target's PRI class is available!
-        while ( !bTargetSet )
+        while (!bTargetSet)
         {
             // Cycle trough the list of available pawns
             ViewClass(class'Pawn', true);
             if (ViewTarget != None)
             {
                 i = FindPlayer(Pawn(ViewTarget));
-                if (i!=-1)
+                if (i != -1)
                     bTargetSet = true;
             }
             else
                 bTargetSet=true;
         }
 
-        if ( ViewTarget != None )
-            ClientMessage(ViewingFrom@PI[i].PRI.PlayerName, 'event', true);
+        if (ViewTarget != None)
+            ClientMessage(ViewingFrom @ PInfo[i].PRI.PlayerName, 'event', true);
         else
-            ClientMessage(ViewingFrom@OwnCamera, 'Event', true);
+            ClientMessage(ViewingFrom @ OwnCamera, 'Event', true);
     }
 
-    FixFov();
+    FixFOV();
 }
 
 // =============================================================================
@@ -461,14 +459,14 @@ function FixFOV()
 }
 
 // =============================================================================
-// (Added by Anth) FindPlayer ~ Find a pawn in the PI list
+// (Added by Anth) FindPlayer ~ Find a pawn in the PInfo list
 // =============================================================================
 
-function int FindPlayer (Pawn P)
+function int FindPlayer(Pawn P)
 {
     local int i;
-    for (i=0;i<64;++i)
-        if (PI[i].P == P)
+    for (i = 0; i < ArrayCount(PInfo); i++)
+        if (PInfo[i].P == P)
             return i;
     return -1;
 }
@@ -481,19 +479,19 @@ function FixPRIArray()
 {
     local PlayerReplicationInfo zzMyPRI;
     local GameReplicationInfo zzMyGRI;
-    local int i,j;
+    local int i, j;
 
-    for (i=0;i<64;++i)
+    for (i = 0; i < ArrayCount(PInfo); i++)
     {
-        PI[i].P=None;
-        PI[i].PRI=None;
+        PInfo[i].P = None;
+        PInfo[i].PRI = None;
     }
-    i=0;
+    i = 0;
 
     // bleh
     if (GameReplicationInfo == None)
     {
-        foreach PlayerLinked.AllActors(class'GameReplicationInfo',zzMyGRI)
+        foreach PlayerLinked.AllActors(class'GameReplicationInfo', zzMyGRI)
         {
             GameReplicationInfo = zzMyGRI;
         }
@@ -503,24 +501,20 @@ function FixPRIArray()
     if (GameReplicationInfo != None)
     {
         oldltsoffset = Driver.ltsoffset;
-        foreach Level.AllActors(class'PlayerReplicationInfo',zzMyPRI)
+        foreach Level.AllActors(class'PlayerReplicationInfo', zzMyPRI)
         {
             if (zzMyPRI.Owner == Self)
-            {
                 PlayerReplicationInfo = zzMyPRI;
-            }
 			else if (zzMYPRI.Owner == PlayerLinked)
-			{
 				PlayerLinked.PlayerReplicationInfo = zzMyPRI;
-			}
 			
             if (zzMyPRI.Owner != None &&
 			    zzMyPRI.Owner.IsA('Pawn') &&
 				!zzMyPRI.Owner.IsA('Spectator') &&
 				Pawn(zzMyPRI.Owner).Weapon != None)
             {
-                PI[j].P = Pawn(zzMyPRI.Owner);
-                PI[j++].PRI = zzMyPRI;
+                PInfo[j].P = Pawn(zzMyPRI.Owner);
+                PInfo[j++].PRI = zzMyPRI;
             }
 
             if (zzMyPRI.Owner == None || !zzMyPRI.Owner.IsA('Spectator'))
@@ -528,9 +522,9 @@ function FixPRIArray()
         }
 
         // Set the rest of the array to none!
-        for (i=i;i<32;i++)
+        for (i = i; i < ArrayCount(GameReplicationInfo.PRIArray); i++)
         {
-            GameReplicationInfo.PRIArray[i]=none;
+            GameReplicationInfo.PRIArray[i] = none;
         }
     }
 }
@@ -543,23 +537,20 @@ function BuildFlagArray()
 {
     local int i, j;
 
-    for (i = 0; i < 64; ++i)
+    for (i = 0; i < ArrayCount(FI); i++)
     {
         FI[i].PRI = none;
         FI[i].HasFlag = none;
     }
-    i = 0;
     j = 0;
 
-    for (i = 0; i < 64; ++i)
-    {
-        if (PI[i].PRI != none && PI[i].PRI.HasFlag != None)
+    for (i = 0; i < ArrayCount(PInfo); i++)
+        if (PInfo[i].PRI != None && PInfo[i].PRI.HasFlag != None)
         {
-            FI[j].PRI = PI[i].PRI;
-            FI[j].HasFlag = CTFFlag(PI[i].PRI.HasFlag);
+            FI[j].PRI = PInfo[i].PRI;
+            FI[j].HasFlag = CTFFlag(PInfo[i].PRI.HasFlag);
             j++;
         }
-    }
 }
 
 // =============================================================================
@@ -570,27 +561,23 @@ function RestoreFlagArray()
 {
     local int i, j;
 
-    for (i = 0; i < 64; ++i)
+    for (i = 0; i < ArrayCount(FI); i++)
     {
         if (FI[i].PRI == none)
             return;
 
         FI[i].PRI.HasFlag = FI[i].HasFlag;
-        for (j = 0; j < 64; ++j)
-        {
-            if (PI[j].PRI == FI[i].PRI && FI[i].HasFlag != None)
+        for (j = 0; j < ArrayCount(PInfo); j++)
+            if (PInfo[j].PRI == FI[i].PRI && FI[i].HasFlag != None)
             {
-                FI[i].HasFlag.Holder = PI[j].P;
-                FI[i].HasFlag.Holder.PlayerReplicationInfo = PI[j].PRI;
+                FI[i].HasFlag.Holder = PInfo[j].P;
+                FI[i].HasFlag.Holder.PlayerReplicationInfo = PInfo[j].PRI;
                 break;
             }
-        }
     }
 
-    for (i = 0; i < 64; ++i)
-    {
-        PI[i].P.PlayerReplicationInfo = PI[i].PRI;
-    }
+    for (i = 0; i < ArrayCount(PInfo); i++)
+        PInfo[i].P.PlayerReplicationInfo = PInfo[i].PRI;
 
 }
 
@@ -1204,34 +1191,29 @@ event PostRender( canvas Canvas )
     }
 
     // (Anth) Pure fix
-    if (PlayerLinked != none)
+    if (PlayerLinked != None)
     {
     	if (PlayerLinked.IsInState('InvalidState'))
     		PlayerLinked.GotoState('');
         StartTrace = PlayerLinked.Location;
         StartTrace.Z += PlayerLinked.BaseEyeHeight;
-        EndTrace = StartTrace + vector(PlayerLinked.ViewRotation) * 10000.0;
+        EndTrace = StartTrace + vector(PlayerLinked.ViewRotation)*10000.0;
         Other = Trace(HitLocation, HitNormal, EndTrace, StartTrace, true);
 
-        if ( Pawn(Other) != None )
-        {
-            if ( !Other.bHidden )
-            {
-                for (i = 0; i < 64; ++i)
-                    if (PI[i].P == Pawn(Other) && (ChallengeHUD(myHUD).IdentifyTarget == none || ChallengeHUD(myHUD).IdentifyFadeTime < 3.0))
-                    {
-                        ChallengeHUD(myHUD).IdentifyTarget = PI[i].PRI;
-                        ChallengeHUD(myHUD).IdentifyFadeTime = 3.0;
-                        break;
-                    }
-            }
-        }
+        if (Pawn(Other) != None && !Other.bHidden )
+            for (i = 0; i < ArrayCount(PInfo); i++)
+                if (PInfo[i].P == Pawn(Other) && (ChallengeHUD(myHUD).IdentifyTarget == none || ChallengeHUD(myHUD).IdentifyFadeTime < 3.0))
+                {
+                    ChallengeHUD(myHUD).IdentifyTarget = PInfo[i].PRI;
+                    ChallengeHUD(myHUD).IdentifyFadeTime = 3.0;
+                    break;
+                }
     }
 
-    if (SeekTick>0 && player!=none && player.console!=none)
+    if (SeekTick > 0 && Player != None && Player.Console != None)
     {
-        Canvas.Style=1; // STY_Normal (no translucency!)
-        player.console.PrintActionMessage(Canvas,Seeking);
+        Canvas.Style = ERenderStyle.STY_Normal; // no translucency!
+        Player.Console.PrintActionMessage(Canvas, Seeking);
     }
 
     if (PlayerReplicationInfo != None)
