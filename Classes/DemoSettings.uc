@@ -14,6 +14,8 @@ config (UDemo);
 
 var config bool      bOneTimeUpgrade;
 
+var config bool FollowMyCam; // Follow camera position and rotation for DemoPlaybackSpectator?
+
 //play menu:
 var config string LastDemo; //what has the last demo selected?
 var config byte Timing; //saved timing mode
@@ -262,5 +264,6 @@ defaultproperties {
   TickSize=0.4
   DownloadType=1
   InterpolateView=true
+  FollowMyCam=True
   RedirectServers(0)="uz.ut-files.com"
 }
