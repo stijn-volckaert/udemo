@@ -346,7 +346,7 @@ exec function ViewPlayer( string S )
     local pawn P;
     local int i;
 
-    for (i=0; i < 32; i++)
+    for (i = 0; i < ArrayCount(PInfo); i++)
         if (PInfo[i].PRI != None && PInfo[i].PRI.PlayerName ~= S)
         {
             P = PInfo[i].P;
@@ -490,12 +490,8 @@ function FixPRIArray()
 
     // bleh
     if (GameReplicationInfo == None)
-    {
         foreach PlayerLinked.AllActors(class'GameReplicationInfo', zzMyGRI)
-        {
             GameReplicationInfo = zzMyGRI;
-        }
-    }
 
     // Pure fix
     if (GameReplicationInfo != None)
