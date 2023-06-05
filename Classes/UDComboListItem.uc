@@ -97,7 +97,7 @@ function PreSort() {
 	local UWindowList Temp;
 	if (CapsValue == string(Class'DemoSettings'.default.OrderByDate))
 		return;	
-	for (Temp = self.Next; Temp.Next != None; Temp = Temp.Next)
+	for (Temp = self.Next; Temp != None; Temp = Temp.Next)
 		if (Class'DemoSettings'.default.OrderByDate)
 			UDComboListItem(Temp).CapsValue = UDComboListItem(Temp).DateTime $ ":" $ Caps(UDComboListItem(Temp).Value);
 		else
