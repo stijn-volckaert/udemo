@@ -1071,7 +1071,8 @@ event RenderOverLays(Canvas Canvas)
 			if (OldPlayer == None)
 				PlayerPawn(ViewTarget).Player = Player; // hack: Weapon.Owner.Player must be not None, for prevent clear WalkBob
             PlayerPawn(ViewTarget).Weapon.renderoverlays(canvas);
-            PlayerPawn(ViewTarget).Player = OldPlayer;
+            if (OldPlayer == None)
+	            PlayerPawn(ViewTarget).Player = OldPlayer;
         }
 
         if (PlayerPawn(ViewTarget).myHUD != None)
