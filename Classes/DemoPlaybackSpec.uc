@@ -902,6 +902,8 @@ function CheckFx()
         {
             if (PlayerLinked.Weapon.AnimSequence=='Shake') // main
             {
+            	if (PlayerLinked.Weapon.IsInState('') || PlayerLinked.Weapon.IsInState(PlayerLinked.Weapon.Class.Name))
+            		PlayerLinked.Weapon.GoToState('Pickup'); // fix for prevent interrupt anim by TournamentWeapon.AnimEnd
                 PlayerLinked.Weapon.AmbientSound=ImPactHammer(PlayerLinked.Weapon).TensionSound;
                 OldWeapon=PlayerLinked.Weapon;
             }
