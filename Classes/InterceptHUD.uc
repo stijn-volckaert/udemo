@@ -8,9 +8,6 @@
 // =============================================================================
 class InterceptHUD expands ChallengeHUD;
 
-// =============================================================================
-// Variables
-// =============================================================================
 var DemoPlayBackSpec Real; // Associated demoviewer
 var string PrevMessageStr; // (Anth) Previous message
 var float PrevMessageTime; // (Anth) when was the previous message received
@@ -85,9 +82,6 @@ simulated function LocalizedMessage
         Real.myHud.LocalizedMessage(Message,Switch,RelatedPRI_1,RelatedPRI_2,OptionalObject,CriticalString);
 }
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
 defaultproperties
 {
 }

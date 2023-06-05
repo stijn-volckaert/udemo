@@ -11,11 +11,8 @@
 class udnative expands Object
     native;
 
-// =============================================================================
-// Structures
-// =============================================================================
 //
-//redefined here to make compiler happy!
+// redefined here to make compiler happy!
 //
 struct HUDLocalizedMessage
 {
@@ -34,9 +31,6 @@ struct HUDLocalizedMessage
     var float YPos;
 };
 
-// =============================================================================
-// Variables
-// =============================================================================
 var const DemoRecDriver DemoDriver; // valid when reading
 var string DemoURL;                 // (Anth) Lame Linux FURL hack...
 
@@ -109,3 +103,7 @@ event PackageRequired (string package, int size, bool Installed, GUID myGUID, in
 // called when demo done being read.
 //
 event DemoReadDone (string Map, bool bServerDemo, float Time, int NumFrames);
+
+defaultproperties
+{
+}

@@ -6,9 +6,6 @@
 class UZHandler expands Object
     native;
 
-// =============================================================================
-// Variables
-// =============================================================================
 var const pointer UzAr;        // C++ FArchive*. (as downloading)
 var const pointer UzDeCompAr;  // C++ FArchive*. (decompressed)
 var const string FileName; // temporary during decompress cycle
@@ -37,3 +34,7 @@ native final function int SaveFile (bool bInCache);
 // force save if gen mismatch
 //
 native final function ForceSave(bool bInCache);
+
+defaultproperties
+{
+}

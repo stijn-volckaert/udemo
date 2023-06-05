@@ -86,7 +86,8 @@ function Paint(Canvas C, float X, float Y)
   LookAndFeel.DrawClientArea(Self, C);
 }
 
-defaultproperties {
+defaultproperties
+{
 	LocAutoRecord="Auto-Record"
 	LocPaths="Paths"
 	LocDownloading="Downloading"

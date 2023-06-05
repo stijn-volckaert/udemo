@@ -8,9 +8,6 @@
 // =============================================================================
 class DownloadClient expands UWindowDialogClientWindow;
 
-// =============================================================================
-// Variables
-// =============================================================================
 var UWindowConsoleTextAreaControl eLog;
 var DemoList                      PkgList;
 var DemoList                      Cur;
@@ -490,15 +487,11 @@ function Notify(UWindowDialogControl C, byte E)  //control notification.
   }
 }
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
 defaultproperties
 {
 	LocUnknownState="Unknown State"
 	LocNoCurrentActivity="No current activity"
 	LocConnectingToPrefix="Connecting to"
-	LocConnectingToSuffix=""
 	LocDownloadTransferOf="of"
 	LocDownloadTransferComplete="complete"
 	LocDownloadTransferETR="Estimated Time Remaining:"
@@ -514,9 +507,7 @@ defaultproperties
 	LocDownloadErrorMessagePrefix="Downloaded file"
 	LocDownloadErrorMessageSuffix="may be corrupted. \\nClick Yes to attempt to redownload it, No to try a new location, or cancel to abort downloading."
 	LocDecompressingAndSavingPrefix="Decompressing and Saving"
-	LocDecompressingAndSavingSuffix=""
 	LocDecompressingAndSavingReceivedPrefix="Received"
-	LocDecompressingAndSavingReceivedSuffix=""
 	LocCancel="CANCEL"
 	LocCancelHelp="Clicking this button will terminate file downloading sequence."
 }

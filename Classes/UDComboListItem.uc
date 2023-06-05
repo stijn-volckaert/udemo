@@ -9,9 +9,6 @@
 // =============================================================================
 class UDComboListItem expands UWindowComboListItem;
 
-// =============================================================================
-// Variables
-// =============================================================================
 var string   MapName;     // map demo uses
 var bool     bServerDemo; // server demo?
 var float    PlayTime;    // amount of PlayTime in Demo
@@ -125,10 +122,6 @@ function UWindowList Sort()
 	//Validate();
 	return Self;
 }
-
-// =============================================================================
-// defaultproperties
-// =============================================================================
 
 defaultproperties
 {

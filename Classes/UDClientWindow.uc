@@ -7,9 +7,6 @@
 // =============================================================================
 class UDClientWindow expands UMenuPageWindow;
 
-// =============================================================================
-// Variables
-// =============================================================================
 var UWindowComboControl demos;         // list to select demo
 var UWindowComboControl timing;        // list to select timing
 var UWindowComboControl drivers;       // list to select driver
@@ -30,9 +27,9 @@ var UDComboListItem     LastDemoItem;  // for list saving
 var DemoReader          demreader;     // class that exists in C++ to search for demos and give info on them.
 var string              last;          // to add new demos found later...
 var byte                ShotTime;      // shot timer
-var byte                LastInstalled; // speed
+var byte                LastInstalled; // summary about all packages for current demo
 var bool                Initialized;   // Init done
-var localized string    Spechelp;      // save file size
+var localized string    SpecHelp;
 var localized string	LocDemos;
 var localized string	LocDemosHelp;
 var localized string	LocPlayDemo;
@@ -196,7 +193,7 @@ function Created()
 
     Spectate=UWindowCheckBox(CreateControl(class'UWindowCheckBox', CenterPos, ControlOffset, CenterWidth2, 16));
     Spectate.SetText(LocAOSpectate);
-    Spectate.SetHelpText(spechelp);
+    Spectate.SetHelpText(SpecHelp);
     Spectate.bChecked=Class'DemoSettings'.default.SpecDemo;
     ControlOffset+=16;
     
@@ -338,7 +335,7 @@ function demochanged()
     //reset spec stuff:
     Spectate.bDisabled=false;
     Spectate.bChecked=Class'DemoSettings'.default.SpecDemo;
-    Spectate.SetHelpText(spechelp);
+    Spectate.SetHelpText(SpecHelp);
 
      //already read
     if (LastDemoItem.Packages != none)
@@ -656,13 +653,9 @@ function Tick(float delta)
     demreader.DispatchTick(delta/GetLevel().timedilation);
 }
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
-
 defaultproperties
 {
-    SpecHelp="If checked, you will be able to fly around the level when playing a demo"
+	SpecHelp="If checked, you will be able to fly around the level when playing a demo"
 	LocDemos="Demos:"
 	LocDemosHelp="Select the demo that you wish to play."
 	LocPlayDemo="PLAY"
@@ -711,7 +704,6 @@ defaultproperties
 	LocRenameDemoTitle="Rename Demo"
 	LocDemoSummarySuccessTitle="SUCCESS!"
 	LocDemoSummarySuccessPrefix="Saved Demo Summary as"
-	LocDemoSummarySuccessSuffix=""
 	LocDemoSummaryErrorTitle="Unknown Error"
 	LocDemoSummaryErrorMessage="Could not write demo summary."
 	LocDeleteDemoTitle="Confirm delete"

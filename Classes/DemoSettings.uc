@@ -10,7 +10,7 @@
 // ============================================================
 
 class DemoSettings expands Object
-config (UDemo);
+	config (udemo);
 
 var config bool      bOneTimeUpgrade;
 
@@ -249,21 +249,23 @@ static function string FloatString (float A){  //converts to 2 dig float
   pos=instr(A,".");
   return left(tmp,pos)$mid(tmp,pos,2);
 }
-defaultproperties {
-  Timing=1
-  DemoPaths(0)="Empty"
-  DemoPaths(1)="Empty"
-  DemoPaths(2)="Empty"
-  DemoPaths(3)="Empty"
-  DemoPaths(4)="Empty"
-  DisplayMode=1
-  //GenerateInfo=true
-  Format="%L_%M-%D_%H-%O-%S"
-  bRecordWhenSpectating=true
-  CacheSeconds=7.0
-  TickSize=0.4
-  DownloadType=1
-  InterpolateView=true
-  FollowMyCam=True
-  RedirectServers(0)="uz.ut-files.com"
+
+defaultproperties
+{
+	FollowMyCam=True
+	timing=1
+	OrderByDate=True
+	DemoPaths(0)="Empty"
+	DemoPaths(1)="Empty"
+	DemoPaths(2)="Empty"
+	DemoPaths(3)="Empty"
+	DemoPaths(4)="Empty"
+	DisplayMode=1
+	Format="%L_%M-%D_%H-%O-%S"
+	bRecordWhenSpectating=True
+	DownloadType=1
+	RedirectServers(0)="uz.ut-files.com"
+	CacheSeconds=7.000000
+	TickSize=0.400000
+	InterpolateView=True
 }

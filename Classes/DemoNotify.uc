@@ -26,7 +26,8 @@ simulated event Actor SpawnNotification(Actor A)
   return A;
 }
 
-defaultproperties {
-  RemoteRole=Role_None
-  ActorClass=class'VoicePack'
+defaultproperties
+{
+	ActorClass=Class'Engine.VoicePack'
+	RemoteRole=ROLE_None
 }

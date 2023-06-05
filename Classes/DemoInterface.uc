@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // UT Demo Manager v3.4
 // Originally written by UsAaR33
 // Project continued by AnthraX after v3.0
@@ -11,9 +11,8 @@
 // ===============================================================
 
 class DemoInterface expands Object
-native config(udemo);
+	native config(udemo);
 
-//variables:
 var const PlayerPawn DemoSpec;  //the spectator subclass
 var const uDemoDriver DemoDriver; //the demo driver. only valid in cpp
 //useful in vars to read in script:
@@ -25,7 +24,7 @@ var const float ltsoffset;   // (Anth) Sync time thingie
 // (Anth) Destroying illegal actors is native now (because of serverside demos)
 var config string IllegalActors[20];
 
-// (Anth) Testing only!'éçà
+// (Anth) Testing only!
 var config bool bDebug;
 var config bool bAnthDebug;
 
@@ -124,3 +123,7 @@ event LinkToPlayer (PlayerPawn p, bool LockOn)
 }
 
 event NetPacketReceived(); //called each packet if message grabbing
+
+defaultproperties
+{
+}

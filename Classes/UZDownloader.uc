@@ -8,9 +8,6 @@
 // =============================================================================
 class UZDownloader expands TcpLink;
 
-// =============================================================================
-// Variables
-// =============================================================================
 var UZHandler Saver;         // saves the stuff downloaded
 var DownloadClient GUI;      // the GUI for this.
 var int TotalSize;           // total size of the file.
@@ -293,13 +290,9 @@ function Timer()
     log ("Time out. Still connected?"@(!IsConnected() || !Close()));
 }
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
 defaultproperties
 {
-    ReceiveMode=RMODE_Event
-    LinkMode=MODE_Binary
-    TotalSize=-1
+	TotalSize=-1
+	LinkMode=MODE_Binary
+	ReceiveMode=RMODE_Event
 }
-

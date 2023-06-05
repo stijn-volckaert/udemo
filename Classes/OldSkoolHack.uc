@@ -8,9 +8,6 @@
 // =============================================================================
 class OldSkoolHack expands Actor;
 
-// =============================================================================
-// Variables
-// =============================================================================
 var string OldLevel;
 var AutoRecorder Rec;
 var bool bLevelChanged;
@@ -46,4 +43,8 @@ event Destroyed()
 {
     if (Rec.Hack==self)
         Rec.Hack=None;
+}
+
+defaultproperties
+{
 }

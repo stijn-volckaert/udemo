@@ -7,9 +7,6 @@
 // =============================================================================
 class UDframedwindow expands UWindowFramedWindow;
 
-// =============================================================================
-// Variables
-// =============================================================================
 var AutoRecorder MemHolder;
 
 // =============================================================================
@@ -26,12 +23,8 @@ function Close(optional bool bByParent)
     MemHolder.SendToBack();
 }
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
 defaultproperties
 {
-    ClientClass=Class'DemoMainClientWindow'
-    WindowTitle="Unreal Tournament Demo Manager 3.5.1 - By UsAaR33 and AnthraX"
+	ClientClass=Class'DemoMainClientWindow'
+	WindowTitle="Unreal Tournament Demo Manager 3.5.1 - By UsAaR33 and AnthraX"
 }
-

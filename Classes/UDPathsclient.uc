@@ -7,9 +7,6 @@
 // =============================================================================
 class UDPathsclient expands UMenuPageWindow;
 
-// =============================================================================
-// Variables
-// =============================================================================
 var UWindowEditControl Paths[5];
 var UWindowCheckBox RecordPath[5];
 var UWindowLabelControl BaseDir;
@@ -268,15 +265,12 @@ function WindowHidden()
     DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).UserWindow.Refresh(); //in case path swap...
 }
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
 defaultproperties
 {
-  Empty="Empty"
-  LocBaseDirectory="Base directory:"
-  LocDemoPaths="Demo Paths:"
-  LocRecordingDir="Recording Dir?"
-  LocDemFilesAreStoredHelp="Enter in the directory path where .dem files are stored."
-  LocShouldDemosBeRecorded="Should demos be recorded into this directory?"
+	Empty="Empty"
+	LocBaseDirectory="Base directory:"
+	LocDemoPaths="Demo Paths:"
+	LocRecordingDir="Recording Dir?"
+	LocDemFilesAreStoredHelp="Enter in the directory path where .dem files are stored."
+	LocShouldDemosBeRecorded="Should demos be recorded into this directory?"
 }

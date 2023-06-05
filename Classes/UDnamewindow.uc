@@ -8,9 +8,6 @@
 // =============================================================================
 class UDnamewindow expands UWindowFramedWindow;
 
-// =============================================================================
-// Variables
-// =============================================================================
 var UWindowSmallCloseButton CloseButton;
 var UWindowSmallButton OKButton;
 
@@ -83,11 +80,8 @@ function Paint(Canvas C, float X, float Y)
     Super.Paint(C, X, Y);
 }
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
 defaultproperties
 {
-    ClientClass=Class'UDnameclient'
-    WindowTitle="Enter Demo Name"
+	ClientClass=Class'UDnameclient'
+	WindowTitle="Enter Demo Name"
 }

@@ -7,9 +7,6 @@
 // =============================================================================
 class UDnameclient expands UWindowDialogClientWindow;
 
-// =============================================================================
-// Variables
-// =============================================================================
 var UWindowEditControl  NameEdit;
 var UWindowMessageBox overwrite;
 var DemoReader demreader;          //if !=none then this is meant for use with renamer.
@@ -134,9 +131,6 @@ function MessageBoxDone(UWindowMessageBox W, MessageBoxResult Result)
     }
 }
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
 defaultproperties
 {
 	LocConfirmFileOverwrite="Confirm file overwrite"

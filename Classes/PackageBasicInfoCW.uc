@@ -8,9 +8,6 @@
 // =============================================================================
 class PackageBasicInfoCW expands UMenuDialogClientWindow;
 
-// =============================================================================
-// Variables
-// =============================================================================
 var bool                UsesBp1;    // Demo uses bonuspack 1?
 var bool                Bp1INS;     // Bonuspack 1 installed by viewer?
 var bool                UsesBP4;    // Demo uses bonuspack 4?
@@ -161,9 +158,6 @@ function Notify(UWindowDialogControl C, byte E)
     }
 }
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
 defaultproperties
 {
 	LocBonusPack1Required="Bonus Pack 1 Required"

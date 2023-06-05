@@ -62,12 +62,9 @@ function Paint(Canvas C, float X, float Y)
 // =============================================================================
 function LMouseDown(float X, float Y);
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
 defaultproperties
 {
-    bTransient=true
-    ClientClass=class'DownloadClient'
-    WindowTitle="Downloading..."
+	ClientClass=Class'DownloadClient'
+	WindowTitle="Downloading..."
+	bTransient=True
 }

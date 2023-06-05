@@ -7,9 +7,6 @@
 // =============================================================================
 class UDNetSettingsClient expands UMenuPageWindow;
 
-// =============================================================================
-// Variables
-// =============================================================================
 var UWindowEditControl Servers[6];
 var UWindowComboControl DLType;
 var localized string Empty;
@@ -96,17 +93,14 @@ function WindowHidden()
     }
 }
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
 defaultproperties
 {
-  Empty="(Empty)"
-  LocSaveType="Save Type:"
-  LocSaveTypeHelp="Configure where demos should be saved to.  If saved in main directories, the file will be usable in singleplayer, but may lead to version mismatches in other demos or netplay."
-  LocInCacheDirectory="In Cache Directory"
-  LocInMainDirectories="In Main Directories"
-//  LocInMainDirectoriesWithINT="Main Directories w/ INT Installing"
-  LocUZRedirectServers="UZ redirect Servers:"
-  LocUZRedirectServersHelp="Enter in an HTTP Unreal UZ redirect server to use."
+	Empty="(Empty)"
+	LocSaveType="Save Type:"
+	LocSaveTypeHelp="Configure where demos should be saved to.  If saved in main directories, the file will be usable in singleplayer, but may lead to version mismatches in other demos or netplay."
+	LocInCacheDirectory="In Cache Directory"
+	LocInMainDirectories="In Main Directories"
+//	LocInMainDirectoriesWithINT="Main Directories w/ INT Installing"
+	LocUZRedirectServers="UZ redirect Servers:"
+	LocUZRedirectServersHelp="Enter in an HTTP Unreal UZ redirect server to use."
 }

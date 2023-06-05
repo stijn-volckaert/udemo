@@ -7,9 +7,6 @@
 // =============================================================================
 class UDmoditem expands UMenuModMenuItem;
 
-// =============================================================================
-// Constants
-// =============================================================================
 const w = 510;
 const h = 340;
 
@@ -81,11 +78,8 @@ function Setup()
     UFW.Close();
 }
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
 defaultproperties
 {
-    MenuCaption="&Demo Manager"
-    MenuHelp="Play and Record demos!"
+	MenuCaption="&Demo Manager"
+	MenuHelp="Play and Record demos!"
 }

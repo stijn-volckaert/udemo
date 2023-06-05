@@ -424,6 +424,7 @@ function int Compare(UWindowList T, UWindowList B)
   return Result;
 }
 
-defaultproperties {
-binstalled=1
+defaultproperties
+{
+	bInstalled=1
 }

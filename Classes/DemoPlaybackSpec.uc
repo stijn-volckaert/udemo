@@ -1780,12 +1780,9 @@ function InterpolateRot(float deltatime, out rotator camrot)
 
 defaultproperties
 {
-    bAdmin=true
-    HUDType=none
-    oldEyeH=27
-    balwaystick=true //screw level.pauser ;p
-    ViewTargetID=-1
-    Seeking="SEEKING"
+	oldEyeH=27.000000
+	ViewTargetID=-1
+	Seeking="SEEKING"
 	LocCurrentlyAt="Currently at"
 	LocCurrentlyAtFrame="Currently at frame"
 	LocDemoIsPrefix="Demo is"
@@ -1796,6 +1793,8 @@ defaultproperties
 	LocSmartCTFToggled="SmartCTF stats toggled"
 	LocCannotGoToFPSMode="Cannot go to first person mode in server demos!"
 	LocDemoIsNowPlayingBackPrefix="Demo is now playing back with type"
-	LocDemoIsNowPlayingBackSuffix=""
 	LocServerDemosHaveNoPlayerRecorders="Server demos have no player recorders!"
+	HUDType=None
+	bAdmin=True
+	bAlwaysTick=True
 }

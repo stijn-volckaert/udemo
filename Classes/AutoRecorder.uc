@@ -9,9 +9,6 @@
 // =============================================================================
 class AutoRecorder expands UWindowWindow;
 
-// =============================================================================
-// Variables
-// =============================================================================
 var UDClientWindow Udemo;      //
 var OldSkoolHack   Hack;       //
 var bool           bIsPlaying; // tells if it is actually a demo playing :p
@@ -87,10 +84,7 @@ function NotifyLevelChange()
     }
 }
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
 defaultproperties
 {
-    bTransient=true
+	bTransient=True
 }

@@ -7,9 +7,6 @@
 // =============================================================================
 class DemoGrid expands UWindowGrid;
 
-// =============================================================================
-// Variables
-// =============================================================================
 var UWindowGridColumn InstalledColumn;
 var int               InstallWidth;
 var localized string  InstallType[3];
@@ -144,9 +141,6 @@ function SelectRow(int Row)
     //add downloading pop-up here?
 }
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
 defaultproperties
 {
 	LocPackageName="Package Name"

@@ -7,9 +7,6 @@
 // =============================================================================
 class UDFeaturesClient expands UMenuPageWindow;
 
-// =============================================================================
-// Variables
-// =============================================================================
 var UWindowEditControl Format;
 var UWindowLabelControl FormatPreview;
 var UWindowCheckBox GenerateInfo;
@@ -166,9 +163,6 @@ function Paint(Canvas C, float X, float Y)
     WriteText(C, "%% - "$LocFlagsSymbol, Y);
 }
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
 defaultproperties
 {
 	LocAutoRecord="Auto-Record"

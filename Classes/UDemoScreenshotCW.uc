@@ -117,9 +117,6 @@ function Paint(Canvas C, float MouseX, float MouseY)
     }
 }
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
 defaultproperties
 {
 	LocCannotPlayDemoPrefix="Warning: Cannot play demo:"
