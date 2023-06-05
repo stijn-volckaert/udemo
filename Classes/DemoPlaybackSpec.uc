@@ -1261,7 +1261,7 @@ event UpdateEyeHeight(float DeltaTime)
 		if (!bBehindView)
 		{
 			bZooming = PlayerLinked.bZooming;
-			if (bZooming)
+			if (bZooming || PlayerLinked.DesiredFOV != PlayerLinked.DefaultFOV)
 			{
 				DesiredFOV = PlayerLinked.DesiredFOV;
 				bWasZooming = true;
