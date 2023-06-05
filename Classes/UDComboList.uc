@@ -69,7 +69,6 @@ function AddSortedItem(string Value, optional string Value2, optional int SortWe
 function UDComboListItem FindItem(string Value)
 {
     local UDComboListItem I;
-    local int Count;
 
     I = UDComboListItem(Items.Next);
 

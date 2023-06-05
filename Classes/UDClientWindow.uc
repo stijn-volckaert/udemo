@@ -96,7 +96,6 @@ function Created()
     local int CenterWidth, CenterPos, CenterWidth2, CenterPos2;
     local int i;
     local UWindowLabelControl Ctrl, Ctrl_dem;
-    local bool B;
 
     CenterWidth2 = WinWidth - 20;//(WinWidth/8)*7; //combo width
     CenterWidth = (WinWidth - 30)/2; //button width

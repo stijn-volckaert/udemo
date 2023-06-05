@@ -70,7 +70,7 @@ static function bool ShouldRecord(LevelInfo level){ //compare stuff to see if re
 //parses format to give result.
 static function string GetDemoName(playerpawn p, UWindowComboListItem List){
   local string Msg, OutMsg, cmd; //names are ripped, yes :)
-  local int pos,i, x;
+  local int pos, x;
   local levelinfo level;
   level=p.level;
   Msg=default.format;

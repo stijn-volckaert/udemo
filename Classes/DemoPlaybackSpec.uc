@@ -264,8 +264,6 @@ exec function BehindView( Bool B )
 
 exec function Say( string Msg )
 {
-    local Pawn P;
-
     if (left(Msg,1) == "#")
     {
         Msg = right(Msg,len(Msg)-1);
@@ -308,7 +306,7 @@ exec function FollowPlayer()
 
 exec function FindFlags()
 {
-    local int x,i;
+    local int i;
     local PlayerReplicationInfo LastFC,PRI,FC;
     local PlayerPawn PP;
 
@@ -483,7 +481,6 @@ function FixPRIArray()
 {
     local PlayerReplicationInfo zzMyPRI;
     local GameReplicationInfo zzMyGRI;
-    local Pawn P;
     local int i,j;
 
     for (i=0;i<64;++i)
@@ -545,8 +542,6 @@ function FixPRIArray()
 function BuildFlagArray()
 {
     local int i, j;
-    local CTFFlag F;
-    local PlayerReplicationInfo PRI;
 
     for (i = 0; i < 64; ++i)
     {
@@ -574,7 +569,6 @@ function BuildFlagArray()
 function RestoreFlagArray()
 {
     local int i, j;
-    local Pawn P;
 
     for (i = 0; i < 64; ++i)
     {
@@ -933,7 +927,6 @@ function CheckFx()
 event PreRender( canvas Canvas )
 {
     local ENetRole oldrole;
-    local PlayerPawn PP;
 
     super.PreRender(Canvas);
 
@@ -985,7 +978,6 @@ event RenderOverLays(Canvas Canvas)
     local vector CamLoc,newLoc,nLoc;
     local ENetRole oldRole;
     local Actor Dummy;
-    local vector HitLocation, HitNormal;
 	local bool bFollowingProjectile;
 	local Player OldPlayer;
 
@@ -1115,7 +1107,6 @@ event PostRender( canvas Canvas )
     local int i;
     local float DamageTime, StatScale, X;
     local ut_shieldbelteffect belt;
-    local PlayerReplicationInfo PRI;
 	local vector HitLocation, HitNormal, StartTrace, EndTrace;
 	local actor Other;
 

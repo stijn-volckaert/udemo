@@ -91,8 +91,6 @@ function GotoFrame (float Time)
 */
 event LinkToPlayer (PlayerPawn p, bool LockOn)
 {
-    local playerpawn PP;
-
     DemoPlaybackSpec(DemoSpec).Driver = self;  //give pointer to self
 
     // No lockon! We don't want to render stuff
