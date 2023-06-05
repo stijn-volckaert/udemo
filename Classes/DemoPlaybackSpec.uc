@@ -52,7 +52,6 @@ var Ammo DummyAmmo;             // hack!
 var InterCeptHud h;
 var float oldltsoffset;
 var Actor OldViewTarget;
-var bool bWasZooming;
 
 // (Anth) support for following projectiles such as guided warshells	
 var bool bWasFollowingProjectile;
@@ -984,6 +983,7 @@ event RenderOverLays(Canvas Canvas)
     local Actor Dummy;
     local vector HitLocation, HitNormal;
 	local bool bFollowingProjectile;
+	local Player OldPlayer;
 
 	if (OldViewTarget != None)
 	{
@@ -1054,8 +1054,11 @@ event RenderOverLays(Canvas Canvas)
 
         // Set the location, Only if not paused!
         // Will cause camera to float away if we do it while paused as well
-        if (Level != None && (Level.Pauser == "" || bFollowingProjectile))
+        if (Level != None && (Level.Pauser == "" || bFollowingProjectile)) {
+            if (PlayerPawn(ViewTarget).Weapon != None) // Apply WalkBob
+                NewLoc -= PlayerPawn(ViewTarget).WalkBob;
             PlayerPawn(ViewTarget).SetLocation(NewLoc);
+        }
 
         // Reset PlayerLinked.Role
         PlayerPawn(ViewTarget).Role=oldRole;
@@ -1081,8 +1084,14 @@ event RenderOverLays(Canvas Canvas)
         }
 
         // No call to ViewTarget.RenderOverLays here!!!
-        if (PlayerPawn(ViewTarget).Weapon != None)
+        if (PlayerPawn(ViewTarget).Weapon != None) {
+			OldPlayer = PlayerPawn(ViewTarget).Player;
+			if (OldPlayer == None)
+				PlayerPawn(ViewTarget).Player = Player; // hack: Weapon.Owner.Player must be not None, for prevent clear WalkBob
             PlayerPawn(ViewTarget).Weapon.renderoverlays(canvas);
+            if (OldPlayer == None)
+	            PlayerPawn(ViewTarget).Player = OldPlayer;
+        }
 
         if (PlayerPawn(ViewTarget).myHUD != None)
             PlayerPawn(ViewTarget).myHUD.renderoverlays(canvas);
@@ -1245,37 +1254,47 @@ event PostRender( canvas Canvas )
 // native call, maintain correct Z-offset
 event UpdateEyeHeight(float DeltaTime)
 {
-    local vector x, y, z;
+	local vector x, y, z;
+	local PlayerPawn PP;
+	local bool bKeepZoom;
+	local ENetRole OldRole;
 
-    super.UpdateEyeHeight(DeltaTime);
+	Super.UpdateEyeHeight(DeltaTime);
 
-    if (PlayerLinked!=none && level.pauser=="")
-    {
-        PlayerLinked.EyeHeight=oldEyeH;
-        PlayerLinked.ViewShake(DeltaTime);
-        PlayerLinked.UpdateEyeHeight(DeltaTime);
-        GetAxes(PlayerLinked.Rotation,X,Y,Z);
-        PlayerLinked.CheckBob(DeltaTime, sqrt(PlayerLinked.Velocity.X * PlayerLinked.Velocity.X + PlayerLinked.Velocity.Y * PlayerLinked.Velocity.Y), Y);
-        oldEyeH=PlayerLinked.EyeHeight;
+	PP = PlayerPawn(ViewTarget);
+	if (PP == None && ViewTarget != None)
+		PP = PlayerPawn(ViewTarget.Owner);
+	if (PP != None) {
+		if (Level.Pauser == "") {
+			PP.EyeHeight = oldEyeH;
+			PP.ViewShake(DeltaTime);
+			//PP.UpdateEyeHeight(DeltaTime);
+			if (PP == ViewTarget && PP.Base != None && PP.GetAnimGroup(PP.AnimSequence) != 'Dodge') {
+				GetAxes(PP.Rotation,X,Y,Z);
+				OldRole = PP.Role;
+				PP.Role = ROLE_Authority; // hack for apply bob when spectate another players, not demo recorder
+				PP.CheckBob(DeltaTime, sqrt(PP.Velocity.X * PP.Velocity.X + PP.Velocity.Y * PP.Velocity.Y), Y);
+				PP.Role = OldRole;
+			} else {
+				PP.BobTime = 0;
+				PP.WalkBob = PP.WalkBob * (1 - FMin(1, 8 * DeltaTime));
+			}
+			WalkBob = PP.WalkBob;
+			oldEyeH = PP.EyeHeight;
+		}
 
 		if (!bBehindView)
 		{
-			bZooming = PlayerLinked.bZooming;
-			if (bZooming || PlayerLinked.DesiredFOV != PlayerLinked.DefaultFOV)
+			bZooming = PP.bZooming;
+			if (bZooming || PP.DesiredFOV != PP.DefaultFOV)
 			{
-				DesiredFOV = PlayerLinked.DesiredFOV;
-				bWasZooming = true;
-			}
-			else
-			{
-				if (bWasZooming)
-				{
-					FixFOV();
-			   		bWasZooming = false;
-				}			
+				DesiredFOV = PP.DesiredFOV;
+				bKeepZoom = true;
 			}
 		}
-    }
+	}
+	if (!bKeepZoom && DesiredFOV != DefaultFOV)
+		FixFOV();
 }
 
 //use viewtarget (for water and such)
