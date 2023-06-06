@@ -630,8 +630,8 @@ function EndSeek()
 // Store playerid of current viewtarget (cam will try to relock on viewtarget after the seek)
 function BackUpRefs()
 {
-    if (pawn(ViewTarget)!=none && Pawn(viewTarget).PlayerReplicationInfo!=none)
-        ViewTargetID=Pawn(viewTarget).PlayerReplicationInfo.PlayerID;
+    if (Pawn(ViewTarget) != None && Pawn(ViewTarget).PlayerReplicationInfo != None)
+        ViewTargetID = Pawn(ViewTarget).PlayerReplicationInfo.PlayerID;
 }
 
 // Not used... :/
@@ -641,11 +641,9 @@ function FixGRI(float DTime)
 {
     local GameReplicationInfo MyGRI;
 
-    if (GameReplicationInfo == none && PlayerLinked != none)
-    {
-        foreach PlayerLinked.AllActors(class'GameReplicationInfo',MyGRI)
+    if (GameReplicationInfo == None && PlayerLinked != None)
+        foreach PlayerLinked.AllActors(class'GameReplicationInfo', MyGRI)
             GameReplicationInfo = MyGRI;
-    }
 }
 
 // =============================================================================
@@ -664,7 +662,7 @@ state CheatFlying
         local vector CamLoc;
         local rotator CamRot;
 
-        if (SeekTick==3)
+        if (SeekTick == 3)
             EndSeek();
         if (bSeeking)
             return;
@@ -681,38 +679,36 @@ state CheatFlying
         if (GameReplicationInfo != none)
         {
             // Keep PRIArray up to date
-            for (i=0; i<32; i++)
+            for (i = 0; i < ArrayCount(GameReplicationInfo.PRIArray); i++)
                 GameReplicationInfo.PRIArray[i] = None;
-            i=0;
+            i = 0;
             foreach AllActors(class'PlayerReplicationInfo', PRI)
-            {
-                if ( i < 32 )
+                if (i < ArrayCount(GameReplicationInfo.PRIArray))
                     GameReplicationInfo.PRIArray[i++] = PRI;
-            }
 
             // Update various information.
             GameReplicationInfo.UpdateTimer = 0;
-            for (i=0; i<32; i++)
+            for (i = 0; i < ArrayCount(GameReplicationInfo.PRIArray); i++)
                 if (GameReplicationInfo.PRIArray[i] != None)
                     FragAcc += GameReplicationInfo.PRIArray[i].Score;
             GameReplicationInfo.SumFrags = FragAcc;
 
-            if ( Level.Game != None )
+            if (Level.Game != None)
                 GameReplicationInfo.NumPlayers = Level.Game.NumPlayers;
         }
 
-        super.PlayerTick(delta);
+        Super.PlayerTick(Delta);
 
         //seeking cr4p:
-        if (SeekTick==1)
+        if (SeekTick == 1)
         {
             ClearHUD();
             Driver.GotoFrame(SeekTime);
-            SeekTick=3;
+            SeekTick = 3;
             return;
         }
 
-        if (SeekTick>0)
+        if (SeekTick > 0)
             SeekTick--;
 
 		// (Anth) Fix for broken HUD in server-side demos
@@ -720,15 +716,14 @@ state CheatFlying
 		    PlayerLinked = None;
 
         // (Anth) Changed this so that it only steals the refs if playerlinked has changed...
-        if (PlayerLinked != None && PlayerLinked!=OldPlayerLinked)
+        if (PlayerLinked != None && PlayerLinked != OldPlayerLinked)
         {
             OldPlayerLinked = PlayerLinked;
             StealRef();
         }
         // DLO Gameclass to get hud & sb
-        else if (PlayerLinked == None && HudType==none)
+        else if (PlayerLinked == None && HudType == None)
             GenRef();
-
     }
     
     // (Sp0ngeb0b)
