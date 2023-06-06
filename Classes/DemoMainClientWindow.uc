@@ -29,64 +29,68 @@ var localized string LocDownloading;
 
 function Created()
 {
-  local UMenuPageControl pages;
-  Super.Created();
+	local UMenuPageControl pages;
+	Super.Created();
 
-  HSplitter = UWindowHSplitter(CreateWindow(class'UWindowHSplitter', 0, 0, WinWidth+4, WinHeight));
+	HSplitter = UWindowHSplitter(CreateWindow(class'UWindowHSplitter', 0, 0, WinWidth + 4, WinHeight));
 
-  HSplitter.Splitpos=270;
-  HSplitter.MaxSplitPos=270;
+	HSplitter.Splitpos = 270;
+	HSplitter.MaxSplitPos = 270;
 
-  VSplitterL = UWindowVSplitter(HSplitter.CreateWindow(class'UWindowVSplitter', 0, 0, WinWidth, WinHeight));
-  VSplitterR = UWindowVSplitter(HSplitter.CreateWindow(class'UWindowVSplitter', 0, 0, WinWidth, WinHeight));
+	VSplitterL = UWindowVSplitter(HSplitter.CreateWindow(class'UWindowVSplitter', 0, 0, WinWidth, WinHeight));
+	VSplitterR = UWindowVSplitter(HSplitter.CreateWindow(class'UWindowVSplitter', 0, 0, WinWidth, WinHeight));
 
-  HSplitter.LeftClientWindow = VSplitterL;
-  HSplitter.RightClientWindow = VSplitterR;
+	HSplitter.LeftClientWindow = VSplitterL;
+	HSplitter.RightClientWindow = VSplitterR;
 
 
-  VSplitterL.Splitpos=190;
-  VSplitterL.MaxSplitpos=190;
+	VSplitterL.Splitpos = 190;
+	VSplitterL.MaxSplitpos = 190;
 
-  VSplitterR.Splitpos=winwidth-272;
-  VSplitterR.MaxSplitpos=VSplitterR.Splitpos;
+	VSplitterR.Splitpos = winwidth - 272;
+	VSplitterR.MaxSplitpos = VSplitterR.Splitpos;
 
-  //remove later?
-  VSplitterR.bSizable=false;
-  VSplitterL.bSizable=false;
-  HSplitter.bSizable=false;
+	//remove later?
+	VSplitterR.bSizable = false;
+	VSplitterL.bSizable = false;
+	HSplitter.bSizable = false;
 
-  Packages=new (none) class'DemoList'; //generate list.
-  Packages.SetupSentinel();
+	Packages = new(None) class'DemoList'; //generate list.
+	Packages.SetupSentinel();
 
-  VSplitterL.BottomClientWindow = VSplitterL.CreateWindow(class'DemoGrid', 0, 0, HSplitter.splitpos, WinHeight);
+	VSplitterL.BottomClientWindow = VSplitterL.CreateWindow(class'DemoGrid', 0, 0, HSplitter.splitpos, WinHeight);
 
-  VSplitterR.TopClientWindow = VSplitterR.CreateWindow(class'UDemoScreenshotCW', 0, 0, WinWidth, WinHeight);
-  ScreenShot = UDemoScreenshotCW(VSplitterR.TopClientWindow);
+	VSplitterR.TopClientWindow = VSplitterR.CreateWindow(class'UDemoScreenshotCW', 0, 0, WinWidth, WinHeight);
+	ScreenShot = UDemoScreenshotCW(VSplitterR.TopClientWindow);
 
-  VSplitterR.BottomClientWindow = VSplitterR.CreateWindow(class'PackageBasicInfoCW', 0, 0, WinWidth-HSplitter.splitpos-7, WinHeight-VSplitterL.splitpos-7);
-  PBI=PackageBasicInfoCW(VSplitterR.BottomClientWindow);
+	VSplitterR.BottomClientWindow = VSplitterR.CreateWindow(class'PackageBasicInfoCW', 0, 0, 
+		WinWidth - HSplitter.splitpos - 7, WinHeight - VSplitterL.splitpos - 7);
+	PBI=PackageBasicInfoCW(VSplitterR.BottomClientWindow);
 
-  //page control in 4th
-  Pages = UMenuPageControl(VSplitterL.CreateWindow(class'UMenuPageControl', 0, 0, HSplitter.splitpos, VSplitterL.splitpos));
-  Pages.SetMultiLine(true); //change?
-  VSplitterL.TopClientWindow=Pages;
-  UserWindow=UDClientwindow(Pages.AddPage("Start", class'UDClientwindow').Page);
-  Pages.AddPage(LocAutoRecord, class'UDFeaturesClient');
-  Pages.AddPage(LocPaths, class'UDPathsClient');
-  Pages.AddPage(LocDownloading, class'UDNetSettingsClient');
-  bInitialized=true;
+	//page control in 4th
+	Pages = UMenuPageControl(VSplitterL.CreateWindow(class'UMenuPageControl', 0, 0, HSplitter.splitpos, VSplitterL.splitpos));
+	Pages.SetMultiLine(true); //change?
+	VSplitterL.TopClientWindow = Pages;
+	UserWindow = UDClientwindow(Pages.AddPage("Start", class'UDClientwindow').Page);
+	Pages.AddPage(LocAutoRecord, class'UDFeaturesClient');
+	Pages.AddPage(LocPaths, class'UDPathsClient');
+	Pages.AddPage(LocDownloading, class'UDNetSettingsClient');
+	bInitialized = true;
 }
 //called when reopened:
-function Refresh(){
-  UserWindow.Refresh();
-}
-function Paint(Canvas C, float X, float Y)
+function Refresh()
 {
-  Super.Paint(C, X, Y);
-  LookAndFeel.DrawClientArea(Self, C);
+	UserWindow.Refresh();
 }
 
-defaultproperties {
+function Paint(Canvas C, float X, float Y)
+{
+	Super.Paint(C, X, Y);
+	LookAndFeel.DrawClientArea(Self, C);
+}
+
+defaultproperties
+{
 	LocAutoRecord="Auto-Record"
 	LocPaths="Paths"
 	LocDownloading="Downloading"

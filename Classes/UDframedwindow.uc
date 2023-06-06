@@ -5,11 +5,8 @@
 // =============================================================================
 // udemo.UDframedwindow: just a frame...
 // =============================================================================
-class UDframedwindow expands UWindowFramedWindow;
+class UDFramedWindow expands UWindowFramedWindow;
 
-// =============================================================================
-// Variables
-// =============================================================================
 var AutoRecorder MemHolder;
 
 // =============================================================================
@@ -17,21 +14,17 @@ var AutoRecorder MemHolder;
 // =============================================================================
 function Close(optional bool bByParent)
 {
-    Super.Close(bByParent);
+	Super.Close(bByParent);
 
-    if (MemHolder==None)
-        MemHolder=AutoRecorder(root.createwindow(class'AutoRecorder',0,0,1,1,self));
+	if (MemHolder==None)
+		MemHolder=AutoRecorder(root.createwindow(class'AutoRecorder',0,0,1,1,self));
 
-    MemHolder.UDemo=DemoMainClientWindow(ClientArea).UserWindow;
-    MemHolder.SendToBack();
+	MemHolder.UDemo=DemoMainClientWindow(ClientArea).UserWindow;
+	MemHolder.SendToBack();
 }
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
 defaultproperties
 {
-    ClientClass=Class'DemoMainClientWindow'
-    WindowTitle="Unreal Tournament Demo Manager 3.5.1 - By UsAaR33 and AnthraX"
+	ClientClass=Class'DemoMainClientWindow'
+	WindowTitle="Unreal Tournament Demo Manager 3.5.1 - By UsAaR33 and AnthraX"
 }
-

@@ -12,14 +12,14 @@ class UDComboList expands UWindowComboList;
 // =============================================================================
 function Created()
 {
-    ListClass = class'UDComboListItem';
-    bAlwaysOnTop = True;
-    bTransient = True;
-    ItemHeight = 15;
-    VBorder = 3;
-    HBorder = 3;
-    TextBorder = 9;
-    Super(UWindowListControl).Created();
+	ListClass = class'UDComboListItem';
+	bAlwaysOnTop = True;
+	bTransient = True;
+	ItemHeight = 15;
+	VBorder = 3;
+	HBorder = 3;
+	TextBorder = 9;
+	Super(UWindowListControl).Created();
 }
 
 // =============================================================================
@@ -27,13 +27,13 @@ function Created()
 // =============================================================================
 function AddItem2(string Value, string Value2, int SortWeight, string DateTime)
 {
-    local UDComboListItem I;
+	local UDComboListItem I;
 
-    I = UDComboListItem(Items.Append(class'UDComboListItem'));
-    I.Value = Value;
-    I.Value2 = Value2;
-    I.SortWeight = SortWeight;
-    I.DateTime = DateTime;
+	I = UDComboListItem(Items.Append(class'UDComboListItem'));
+	I.Value = Value;
+	I.Value2 = Value2;
+	I.SortWeight = SortWeight;
+	I.DateTime = DateTime;
 }
 
 // =============================================================================
@@ -41,12 +41,12 @@ function AddItem2(string Value, string Value2, int SortWeight, string DateTime)
 // =============================================================================
 function InsertItem(string Value, optional string Value2, optional int SortWeight)
 {
-    local UDComboListItem I;
+	local UDComboListItem I;
 
-    I = UDComboListItem(Items.Insert(class'UDComboListItem'));
-    I.Value = Value;
-    I.Value2 = Value2;
-    I.SortWeight = SortWeight;
+	I = UDComboListItem(Items.Insert(class'UDComboListItem'));
+	I.Value = Value;
+	I.Value2 = Value2;
+	I.SortWeight = SortWeight;
 }
 
 // =============================================================================
@@ -54,13 +54,13 @@ function InsertItem(string Value, optional string Value2, optional int SortWeigh
 // =============================================================================
 function AddSortedItem(string Value, optional string Value2, optional int SortWeight)
 {
-    local UDComboListItem I;
+	local UDComboListItem I;
 
-    I = UDComboListItem(Items.CreateItem(class'UDComboListItem'));
-    I.Value = Value;
-    I.Value2 = Value2;
-    I.SortWeight = SortWeight;
-    Items.MoveItemSorted(I);
+	I = UDComboListItem(Items.CreateItem(class'UDComboListItem'));
+	I.Value = Value;
+	I.Value2 = Value2;
+	I.SortWeight = SortWeight;
+	Items.MoveItemSorted(I);
 }
 
 // =============================================================================
@@ -68,22 +68,18 @@ function AddSortedItem(string Value, optional string Value2, optional int SortWe
 // =============================================================================
 function UDComboListItem FindItem(string Value)
 {
-    local UDComboListItem I;
-    local int Count;
+	local UDComboListItem I;
 
-    I = UDComboListItem(Items.Next);
+	I = UDComboListItem(Items.Next);
 
-    while(I != None)
-    {
-        if(I.Value == Value)
-            return I;
-        I = UDComboListItem(I.Next);
-    }
+	while(I != None)
+	{
+		if(I.Value == Value)
+			return I;
+		I = UDComboListItem(I.Next);
+	}
 }
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
 defaultproperties
 {
 }

@@ -10,7 +10,7 @@
 // ============================================================
 
 class DemoSettings expands Object
-config (UDemo);
+	config (udemo);
 
 var config bool      bOneTimeUpgrade;
 
@@ -27,9 +27,9 @@ var localized config string DemoPaths[5]; //1 of these is setup to be base direc
 var config int RecordingDir; //DemoPaths[recordingdir] is where to record.
 
 //Sorting/PBI saved info
-var config byte        SortColumn;
-var config bool      bDescending;
-var config byte      DisplayMode; //0=show all, 1=hide ones PBI shows, 2=hide all installed.
+var config byte		SortColumn;
+var config bool		bDescending;
+var config byte		DisplayMode; //0=show all, 1=hide ones PBI shows, 2=hide all installed.
 
 //stuff for level recorder:
 var config byte LevelRecord; //0=never, 1=both, 2=singleplayer only, 3=multiplayer only.
@@ -47,223 +47,246 @@ var config float TickSize; //how big the update tick should be during cache... (
 var config bool InterpolateView; //if garfield's interpolation rotator thing should be used in 1st person view
 
 //functions for easy reading:
-static function int ReDirectIndex (String ServerURL){
-  local int i;
-  for (i=0;i<5;i++)
-    if (ServerURL == default.RedirectServers[i])
-        return i;
-  return -1; //error.
+static function int ReDirectIndex(String ServerURL)
+{
+	local int i;
+	for (i = 0; i < ArrayCount(default.RedirectServers); i++)
+		if (ServerURL == default.RedirectServers[i])
+			return i;
+	return -1; //error.
 }
-static function string GetRecordingDir(){
-  return default.DemoPaths[default.RecordingDir];
+static function string GetRecordingDir()
+{
+	return default.DemoPaths[default.RecordingDir];
 }
-static function string Path(int i, string base){ //returns "" if base:
-  if (default.DemoPaths[i]==base)
-    return "";
-  else
-    return default.DemoPaths[i];
+// returns "" if base:
+static function string Path(int i, string base)
+{ 
+	if (default.DemoPaths[i] == base)
+		return "";
+	else
+		return default.DemoPaths[i];
 }
-static function bool ShouldRecord(LevelInfo level){ //compare stuff to see if record good:
-  return (default.LevelRecord==1||(default.LevelRecord==2&&level.NetMode==NM_Standalone)
-   ||(default.LevelRecord==3&&level.NetMode>NM_DedicatedServer));
+// compare stuff to see if record good:
+static function bool ShouldRecord(LevelInfo level)
+{
+	return default.LevelRecord == 1 || 
+		(default.LevelRecord == 2 && Level.NetMode == NM_Standalone) || 
+		(default.LevelRecord == 3 && Level.NetMode > NM_DedicatedServer);
 }
 //parses format to give result.
-static function string GetDemoName(playerpawn p, UWindowComboListItem List){
-  local string Msg, OutMsg, cmd; //names are ripped, yes :)
-  local int pos,i, x;
-  local levelinfo level;
-  level=p.level;
-  Msg=default.format;
-  pos = InStr(Msg,"%");
-  if (pos>-1)
-  {
-    While (true)
-    {
-      if (pos>0)
-      {
-        OutMsg = OutMsg$Left(Msg,pos);
-        Msg = Mid(Msg,pos);
-        pos = 0;
-      }
-
-      x = len(Msg);
-      cmd = mid(Msg,pos,2);
-      if (x-2 > 0)
-        Msg = right(msg,x-2);
-      else
-        Msg = "";
-
-      if (cmd~="%L")
-      {
-        cmd=level.GetURLMap();
-        if (Right(cmd,4)~=".unr")
-          cmd=Left(level.GetURLMap(),len(level.GetURLMap())-4);
-        OutMsg = OutMsg$cmd;
-      }
-      else if (cmd~="%D")
-      {
-        cmd=string(level.Day);
-        if (len(cmd)==1)
-          cmd="0"$cmd;
-        OutMsg = OutMsg$cmd;
-      }
-      else if (cmd~="%M")
-      {
-        cmd=string(level.Month);
-        if (len(cmd)==1)
-          cmd="0"$cmd;
-        OutMsg = OutMsg$cmd;
-      }
-      else if (cmd~="%Y")
-      {
-        OutMsg = OutMsg$level.Year;
-      }
-      else if (cmd~="%H")
-      {
-        cmd=string(level.Hour);
-        if (len(cmd)==1)
-          cmd="0"$cmd;
-        OutMsg = OutMsg$cmd;
-      }
-      else if (cmd~="%O")
-      {
-        cmd=string(level.Minute);
-        if (len(cmd)==1)
-          cmd="0"$cmd;
-        OutMsg = OutMsg$cmd;
-      }
-      else if (cmd~="%S")
-      {
-        cmd=string(level.Second);
-        if (len(cmd)==1)
-          cmd="0"$cmd;
-        OutMsg = OutMsg$cmd;
-      }
-      else if (cmd~="%V")
-      {
-        if (P.GameReplicationInfo!=none)
-          OutMsg = OutMsg$P.GameReplicationInfo.ServerName;
-      }
-      else if (cmd=="%%")
-        OutMsg = OutMsg$"%";
-      else
-      {
-        OutMsg = OutMsg$cmd;
-      }
-
-      pos = InStr(Msg,"%");
-
-      if (Pos==-1)
-        break;
-
-    }
-    if (len(msg)>0)
-      OutMsg = OutMsg$Msg;
-
-  }
-  else
-    OutMsg = Msg;
-  Msg=OutMsg;  //reverse for simplicity.
-  OutMsg="";
+static function string GetDemoName(playerpawn p, UWindowComboListItem List)
+{
+	local string Msg, OutMsg, cmd; //names are ripped, yes :)
+	local int pos, x;
+	local levelinfo level;
+	
+	Level = p.Level;
+	Msg = default.format;
+	pos = InStr(Msg, "%");
+	if (pos > -1)
+	{
+		While (true)
+		{
+			if (pos > 0)
+			{
+				OutMsg = OutMsg $ Left(Msg, pos);
+				Msg = Mid(Msg, pos);
+				pos = 0;
+			}
+	
+			x = Len(Msg);
+			cmd = Mid(Msg, pos, 2);
+			if (x - 2 > 0)
+				Msg = Right(msg, x - 2);
+			else
+				Msg = "";
+	
+			if (cmd ~= "%L")
+			{
+				cmd = level.GetURLMap();
+				if (Right(cmd, 4) ~= ".unr")
+					cmd = Left(Level.GetURLMap(), Len(Level.GetURLMap()) - 4);
+				OutMsg = OutMsg $ cmd;
+			}
+			else if (cmd ~= "%D")
+			{
+				cmd = string(Level.Day);
+				if (Len(cmd) == 1)
+					cmd = "0" $ cmd;
+				OutMsg = OutMsg $ cmd;
+			}
+			else if (cmd ~= "%M")
+			{
+				cmd = string(Level.Month);
+				if (Len(cmd) == 1)
+					cmd = "0" $ cmd;
+				OutMsg = OutMsg $ cmd;
+			}
+			else if (cmd ~= "%Y")
+				OutMsg = OutMsg $ level.Year;
+			else if (cmd ~= "%H")
+			{
+				cmd = string(Level.Hour);
+				if (Len(cmd) == 1)
+					cmd = "0" $ cmd;
+				OutMsg = OutMsg $ cmd;
+			}
+			else if (cmd ~= "%O")
+			{
+				cmd = string(Level.Minute);
+				if (Len(cmd) == 1)
+					cmd = "0" $ cmd;
+				OutMsg = OutMsg $ cmd;
+			}
+			else if (cmd ~= "%S")
+			{
+				cmd = string(Level.Second);
+				if (Len(cmd) == 1)
+					cmd = "0" $ cmd;
+				OutMsg = OutMsg $ cmd;
+			}
+			else if (cmd ~= "%V")
+			{
+				if (P.GameReplicationInfo != None)
+					OutMsg = OutMsg $ P.GameReplicationInfo.ServerName;
+			}
+			else if (cmd == "%%")
+				OutMsg = OutMsg $ "%";
+			else
+				OutMsg = OutMsg $ cmd;
+	
+			pos = InStr(Msg, "%");
+	
+			if (Pos == -1)
+				break;
+		}
+		if (Len(msg) > 0)
+			OutMsg = OutMsg $ Msg;
+	}
+	else
+		OutMsg = Msg;
+	Msg = OutMsg;  //reverse for simplicity.
+	OutMsg = "";
 //illegal char parsing:
-  X=Len(Msg);
-  for (pos = 0; pos<X; pos++){
-      //USE reads bad!
-        if (InStr("\\/*?<:>\"|", Mid(Msg, pos, 1)) != -1)
-          continue;
-        else if (InStr(" ", Mid(Msg, pos, 1)) != -1)
-          outMsg = outMsg $ "_";
-        else
-          outMsg = outMsg $ Mid(Msg, pos, 1);
-      }
-  Msg=outMsg;
-  OutMsg="";
-  x=2;
-  Cmd=Msg; //store one with %N
-  //filter out N for next test...
-  pos=instru(Msg,"%n");
-  while (pos!=-1){
-    outMsg=outMsg$left(Msg,pos);
-    Msg=mid(Msg,pos+2);
-    pos=instru(Msg,"%n");
-  }
-  Msg=outMsg$Msg;
-  While (Matching(List,Msg)){   //verify if something is similar me.   If so, keep trying until all fine.
-    //code based on codeconsole from onp
-    OutMsg="";
-    Msg=Cmd;   //reset each loop.
-    pos=instru(Msg,"%n");
-    while (pos!=-1){
-      outMsg=outMsg$left(Msg,pos)$x;
-      Msg=mid(Msg,pos+2);
-      pos=instru(Msg,"%n");
-    }
-    Msg=outMsg$Msg;
-    if (outMsg=="") //no change: do something!
-      Msg=Msg$"-"$x;
-    x++;
-  }
-  return Msg;
+	X = Len(Msg);
+	for (pos = 0; pos < X; pos++)
+	{
+		//USE reads bad!
+		if (InStr("\\/*?<:>\"|", Mid(Msg, pos, 1)) != -1)
+			continue;
+		else if (InStr(" ", Mid(Msg, pos, 1)) != -1)
+			outMsg = outMsg $ "_";
+		else
+			outMsg = outMsg $ Mid(Msg, pos, 1);
+	}
+	Msg = outMsg;
+	OutMsg = "";
+	x = 2;
+	Cmd = Msg; //store one with %N
+	//filter out N for next test...
+	pos = InStru(Msg, "%n");
+	while (pos != -1)
+	{
+		outMsg = outMsg $ left(Msg, pos);
+		Msg = Mid(Msg, pos + 2);
+		pos = InStru(Msg, "%n");
+	}
+	Msg = outMsg $ Msg;
+	// verify if something is similar me.   If so, keep trying until all fine.
+	While (Matching(List,Msg))
+	{
+		// code based on codeconsole from onp
+		OutMsg = "";
+		Msg = Cmd;   //reset each loop.
+		pos = InStru(Msg, "%n");
+		while (pos != -1)
+		{
+			outMsg = outMsg $ left(Msg, pos) $ x;
+			Msg = Mid(Msg, pos + 2);
+			pos = InStru(Msg, "%n");
+		}
+		Msg = outMsg $ Msg;
+		if (outMsg == "") //no change: do something!
+			Msg = Msg $ "-" $ x;
+		x++;
+	}
+	return Msg;
 }
 //used in above function:
-static function bool Matching(UWindowComboListItem List, string test){
-  for (List=UWindowComboListItem(List.Next);List!=none;List=UWindowComboListItem(List.Next))
-    if (List.Value~=test)
-      return true;
+static function bool Matching(UWindowComboListItem List, string test)
+{
+	for (List = UWindowComboListItem(List.Next); List != None; List = UWindowComboListItem(List.Next))
+		if (List.Value ~= test)
+			return true;
+	return false;
 }
 //case insensitive: (give lowe though for t!)
-static function int InStru  ( coerce string S, coerce string t ){
-  local int temp;
-  temp=InStr(S,t);
-  if (temp!=-1)
-    return temp;
-  return InStr(S,Caps(t));
+static function int InStru(coerce string S, coerce string t)
+{
+	local int temp;
+	
+	temp = InStr(S, t);
+	if (temp != -1)
+		return temp;
+	return InStr(S, Caps(t));
 }
 
 //nothing to do with settings, but I couldn't find a better place to put it :/
-static function string parseTime( float time )
+static function string parseTime(float time)
 {
-    local int hour, min, sec;
-    local string hourstr, minStr, secStr;
+	local int hour, min, sec;
+	local string hourstr, minStr, secStr;
 
-    hour = int (time / 3600);
-    min = int(time / 60)%60;
-    sec = int(time) % 60;
+	hour = int(time/3600);
+	min = int(time/60)%60;
+	sec = int(time)%60;
 
-    if (hour>0)
-      hourstr = string(hour)$":";
-    minStr = string(min);
+	if (hour > 0)
+		hourstr = string(hour) $ ":";
+	minStr = string(min);
 
-    if(min >= 10||hour==0) minStr = string(min); // If sec is one digit, add a zero
-    else minstr = "0"$string(min);
+	// If sec is one digit, add a zero
+	if (min >= 10 || hour == 0)
+		minStr = string(min);
+	else
+		minstr = "0" $ string(min);
 
-    if(sec >= 10) secStr = string(sec); // If sec is one digit, add a zero
-    else secStr = "0"$string(sec);
+	// If sec is one digit, add a zero
+	if (sec >= 10)
+		secStr = string(sec);
+	else
+		secStr = "0" $ string(sec);
 
-    return hourstr$minStr$":"$secStr;
+	return hourstr $ minStr $ ":" $ secStr;
 }
-static function string FloatString (float A){  //converts to 2 dig float
-  local string tmp;
-  local int pos;
-  tmp=string(A);
-  pos=instr(A,".");
-  return left(tmp,pos)$mid(tmp,pos,2);
+//converts to 2 dig float
+static function string FloatString(float A)
+{
+	local string tmp;
+	local int pos;
+	
+	tmp = string(A);
+	pos = InStr(A, ".");
+	return Left(tmp, pos) $ Mid(tmp, pos, 2);
 }
-defaultproperties {
-  Timing=1
-  DemoPaths(0)="Empty"
-  DemoPaths(1)="Empty"
-  DemoPaths(2)="Empty"
-  DemoPaths(3)="Empty"
-  DemoPaths(4)="Empty"
-  DisplayMode=1
-  //GenerateInfo=true
-  Format="%L_%M-%D_%H-%O-%S"
-  bRecordWhenSpectating=true
-  CacheSeconds=7.0
-  TickSize=0.4
-  DownloadType=1
-  InterpolateView=true
-  FollowMyCam=True
-  RedirectServers(0)="uz.ut-files.com"
+
+defaultproperties
+{
+	FollowMyCam=True
+	timing=1
+	OrderByDate=True
+	DemoPaths(0)="Empty"
+	DemoPaths(1)="Empty"
+	DemoPaths(2)="Empty"
+	DemoPaths(3)="Empty"
+	DemoPaths(4)="Empty"
+	DisplayMode=1
+	Format="%L_%M-%D_%H-%O-%S"
+	bRecordWhenSpectating=True
+	DownloadType=1
+	RedirectServers(0)="uz.ut-files.com"
+	CacheSeconds=7.000000
+	TickSize=0.400000
+	InterpolateView=True
 }

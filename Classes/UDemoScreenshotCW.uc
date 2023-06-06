@@ -23,22 +23,22 @@ var string MapAuthor2;
 // =============================================================================
 function SetUDMap(string mapname, bool bServerDemo, int NumFrames, float PlayTime)
 {
-    SetMap(MapName);
+	SetMap(MapName);
 
-    if (DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).Packages.FindPackage(mapname).binstalled==0)
-        MapTitle=LocCannotPlayDemoPrefix@" "@mapname@" "@LocCannotPlayDemoSuffix;
-    else
-        MapTitle=LocPlayingOn@" "@mapname;
+	if (DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).Packages.FindPackage(mapname).binstalled==0)
+		MapTitle=LocCannotPlayDemoPrefix@" "@mapname@" "@LocCannotPlayDemoSuffix;
+	else
+		MapTitle=LocPlayingOn@" "@mapname;
 
-    MapAuthor=LocPlayTime@" "@class'DemoSettings'.static.ParseTime(PlayTime)$","@NumFrames@"Frames";
-    MapAuthor2 = "(Avg. FPS:"@class'demosettings'.static.FloatString(NumFrames/PlayTime)$")";
+	MapAuthor=LocPlayTime@" "@class'DemoSettings'.static.ParseTime(PlayTime)$","@NumFrames@"Frames";
+	MapAuthor2 = "(Avg. FPS:"@class'demosettings'.static.FloatString(NumFrames/PlayTime)$")";
 
-    if (bServerDemo)
-        IdealPlayerCount=LocRecordedOnADedicatedServer;
-    else
-        IdealPlayerCount=LocRecordedThroughAPlayer;
+	if (bServerDemo)
+		IdealPlayerCount=LocRecordedOnADedicatedServer;
+	else
+		IdealPlayerCount=LocRecordedThroughAPlayer;
 
-    DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).Packages.FindPackage(mapname).bpbishows=true;
+	DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).Packages.FindPackage(mapname).bpbishows=true;
 }
 
 // =============================================================================
@@ -46,10 +46,10 @@ function SetUDMap(string mapname, bool bServerDemo, int NumFrames, float PlayTim
 // =============================================================================
 function SetPending()
 {
-    Screenshot=none;
-    MapTitle=LocPleaseWait;
-    MapAuthor="";
-    IdealPlayerCount=LocReadingInformationFromDemoFile;
+	Screenshot=none;
+	MapTitle=LocPleaseWait;
+	MapAuthor="";
+	IdealPlayerCount=LocReadingInformationFromDemoFile;
 }
 
 // =============================================================================
@@ -57,69 +57,66 @@ function SetPending()
 // =============================================================================
 function Paint(Canvas C, float MouseX, float MouseY)
 {
-    local float X, Y, W, H;
+	local float X, Y, W, H;
 
-    DrawStretchedTexture(C, 0, 0, WinWidth, WinHeight, Texture'BlackTexture');
-    C.Font=root.fonts[F_Normal];
+	DrawStretchedTexture(C, 0, 0, WinWidth, WinHeight, Texture'BlackTexture');
+	C.Font=root.fonts[F_Normal];
 
-    if(Screenshot != None)
-    {
-        W = Min(WinWidth, Screenshot.USize);
-        H = Min(WinHeight, Screenshot.VSize);
+	if(Screenshot != None)
+	{
+		W = Min(WinWidth, Screenshot.USize);
+		H = Min(WinHeight, Screenshot.VSize);
 
-        if(W > H)
-            W = H;
-        if(H > W)
-            H = W;
+		if(W > H)
+			W = H;
+		if(H > W)
+			H = W;
 
-        X = (WinWidth - W) / 2;
-        Y = (WinHeight - H) / 2;
+		X = (WinWidth - W) / 2;
+		Y = (WinHeight - H) / 2;
 
-        C.DrawColor.R = 255;
-        C.DrawColor.G = 255;
-        C.DrawColor.B = 255;
+		C.DrawColor.R = 255;
+		C.DrawColor.G = 255;
+		C.DrawColor.B = 255;
 
-        DrawStretchedTexture(C, X, Y, W, H, Screenshot);
+		DrawStretchedTexture(C, X, Y, W, H, Screenshot);
 
-        C.Font = Root.Fonts[F_Normal];
-    }
+		C.Font = Root.Fonts[F_Normal];
+	}
 
-    if(IdealPlayerCount != "")
-    {
-        TextSize(C, IdealPlayerCount, W, H);
-        X = (WinWidth - W) / 2;
-        Y = WinHeight - H*1;
-        ClipText(C, X, Y, IdealPlayerCount);
-    }
-    
-    if (MapAuthor2 != "")
-    {
-        TextSize(C, MapAuthor2, W, H);
-        X = (WinWidth - W) / 2;
-        Y = WinHeight - H*2;
-        ClipText(C, X, Y, MapAuthor2);
-    }
+	if(IdealPlayerCount != "")
+	{
+		TextSize(C, IdealPlayerCount, W, H);
+		X = (WinWidth - W) / 2;
+		Y = WinHeight - H*1;
+		ClipText(C, X, Y, IdealPlayerCount);
+	}
+	
+	if (MapAuthor2 != "")
+	{
+		TextSize(C, MapAuthor2, W, H);
+		X = (WinWidth - W) / 2;
+		Y = WinHeight - H*2;
+		ClipText(C, X, Y, MapAuthor2);
+	}
 
-    if(MapAuthor != "")
-    {
-        TextSize(C, MapAuthor, W, H);
-        X = (WinWidth - W) / 2;
-        Y = WinHeight - H*3;
-        ClipText(C, X, Y, MapAuthor);
-    }
+	if(MapAuthor != "")
+	{
+		TextSize(C, MapAuthor, W, H);
+		X = (WinWidth - W) / 2;
+		Y = WinHeight - H*3;
+		ClipText(C, X, Y, MapAuthor);
+	}
 
-    if(MapTitle != "")
-    {
-        TextSize(C, MapTitle, W, H);
-        X = (WinWidth - W) / 2;
-        Y = WinHeight - H*4;
-        ClipText(C, X, Y, MapTitle);
-    }
+	if(MapTitle != "")
+	{
+		TextSize(C, MapTitle, W, H);
+		X = (WinWidth - W) / 2;
+		Y = WinHeight - H*4;
+		ClipText(C, X, Y, MapTitle);
+	}
 }
 
-// =============================================================================
-// defaultproperties
-// =============================================================================
 defaultproperties
 {
 	LocCannotPlayDemoPrefix="Warning: Cannot play demo:"

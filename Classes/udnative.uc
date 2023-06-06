@@ -9,34 +9,28 @@
 // However, this is still the native class used by the actual manager windows.
 // =============================================================================
 class udnative expands Object
-    native;
+	native;
 
-// =============================================================================
-// Structures
-// =============================================================================
 //
-//redefined here to make compiler happy!
+// redefined here to make compiler happy!
 //
 struct HUDLocalizedMessage
 {
-    var Class<LocalMessage> Message;
-    var int Switch;
-    var PlayerReplicationInfo RelatedPRI;
-    var Object OptionalObject;
-    var float EndOfLife;
-    var float LifeTime;
-    var bool bDrawing;
-    var int numLines;
-    var string StringMessage;
-    var color DrawColor;
-    var font StringFont;
-    var float XL, YL;
-    var float YPos;
+	var Class<LocalMessage> Message;
+	var int Switch;
+	var PlayerReplicationInfo RelatedPRI;
+	var Object OptionalObject;
+	var float EndOfLife;
+	var float LifeTime;
+	var bool bDrawing;
+	var int numLines;
+	var string StringMessage;
+	var color DrawColor;
+	var font StringFont;
+	var float XL, YL;
+	var float YPos;
 };
 
-// =============================================================================
-// Variables
-// =============================================================================
 var const DemoRecDriver DemoDriver; // valid when reading
 var string DemoURL;                 // (Anth) Lame Linux FURL hack...
 
@@ -109,3 +103,7 @@ event PackageRequired (string package, int size, bool Installed, GUID myGUID, in
 // called when demo done being read.
 //
 event DemoReadDone (string Map, bool bServerDemo, float Time, int NumFrames);
+
+defaultproperties
+{
+}
