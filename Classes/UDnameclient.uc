@@ -5,11 +5,11 @@
 // =============================================================================
 // udemo.UDnameclient: Input a file name here.
 // =============================================================================
-class UDnameclient expands UWindowDialogClientWindow;
+class UDNameClient expands UWindowDialogClientWindow;
 
 var UWindowEditControl  NameEdit;
 var UWindowMessageBox overwrite;
-var DemoReader demreader;          //if !=none then this is meant for use with renamer.
+var DemoReader DemReader;          //if != None then this is meant for use with renamer.
 var localized string LocConfirmFileOverwrite;
 var localized string LocConfirmFileOverwritePrefix;
 var localized string LocConfirmFileOverwriteSuffix;

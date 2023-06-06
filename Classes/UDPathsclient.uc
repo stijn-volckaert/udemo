@@ -5,7 +5,7 @@
 // =============================================================================
 // udemo.UDPathsclient: options for the directories where demos are stored + recording path
 // =============================================================================
-class UDPathsclient expands UMenuPageWindow;
+class UDPathsClient expands UMenuPageWindow;
 
 var UWindowEditControl Paths[5];
 var UWindowCheckBox RecordPath[5];
@@ -59,7 +59,7 @@ function Created()
 	ControlOffset += 15;
 
 	//generate stuff:
-	for (i=0; i<5; i++)
+	for (i = 0; i < ArrayCount(Paths); i++)
 	{
 		Paths[i] = UWindowEditControl(CreateControl(class'UWindowEditControl',CenterPos, ControlOffset, CenterWidth2 - 35, 1));
 		Paths[i].editboxwidth=0.9*Paths[i].winwidth;
@@ -98,15 +98,15 @@ function CheckSomePath()
 {
 	local int i;
 
-	for (i=0;i<5;i++)
+	for (i = 0; i < ArrayCount(RecordPath); i++)
 	{
-		if (!RecordPath[i].bdisabled)
+		if (!RecordPath[i].bDisabled)
 		{
-			RecordPath[i].bchecked=true;
+			RecordPath[i].bChecked = true;
 			return;
 		}
 	}
-	RecordPath[0].bchecked=true; //this one...
+	RecordPath[0].bChecked = true; //this one...
 }
 
 // =============================================================================
@@ -143,10 +143,10 @@ function Notify(UWindowDialogControl C, byte E)
 		case DE_Change:    //combo
 			if (C.IsA('UWindowEditControl'))
 			{
-				C.NotifyWindow=none; //or else infinite iterator.
+				C.NotifyWindow = None; //or else infinite iterator.
 
-				for (i=0;i<5;i++)
-					if (Paths[i]==C)
+				for (i = 0; i < ArrayCount(Paths); i++)
+					if (Paths[i] == C)
 						break;
 
 				if (Paths[i].GetValue()==""||Paths[i].GetValue()~=Empty)
@@ -165,7 +165,7 @@ function Notify(UWindowDialogControl C, byte E)
 
 					Str=Paths[i].GetValue();
 
-					for (j = 0; j<Len(Str); j++)
+					for (j = 0; j < Len(Str); j++)
 					{
 						//USE reads bad!              Note that ":" is legal dir path, just not legal file name.
 						if (InStr("*?<>\"|", Mid(str, j, 1)) != -1)
@@ -176,21 +176,21 @@ function Notify(UWindowDialogControl C, byte E)
 							str2 = str2 $ Mid(str, j, 1);
 					}
 
-					if (Right(Str2,1) != PathSeperator)
+					if (Right(Str2, 1) != PathSeperator)
 						Str2 = Str2 $ PathSeperator;
 
-					if (left(Str2,1) == PathSeperator && !bLinux) //force .. in front
+					if (Left(Str2, 1) == PathSeperator && !bLinux) //force .. in front
 						Str2 = ".." $ Str2;
 
-					for (j = 0; j<5; j++)    //detect similar.
+					for (j = 0; j < ArrayCount(Paths); j++)    //detect similar.
 					{
-						if (J!=I && Paths[j].GetValue()~=Str2)
+						if (j != i && Paths[j].GetValue() ~= Str2)
 						{
-							Str2=empty;
-							RecordPath[i].bdisabled = true;
-							if (RecordPath[i].bchecked)
+							Str2 = empty;
+							RecordPath[i].bDisabled = true;
+							if (RecordPath[i].bChecked)
 							{
-								RecordPath[i].bchecked=false;
+								RecordPath[i].bChecked = false;
 								CheckSomePath();
 							}
 						}
@@ -202,30 +202,30 @@ function Notify(UWindowDialogControl C, byte E)
 				return;
 			}
 
-			if (!C.IsA('UWindowCheckBox')||UWindowCheckBox(C).bdisabled)
+			if (!C.IsA('UWindowCheckBox') || UWindowCheckBox(C).bDisabled)
 				return;
 
-			for (i=0;i<5;i++)
-				if (RecordPath[i]==C)
+			for (i = 0; i < ArrayCount(RecordPath); i++)
+				if (RecordPath[i] == C)
 					break;
 
-			if (i==5) //???
+			if (i == ArrayCount(RecordPath)) //???
 				return;
 
-			if (!recordPath[i].bchecked)
+			if (!RecordPath[i].bChecked)
 			{ //no unchecking!
-				RecordPath[i].bchecked=true;
+				RecordPath[i].bChecked = true;
 				return;
 			}
 
-			for (j=0;j<5;j++)
-				if (J!=I&&RecordPath[j].bchecked)
+			for (j = 0; j < ArrayCount(RecordPath); j++)
+				if (j != i && RecordPath[j].bChecked)
 				{
-					RecordPath[j].bchecked=false;
+					RecordPath[j].bChecked = false;
 					break;
 				}
 
-			class'DemoSettings'.default.RecordingDir=I;
+			class'DemoSettings'.default.RecordingDir = i;
 			break;
 	}
 }
@@ -243,23 +243,23 @@ function WindowHidden()
 	if (!DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).bInitialized)
 		return;
 
-	for (i=0; i<5; i++)
+	for (i = 0; i < ArrayCount(Paths); i++)
 	{
-		Notify(Paths[i],DE_Change); //force update stuff.
+		Notify(Paths[i], DE_Change); //force update stuff.
 
-		if (Paths[i].GetValue()~=Empty||Paths[i].GetValue()=="")
+		if (Paths[i].GetValue() ~= Empty || Paths[i].GetValue() == "")
 			Paths[i].SetValue(Empty);
-		if (Paths[i].GetValue()!=Empty)
-			bOneSet=true;
-		class'DemoSettings'.default.DemoPaths[i]=Paths[i].GetValue();
+		if (Paths[i].GetValue() != Empty)
+			bOneSet = true;
+		class'DemoSettings'.default.DemoPaths[i] = Paths[i].GetValue();
 	}
 
 	if (!bOneSet)
 	{
 		Paths[0].SetValue(DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).UserWindow.DemReader.BasePath());
-		class'DemoSettings'.default.DemoPaths[0]=Paths[0].GetValue();
-		RecordPath[0].bchecked=true;
-		Notify(RecordPath[0],DE_Change);
+		class'DemoSettings'.default.DemoPaths[0] = Paths[0].GetValue();
+		RecordPath[0].bChecked = true;
+		Notify(RecordPath[0], DE_Change);
 	}
 
 	DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).UserWindow.Refresh(); //in case path swap...

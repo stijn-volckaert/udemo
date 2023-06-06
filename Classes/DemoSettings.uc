@@ -8,6 +8,7 @@
 // udemo.DemoSettings: an abstract class that simply stores a bunch of settings :)
 // This stores EVERY SETTING FOR UDEMO!
 // ============================================================
+
 class DemoSettings expands Object
 	config (udemo);
 

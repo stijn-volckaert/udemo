@@ -90,7 +90,7 @@ function Notify(UWindowDialogControl C, byte E)
 			{
 				case Activate:
 					class'DemoSettings'.default.LevelRecord=Activate.GetSelectedIndex();
-				break;
+					break;
 				case GenerateInfo:
 					break;
 				case RecordWhenSpectating:
@@ -99,9 +99,9 @@ function Notify(UWindowDialogControl C, byte E)
 					break;
 				case Format:
 					//check bad characters:
-					C.NotifyWindow=none;
-					Str=Format.GetValue();
-					for (j = 0; j<Len(Str); j++)
+					C.NotifyWindow = None;
+					Str = Format.GetValue();
+					for (j = 0; j < Len(Str); j++)
 					{
 						if (InStr("\\/*?<:>\"|", Mid(str, j, 1)) != -1)
 							continue;
@@ -111,8 +111,8 @@ function Notify(UWindowDialogControl C, byte E)
 							str2 = str2 $ Mid(str, j, 1);
 					}
 					Format.SetValue(str2);
-					C.NotifyWindow=self;
-					class'DemoSettings'.default.Format=Format.GetValue();
+					C.NotifyWindow = Self;
+					class'DemoSettings'.default.Format = Format.GetValue();
 					break;
 			}
 	}

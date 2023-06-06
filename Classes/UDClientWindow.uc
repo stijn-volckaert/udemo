@@ -248,7 +248,7 @@ function SetupDemos(bool Refreshing)
 		Combo = UDComboList(demos.List);
 
 	// Once for each path
-	for (i=0; i<5; i++)
+	for (i = 0; i < ArrayCount(Class'DemoSettings'.default.DemoPaths); i++)
 	{
 		if (!(Class'DemoSettings'.default.DemoPaths[i] ~= class'udpathsclient'.default.Empty))
 		{
@@ -373,7 +373,7 @@ function PlayDemo(optional bool noInstallCheck)
 			// we must call this repeatively, in order to force all linkers to load correctly! up to package amount is max!
 			j = DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).Packages.InternalCount;
 
-			for (i=0; i<j; i++)
+			for (i = 0; i < j; i++)
 			{
 				LastInstalled = DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).Packages.AllInstalled();
 				if (LastInstalled!=3) //if is 3, may need to load cached linkers

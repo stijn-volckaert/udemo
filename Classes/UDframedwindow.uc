@@ -5,7 +5,7 @@
 // =============================================================================
 // udemo.UDframedwindow: just a frame...
 // =============================================================================
-class UDframedwindow expands UWindowFramedWindow;
+class UDFramedWindow expands UWindowFramedWindow;
 
 var AutoRecorder MemHolder;
 

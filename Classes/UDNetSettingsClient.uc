@@ -57,7 +57,7 @@ function Created()
 	ControlOffset += 15;
 
 	//generate stuff:
-	for (i=0;i<6;i++)
+	for (i = 0; i < ArrayCount(Servers); i++)
 	{
 		Servers[i] = UWindowEditControl(CreateControl(class'UWindowEditControl',CenterPos, ControlOffset, CenterWidth2-5, 1));
 		Servers[i].editboxwidth=0.78*Servers[i].winwidth;
@@ -85,7 +85,7 @@ function WindowHidden()
 
 	class'DemoSettings'.default.DownloadType=DLType.GetSelectedIndex();
 
-	for (i=0;i<6;i++)
+	for (i = 0; i < ArrayCount(Servers); i++)
 	{
 		if (Servers[i].GetValue()~=Empty||Servers[i].GetValue()=="")
 			Servers[i].SetValue(Empty);

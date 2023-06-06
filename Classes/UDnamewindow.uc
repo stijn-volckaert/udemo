@@ -6,7 +6,7 @@
 // udemo.UDnamewindow: a framed window for entry into "record demo"
 // ripped from edit favorite window.
 // =============================================================================
-class UDnamewindow expands UWindowFramedWindow;
+class UDNameWindow expands UWindowFramedWindow;
 
 var UWindowSmallCloseButton CloseButton;
 var UWindowSmallButton OKButton;

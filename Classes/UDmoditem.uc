@@ -5,7 +5,7 @@
 // =============================================================================
 // udemo.UDmoditem: The entry point :)
 // =============================================================================
-class UDmoditem expands UMenuModMenuItem;
+class UDModItem expands UMenuModMenuItem;
 
 const w = 510;
 const h = 340;

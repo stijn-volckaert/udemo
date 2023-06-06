@@ -1165,7 +1165,7 @@ event PostRender( canvas Canvas )
 		StatScale = ChallengeHUD(myHud).Scale * ChallengeHUD(myHud).StatusScale;
 		X = Canvas.ClipX - 128 * StatScale;
 
-		for ( i=0; i<4; i++ )
+		for (i = 0; i < ArrayCount(ChallengeHUD(myHud).HitTime); i++)
 		{
 			DamageTime = Level.TimeSeconds - ChallengeHUD(myHud).HitTime[i];
 			if ( DamageTime < 1 )
@@ -1539,7 +1539,7 @@ function FlagDrop(PlayerReplicationInfo PRI)
 {
 	local int i;
 
-	for (i = 0; i < 64; ++i)
+	for (i = 0; i < ArrayCount(FI); i++)
 		if (FI[i].PRI == PRI)
 		{
 			FI[i].HasFlag = none;
@@ -1556,10 +1556,10 @@ function FlagReturn(Object OptionalObject)
 {
 	local int i;
 
-	for (i = 0; i < 64; ++i)
-		if (FI[i].HasFlag != none && FI[i].HasFlag.Team == TeamInfo(OptionalObject).TeamIndex)
+	for (i = 0; i < ArrayCount(FI); i++)
+		if (FI[i].HasFlag != None && FI[i].HasFlag.Team == TeamInfo(OptionalObject).TeamIndex)
 		{
-			FI[i].HasFlag = none;
+			FI[i].HasFlag = None;
 			return;
 		}
 }

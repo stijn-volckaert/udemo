@@ -200,33 +200,33 @@ function AddToLine (int Count, byte B[255])
 {
 	local int i, j;
 
-	for (i=0;i<Count;i++)
+	for (i = 0; i < Count; i++)
 	{
 		// We might have received a part of the file already
 		// => send the rest as binary
 		if (bHeaderRead)
 		{
-			while (i<Count)
+			while (i < Count)
 			{
-				B[j]=B[i];
+				B[j] = B[i];
 				j++;
 				i++;
 			}
-			ReceivedBinary(j,B);
+			ReceivedBinary(j, B);
 			return;
 		}
 
-		if (B[i] == 10 && asc(right(Line,1)) == 13)
+		if (B[i] == 10 && Asc(Right(Line, 1)) == 13)
 		{
-			ReceivedLine(left(Line,len(line)-1));
-			Line="";
+			ReceivedLine(Left(Line, Len(line) - 1));
+			Line = "";
 
 			if (bDeleteMe)
 				return;
 			continue;
 		}
 
-		Line=Line$Chr(B[i]);
+		Line = Line $ Chr(B[i]);
 	}
 }
 
