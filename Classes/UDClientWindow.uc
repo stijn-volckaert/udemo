@@ -654,7 +654,7 @@ function Tick(float delta)
 
 defaultproperties
 {
-	Spechelp="If checked, you will be able to fly around the level when playing a demo"
+	SpecHelp="If checked, you will be able to fly around the level when playing a demo"
 	LocDemos="Demos:"
 	LocDemosHelp="Select the demo that you wish to play."
 	LocPlayDemo="PLAY"
