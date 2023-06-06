@@ -1131,8 +1131,11 @@ event PostRender( canvas Canvas )
 
 		if (myhud!=none)
 			myhud.setowner(PlayerLinked);
-
-		PlayerLinked.Player=player;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
+	}
+	if (PlayerLinked != None && (bLockOn || class'DemoSettings'.default.AssignPlayer > 0))
+	{
+		PlayerLinked.Player = player;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
+		PlayerLinked.Owner = self; // for make sure tick first, for get input before it be absorb in PlayerLinked
 	}
 
 	if (!bLockOn && Pawn(ViewTarget)!=none)
@@ -1213,10 +1216,12 @@ event PostRender( canvas Canvas )
 		ViewTarget=PlayerLinked; //heh.. hack
 		if (myhud!=none)
 			myhud.setowner(self);
-		PlayerLinked.Player=none;  //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
 		PlayerLinked.Scoring=none;
 		PlayerLinked.ScoringType=none;
 	}
+	if ((class'DemoSettings'.default.AssignPlayer == 0 && bLockOn) ||
+		class'DemoSettings'.default.AssignPlayer == 1)
+		PlayerLinked.Player = None;  //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
 }
 
 // native call, maintain correct Z-offset

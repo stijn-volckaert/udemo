@@ -45,6 +45,11 @@ var config String RedirectServers[24]; //list of redirect servers where files ma
 var config float CacheSeconds; //amount of seconds to cache for when jumping (i.e. run x updates this amount of time)
 var config float TickSize; //how big the update tick should be during cache... (i.e. tick by this deltatime.. lower=more accurate)
 var config bool InterpolateView; //if garfield's interpolation rotator thing should be used in 1st person view
+// Mode for assign PlayerLinked.Player to actual viewport
+// 0 - as before.- only on bLockOn and only during PostRender.
+// 1 - Only during PostRender in all modes
+// 2 - Whole time in all modes - possible can absorb mouse inpout in free camera mode
+var config int AssignPlayer; 
 
 //functions for easy reading:
 static function int ReDirectIndex(String ServerURL)
@@ -289,4 +294,5 @@ defaultproperties
 	CacheSeconds=7.000000
 	TickSize=0.400000
 	InterpolateView=True
+	AssignPlayer=2
 }
