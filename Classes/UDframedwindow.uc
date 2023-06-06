@@ -14,13 +14,13 @@ var AutoRecorder MemHolder;
 // =============================================================================
 function Close(optional bool bByParent)
 {
-    Super.Close(bByParent);
+	Super.Close(bByParent);
 
-    if (MemHolder==None)
-        MemHolder=AutoRecorder(root.createwindow(class'AutoRecorder',0,0,1,1,self));
+	if (MemHolder==None)
+		MemHolder=AutoRecorder(root.createwindow(class'AutoRecorder',0,0,1,1,self));
 
-    MemHolder.UDemo=DemoMainClientWindow(ClientArea).UserWindow;
-    MemHolder.SendToBack();
+	MemHolder.UDemo=DemoMainClientWindow(ClientArea).UserWindow;
+	MemHolder.SendToBack();
 }
 
 defaultproperties

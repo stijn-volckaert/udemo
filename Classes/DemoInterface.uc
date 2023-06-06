@@ -45,35 +45,35 @@ native final function float GetStartTime(); //returns the time demo was at when 
 //non-native functions:
 function GotoFrame (float Time)
 {
-    local float cur;
+	local float cur;
 
-    if (Time > GetTotalTime() || Time < GetStartTime())  //invalid
-        return;
+	if (Time > GetTotalTime() || Time < GetStartTime())  //invalid
+		return;
 
-    cur=GetCurrentTime();
+	cur=GetCurrentTime();
 
-    if (abs(Time-cur) < 0.5) //too small interval.. don't jump!
-        return;
+	if (abs(Time-cur) < 0.5) //too small interval.. don't jump!
+		return;
 
-    DemoPlaybackSpec(DemoSpec).bSeeking=true;
+	DemoPlaybackSpec(DemoSpec).bSeeking=true;
 
-    if (Time > cur && Time < cur + fmax(2*class'DemoSettings'.default.CacheSeconds,5.0))
-        ReadCache (Time+GetStartTime(),class'demosettings'.default.TickSize); //more reliable to keep reading w/ cache
-    else
-    { //must do complex jumping method...
-        Time+=GetStartTime();
+	if (Time > cur && Time < cur + fmax(2*class'DemoSettings'.default.CacheSeconds,5.0))
+		ReadCache (Time+GetStartTime(),class'demosettings'.default.TickSize); //more reliable to keep reading w/ cache
+	else
+	{ //must do complex jumping method...
+		Time+=GetStartTime();
 
-        if (Time<cur)
-        {
-            DemoPlaybackSpec(DemoSpec).BackUpRefs(); //back up pointers (playerid! channel# does change!)
-            JumpBack(); //go backwards in demo
-        }
+		if (Time<cur)
+		{
+			DemoPlaybackSpec(DemoSpec).BackUpRefs(); //back up pointers (playerid! channel# does change!)
+			JumpBack(); //go backwards in demo
+		}
 
-        if (time-class'DemoSettings'.default.CacheSeconds>GetCurrentTime())
-            ReadTo(time-class'DemoSettings'.default.CacheSeconds); //read forwards
+		if (time-class'DemoSettings'.default.CacheSeconds>GetCurrentTime())
+			ReadTo(time-class'DemoSettings'.default.CacheSeconds); //read forwards
 
-        DemoPlaybackSpec(DemoSpec).FixGRI(time-cur); //fix gri times
-        ReadCache(Time,class'DemoSettings'.default.TickSize); //now do caching
+		DemoPlaybackSpec(DemoSpec).FixGRI(time-cur); //fix gri times
+		ReadCache(Time,class'DemoSettings'.default.TickSize); //now do caching
    }
    
 	SetSpeed(mySpeed);
@@ -87,37 +87,37 @@ function GotoFrame (float Time)
 //LockOn is true if 3rdperson not in url (and not server demo). can be toggled during playback!
 
 /*
-    (Anth) Changed in v3.2. DemoSpawnNotify moved to native...
+	(Anth) Changed in v3.2. DemoSpawnNotify moved to native...
 */
 event LinkToPlayer (PlayerPawn p, bool LockOn)
 {
-    DemoPlaybackSpec(DemoSpec).Driver = self;  //give pointer to self
+	DemoPlaybackSpec(DemoSpec).Driver = self;  //give pointer to self
 
-    // No lockon! We don't want to render stuff
-    if (bDoingMessagePlay)
-        LockOn=false;
+	// No lockon! We don't want to render stuff
+	if (bDoingMessagePlay)
+		LockOn=false;
 
-    if (bDebug)
-        Log("UDEMO: Trying to link to player :"@p);
+	if (bDebug)
+		Log("UDEMO: Trying to link to player :"@p);
 
-    if (!DemoPlaybackSpec(DemoSpec).bInit)
-    {
-        log (DemoSpec@"(viewport: '"$DemoSpec.Player$"') linked to"@p,'Udemo');
+	if (!DemoPlaybackSpec(DemoSpec).bInit)
+	{
+		log (DemoSpec@"(viewport: '"$DemoSpec.Player$"') linked to"@p,'Udemo');
 
-        DemoPlaybackSpec(DemoSpec).bLockOn = LockOn;
+		DemoPlaybackSpec(DemoSpec).bLockOn = LockOn;
 
-        if (p!=none&&!bDoingMessagePlay)
-            DemoSpec.spawn(class'DemoNotify'); //used for voice pack interception!
-    }
+		if (p!=none&&!bDoingMessagePlay)
+			DemoSpec.spawn(class'DemoNotify'); //used for voice pack interception!
+	}
 
-    DemoPlaybackSpec(DemoSpec).PlayerLinked = p;
-    DemoPlaybackSpec(DemoSpec).bInit=true; //me is too lazy to re-do headers ;p
-    
-     if (Spectator(p) != None)
-    {
-    	Log("Linked player is Spectator - switched to 3rdperson play.", 'Udemo');
-    	DemoPlaybackSpec(DemoSpec).Spectate();
-    }
+	DemoPlaybackSpec(DemoSpec).PlayerLinked = p;
+	DemoPlaybackSpec(DemoSpec).bInit=true; //me is too lazy to re-do headers ;p
+	
+	 if (Spectator(p) != None)
+	{
+		Log("Linked player is Spectator - switched to 3rdperson play.", 'Udemo');
+		DemoPlaybackSpec(DemoSpec).Spectate();
+	}
 }
 
 event NetPacketReceived(); //called each packet if message grabbing

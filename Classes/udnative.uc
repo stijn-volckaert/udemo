@@ -9,26 +9,26 @@
 // However, this is still the native class used by the actual manager windows.
 // =============================================================================
 class udnative expands Object
-    native;
+	native;
 
 //
 // redefined here to make compiler happy!
 //
 struct HUDLocalizedMessage
 {
-    var Class<LocalMessage> Message;
-    var int Switch;
-    var PlayerReplicationInfo RelatedPRI;
-    var Object OptionalObject;
-    var float EndOfLife;
-    var float LifeTime;
-    var bool bDrawing;
-    var int numLines;
-    var string StringMessage;
-    var color DrawColor;
-    var font StringFont;
-    var float XL, YL;
-    var float YPos;
+	var Class<LocalMessage> Message;
+	var int Switch;
+	var PlayerReplicationInfo RelatedPRI;
+	var Object OptionalObject;
+	var float EndOfLife;
+	var float LifeTime;
+	var bool bDrawing;
+	var int numLines;
+	var string StringMessage;
+	var color DrawColor;
+	var font StringFont;
+	var float XL, YL;
+	var float YPos;
 };
 
 var const DemoRecDriver DemoDriver; // valid when reading

@@ -23,14 +23,14 @@ var localized string LocFailedToRenameSuffix;
 // =============================================================================
 function Created()
 {
-    super.created();
+	super.created();
 
-    NameEdit = UWindowEditControl(CreateControl(class'UWindowEditControl', 10, 10, 220, 1));
-    NameEdit.SetFont(F_Normal);
-    NameEdit.SetNumericOnly(False);
-    NameEdit.SetMaxLength(300);
-    NameEdit.EditBoxWidth = 220;
-    NameEdit.BringToFront();
+	NameEdit = UWindowEditControl(CreateControl(class'UWindowEditControl', 10, 10, 220, 1));
+	NameEdit.SetFont(F_Normal);
+	NameEdit.SetNumericOnly(False);
+	NameEdit.SetMaxLength(300);
+	NameEdit.EditBoxWidth = 220;
+	NameEdit.BringToFront();
 }
 
 // =============================================================================
@@ -38,10 +38,10 @@ function Created()
 // =============================================================================
 function BeforePaint(Canvas C, float X, float Y)
 {
-    Super.BeforePaint(C, X, Y);
+	Super.BeforePaint(C, X, Y);
 
-    NameEdit.WinWidth = WinWidth - 20;
-    NameEdit.EditBoxWidth = WinWidth - 50;
+	NameEdit.WinWidth = WinWidth - 20;
+	NameEdit.EditBoxWidth = WinWidth - 50;
 }
 
 // =============================================================================
@@ -49,15 +49,15 @@ function BeforePaint(Canvas C, float X, float Y)
 // =============================================================================
 function Notify(UWindowDialogControl C, byte E)
 {
-    Super.Notify(C, E);
+	Super.Notify(C, E);
 
-    if((C == UDnamewindow(ParentWindow).OKButton && E == DE_Click))
-    {
-        if (demreader==none)
-            CheckRec();
-        else
-            DoRename();
-    }
+	if((C == UDnamewindow(ParentWindow).OKButton && E == DE_Click))
+	{
+		if (demreader==none)
+			CheckRec();
+		else
+			DoRename();
+	}
 }
 
 // =============================================================================
@@ -65,16 +65,16 @@ function Notify(UWindowDialogControl C, byte E)
 // =============================================================================
 function CheckRec()
 {
-    local int i;
+	local int i;
 
-    i=instr(nameedit.getvalue(),".");  //check for .dem presense
+	i=instr(nameedit.getvalue(),".");  //check for .dem presense
 
-    if (i!=-1)
-        nameedit.editbox.value=left(nameedit.getvalue(),i);
-    if (UDClientWindow(ownerwindow).demos.finditemindex(nameedit.getvalue(),true)!=-1) //prompt user.
-        overwrite=MessageBox(LocConfirmFileOverwrite, LocConfirmFileOverwritePrefix$nameedit.getvalue()$LocConfirmFileOverwriteSuffix, MB_YesNo, MR_No, MR_None);
-    else
-        record();  //record demo
+	if (i!=-1)
+		nameedit.editbox.value=left(nameedit.getvalue(),i);
+	if (UDClientWindow(ownerwindow).demos.finditemindex(nameedit.getvalue(),true)!=-1) //prompt user.
+		overwrite=MessageBox(LocConfirmFileOverwrite, LocConfirmFileOverwritePrefix$nameedit.getvalue()$LocConfirmFileOverwriteSuffix, MB_YesNo, MR_No, MR_None);
+	else
+		record();  //record demo
 }
 
 // =============================================================================
@@ -82,22 +82,22 @@ function CheckRec()
 // =============================================================================
 function DoRename()
 {
-    local int i;
+	local int i;
 
-    i=instr(nameedit.getvalue(),".");  //check for .dem presence
+	i=instr(nameedit.getvalue(),".");  //check for .dem presence
 
-    if (i!=-1)
-        nameedit.editbox.value=left(nameedit.getvalue(),i);
-    if (demreader.rename(UDClientWindow(ownerwindow).demos.getvalue2()$UDClientWindow(ownerwindow).demos.getvalue()$".dem",UDClientWindow(ownerwindow).demos.getvalue2()$nameedit.getvalue()$".dem")) //attempt to rename
-    {
-        UWindowComboListItem(UDclientwindow(ownerwindow).demos.list.items).value=nameedit.getvalue();
-        UDclientwindow(ownerwindow).demos.EditBox.value=nameedit.getvalue();
-        UDClientWindow(ownerwindow).demos.sort(); //resort.
-    }
-    else
-        MessageBox(LocFailedToRenameWarning, LocFailedToRenamePrefix@UDClientWindow(ownerwindow).demos.getvalue()$".dem"$LocFailedToRenameMidfix@nameedit.getvalue()$".dem\\n"$LocFailedToRenameSuffix, MB_OK, MR_OK, MR_OK);
+	if (i!=-1)
+		nameedit.editbox.value=left(nameedit.getvalue(),i);
+	if (demreader.rename(UDClientWindow(ownerwindow).demos.getvalue2()$UDClientWindow(ownerwindow).demos.getvalue()$".dem",UDClientWindow(ownerwindow).demos.getvalue2()$nameedit.getvalue()$".dem")) //attempt to rename
+	{
+		UWindowComboListItem(UDclientwindow(ownerwindow).demos.list.items).value=nameedit.getvalue();
+		UDclientwindow(ownerwindow).demos.EditBox.value=nameedit.getvalue();
+		UDClientWindow(ownerwindow).demos.sort(); //resort.
+	}
+	else
+		MessageBox(LocFailedToRenameWarning, LocFailedToRenamePrefix@UDClientWindow(ownerwindow).demos.getvalue()$".dem"$LocFailedToRenameMidfix@nameedit.getvalue()$".dem\\n"$LocFailedToRenameSuffix, MB_OK, MR_OK, MR_OK);
 
-    ParentWindow.Close();
+	ParentWindow.Close();
 }
 
 // =============================================================================
@@ -105,14 +105,14 @@ function DoRename()
 // =============================================================================
 function record()
 {
-    if (nameedit.getvalue()!="")
-    {
-        ParentWindow.Close();
-        ownerwindow.GetParent(class'UWindowFramedWindow').Close();
-        Root.Console.CloseUWindow();
-        getplayerowner().consolecommand("stopdemo"); //stop any current demo
-        getplayerowner().consolecommand("demorec \""$class'DemoSettings'.static.GetRecordingDir()$nameedit.getvalue()$"\"");
-    }
+	if (nameedit.getvalue()!="")
+	{
+		ParentWindow.Close();
+		ownerwindow.GetParent(class'UWindowFramedWindow').Close();
+		Root.Console.CloseUWindow();
+		getplayerowner().consolecommand("stopdemo"); //stop any current demo
+		getplayerowner().consolecommand("demorec \""$class'DemoSettings'.static.GetRecordingDir()$nameedit.getvalue()$"\"");
+	}
 }
 
 // =============================================================================
@@ -120,15 +120,15 @@ function record()
 // =============================================================================
 function MessageBoxDone(UWindowMessageBox W, MessageBoxResult Result)
 {
-    if(Result == MR_Yes)
-    {
-        switch(W)
-        {
-            case overwrite:
-                record(); //user has confirmed he wishes to over-write file.
-            break;
-        }
-    }
+	if(Result == MR_Yes)
+	{
+		switch(W)
+		{
+			case overwrite:
+				record(); //user has confirmed he wishes to over-write file.
+			break;
+		}
+	}
 }
 
 defaultproperties

@@ -33,31 +33,31 @@ var localized string LocDemoSummarySize;
 var localized string LocDemoSummaryBytes;
 
 event PackageRequired (string package, int size, bool Installed, GUID myGUID, int gen, bool Cached){
-  if (bBlocked)
-    return;
-  if (package=="")
-    package=" ";
-  if (!Installed)
-    Cached=false; //just in case...
-  Control.Packages.AddPackage(Package,Size,2*byte(Installed)-byte(Cached),myGUID,gen).CheckPBI(Control.PBI);
-    //control.GetPlayerowner().ClientMessage(package@"is of size"@size@"and is Installed?"@Installed);
+	if (bBlocked)
+		return;
+	if (package == "")
+		package = " ";
+	if (!Installed)
+		Cached = false; //just in case...
+	Control.Packages.AddPackage(Package,Size,2*byte(Installed)-byte(Cached),myGUID,gen).CheckPBI(Control.PBI);
+	//control.GetPlayerowner().ClientMessage(package@"is of size"@size@"and is Installed?"@Installed);
 }
 
 event DemoReadDone(string Map, bool bServerDemo, float Time, int NumFrames){
-    local int i;
-    local DemoList MapItem;
-    if (bBlocked)
-      return;
-    Control.UserWindow.LastDemoItem.MapName=Map;
-    Control.UserWindow.LastDemoItem.bServerDemo=bServerDemo;
-    Control.UserWindow.LastDemoItem.NumFrames=NumFrames;
-    Control.UserWindow.LastDemoItem.PlayTime=Time;
-    Control.UserWindow.ShotTime=1;
-    //force .unr extension on maps (for more efficient downloading)
-    MapItem = Control.Packages.FindPackage(Map);
-    i = instr(MapItem.PackageName,".");
-    if (i==-1)
-      MapItem.PackageName = MapItem.PackageName$".unr";
+	local int i;
+	local DemoList MapItem;
+	if (bBlocked)
+		return;
+	Control.UserWindow.LastDemoItem.MapName = Map;
+	Control.UserWindow.LastDemoItem.bServerDemo = bServerDemo;
+	Control.UserWindow.LastDemoItem.NumFrames = NumFrames;
+	Control.UserWindow.LastDemoItem.PlayTime = Time;
+	Control.UserWindow.ShotTime = 1;
+	//force .unr extension on maps (for more efficient downloading)
+	MapItem = Control.Packages.FindPackage(Map);
+	i = InStr(MapItem.PackageName, ".");
+	if (i == -1)
+		MapItem.PackageName = MapItem.PackageName $ ".unr";
 }
 //summarize info:
 function bool SaveInfo(){
@@ -65,43 +65,54 @@ function bool SaveInfo(){
 	local string Save, N;
 	local DemoList Package, CSHP;
 
-	Demo=Control.UserWindow.LastDemoItem;
+	Demo = Control.UserWindow.LastDemoItem;
 
-	for (Package=DemoList(control.Packages.Next);Package!=none;Package=DemoList(Package.Next))
-	  if (Package.bIsCSHP)
-		break;
+	for (Package = DemoList(control.Packages.Next); Package != None; Package = DemoList(Package.Next))
+		if (Package.bIsCSHP)
+			break;
 
-	N=CHR(13)$CHR(10); //new line :)
-	CSHP=Package;
+	N = Chr(13) $ Chr(10); //new line :)
+	CSHP = Package;
 	//write stuff here:
-	Save=LocDemoSummary$N$LocDemoSummaryAvailable$N$N$Demo.Value$".dem "$LocDemoSummaryInformation$N$LocDemoSummaryMapName@Demo.MapName$".unr"$N$LocDemoSummaryDemoType$" ";
+	Save = LocDemoSummary $ N $ 
+		LocDemoSummaryAvailable $ N $ N $ 
+		Demo.Value $ ".dem " $ LocDemoSummaryInformation $ N $ 
+		LocDemoSummaryMapName @ Demo.MapName $ ".unr" $ N $ 
+		LocDemoSummaryDemoType $ " ";
 
 	if (Demo.bServerDemo)
-	  Save=Save$LocDemoSummaryDemoTypeServer;
+		Save=Save $ LocDemoSummaryDemoTypeServer;
 	else
-	  Save=Save$LocDemoSummaryDemoTypeClient;
+		Save=Save $ LocDemoSummaryDemoTypeClient;
 
-	Save=Save$N$Demo.NumFrames$" "$LocDemoSummaryFrames$N$LocDemoSummaryPlayTime$" "$class'DemoSettings'.static.ParseTime(Demo.PlayTime)$" "$LocDemoSummaryMinSeconds$N$LocDemoSummaryAvgFPS$" "$Demo.NumFrames/Demo.PlayTime$N$LocDemoSummaryCheatProtection$" "$Control.PBI.CSHPVer.GetValue();
+	Save = Save $ N $ Demo.NumFrames @ LocDemoSummaryFrames $ N $ 
+		LocDemoSummaryPlayTime @ class'DemoSettings'.static.ParseTime(Demo.PlayTime) @ LocDemoSummaryMinSeconds $ N $ 
+		LocDemoSummaryAvgFPS @ Demo.NumFrames/Demo.PlayTime $ N $ 
+		LocDemoSummaryCheatProtection @ Control.PBI.CSHPVer.GetValue();
 
-	if (Control.PBI.CSHPVer.GetValue()!=LocDemoSummaryNone)
-	   Save=Save$".u ("$LocDemoSummaryCachedAs$" '"$GUIDstring(CSHP.PackageGUID)$".uxx')";
+	if (Control.PBI.CSHPVer.GetValue() != LocDemoSummaryNone)
+		 Save = Save $ ".u (" $ LocDemoSummaryCachedAs $ " '" $ GUIDstring(CSHP.PackageGUID) $ ".uxx')";
 
-	Save=Save$N$N$LocDemoSummaryFileRequirements;
+	Save = Save $ N $ N $ 
+		LocDemoSummaryFileRequirements;
 
 	if (Control.PBI.UsesBp1)
-	  Save=Save$N$"- "$LocDemoSummaryBonusPack1;
+		Save = Save $ N $ "- " $ LocDemoSummaryBonusPack1;
 
 	if (Control.PBI.UsesBp4)
-	  Save=Save$N$"- "$LocDemoSummaryBonusPack4;
+		Save = Save $ N $ "- " $ LocDemoSummaryBonusPack4;
 
-  if (Control.PBI.UsesRA)
-    Save=Save$N$"- "$LocDemoSummaryRocketArena;
+	if (Control.PBI.UsesRA)
+		Save=Save $ N $ "- " $ LocDemoSummaryRocketArena;
 
-	for (Package=DemoList(control.Packages.Next);Package!=none;Package=DemoList(Package.Next))
-	  if (!Package.bPBIShows)
-		Save=Save$N$Package.PackageName$"("$LocDemoSummaryCachedAs$" '"$GUIDstring(Package.PackageGUID)$".uxx') - "$LocDemoSummarySize$": "$Package.PackageSize$LocDemoSummaryBytes;
+	for (Package = DemoList(control.Packages.Next); Package != None; Package = DemoList(Package.Next))
+		if (!Package.bPBIShows)
+			Save = Save $ N $ 
+				Package.PackageName $ "(" $ LocDemoSummaryCachedAs $ 
+				" '" $ GUIDstring(Package.PackageGUID) $ ".uxx') - " $ 
+				LocDemoSummarySize $ ": " $ Package.PackageSize$LocDemoSummaryBytes;
 
-	return WriteDemoInfo(Demo.Value2$Demo.Value,Save);
+	return WriteDemoInfo(Demo.Value2 $ Demo.Value, Save);
 }
 
 defaultproperties

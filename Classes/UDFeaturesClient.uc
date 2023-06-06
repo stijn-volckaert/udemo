@@ -40,37 +40,37 @@ var localized string LocFlagsSymbol;
 // =============================================================================
 function Created()
 {
-    Super.Created();
+	Super.Created();
 
-    Activate = UWindowComboControl(CreateControl(class'UWindowComboControl', 10, 10, winwidth-18, 1));
-    Activate.SetButtons(True);
-    Activate.SetText(LocAutoRecord);
-    Activate.Align = TA_Left;
-    Activate.SetHelpText(LocAutoRecordHelp);
-    Activate.SetFont(F_Normal);
-    Activate.SetEditable(False);
-    Activate.editboxwidth=0.7*Activate.winwidth;
-    Activate.additem(LocAutoRecordNever);
-    Activate.AddItem(LocAutoRecordAlways);
-    Activate.AddItem(LocAutoRecordSPOnly);
-    Activate.AddItem(LocAutoRecordMPOnly);
-    Activate.SetSelectedIndex(class'DemoSettings'.default.LevelRecord);
+	Activate = UWindowComboControl(CreateControl(class'UWindowComboControl', 10, 10, winwidth-18, 1));
+	Activate.SetButtons(True);
+	Activate.SetText(LocAutoRecord);
+	Activate.Align = TA_Left;
+	Activate.SetHelpText(LocAutoRecordHelp);
+	Activate.SetFont(F_Normal);
+	Activate.SetEditable(False);
+	Activate.editboxwidth=0.7*Activate.winwidth;
+	Activate.additem(LocAutoRecordNever);
+	Activate.AddItem(LocAutoRecordAlways);
+	Activate.AddItem(LocAutoRecordSPOnly);
+	Activate.AddItem(LocAutoRecordMPOnly);
+	Activate.SetSelectedIndex(class'DemoSettings'.default.LevelRecord);
 
-    // (Anth) Added by request
-    RecordWhenSpectating=UWindowCheckBox(CreateControl(class'UWindowCheckBox', 10, 30, winwidth-18, 1));
-    RecordWhenSpectating.SetText(LocRecordWhenSpectating);
-    RecordWhenSpectating.bchecked=class'DemoSettings'.default.bRecordWhenSpectating;
-    RecordWhenSpectating.SetHelpText(LocRecordWhenSpectatingHelp);
+	// (Anth) Added by request
+	RecordWhenSpectating=UWindowCheckBox(CreateControl(class'UWindowCheckBox', 10, 30, winwidth-18, 1));
+	RecordWhenSpectating.SetText(LocRecordWhenSpectating);
+	RecordWhenSpectating.bchecked=class'DemoSettings'.default.bRecordWhenSpectating;
+	RecordWhenSpectating.SetHelpText(LocRecordWhenSpectatingHelp);
 
-    Format = UWindowEditControl(CreateControl(class'UWindowEditControl', 10, 50, winwidth-18, 1));
-    Format.editboxwidth=0.7*Format.winwidth;
-    Format.SetText(LocRecordFormat);
-    Format.SetHelpText(LocRecordFormatHelp);
-    Format.Align = TA_Left;
-    Format.SetValue(class'DemoSettings'.default.Format);
+	Format = UWindowEditControl(CreateControl(class'UWindowEditControl', 10, 50, winwidth-18, 1));
+	Format.editboxwidth=0.7*Format.winwidth;
+	Format.SetText(LocRecordFormat);
+	Format.SetHelpText(LocRecordFormatHelp);
+	Format.Align = TA_Left;
+	Format.SetValue(class'DemoSettings'.default.Format);
 
-    FormatPreview = UWindowLabelControl(CreateControl(class'UWindowLabelControl', 10, 70, winwidth-18, 1));
-    FormatPreview.Align = TA_Center;
+	FormatPreview = UWindowLabelControl(CreateControl(class'UWindowLabelControl', 10, 70, winwidth-18, 1));
+	FormatPreview.Align = TA_Center;
 }
 
 // =============================================================================
@@ -78,44 +78,44 @@ function Created()
 // =============================================================================
 function Notify(UWindowDialogControl C, byte E)
 {
-    local string Str, Str2;
-    local int j;
+	local string Str, Str2;
+	local int j;
 
-    Super.Notify(C, E);
+	Super.Notify(C, E);
 
-    switch(E)
-    {
-        case DE_Change:    //combo
-            switch(C)
-            {
-                case Activate:
-                    class'DemoSettings'.default.LevelRecord=Activate.GetSelectedIndex();
-                break;
-                case GenerateInfo:
-                    break;
-                case RecordWhenSpectating:
-                    class'DemoSettings'.default.bRecordWhenSpectating=RecordWhenSpectating.bChecked;
-                    class'DemoSettings'.SaveConfig();
-                    break;
-                case Format:
-                    //check bad characters:
-                    C.NotifyWindow=none;
-                    Str=Format.GetValue();
-                    for (j = 0; j<Len(Str); j++)
-                    {
-                        if (InStr("\\/*?<:>\"|", Mid(str, j, 1)) != -1)
-                            continue;
-                        else if (InStr(" ", Mid(str, j, 1)) != -1)
-                            str2 = str2 $ "_";
-                        else
-                            str2 = str2 $ Mid(str, j, 1);
-                    }
-                    Format.SetValue(str2);
-                    C.NotifyWindow=self;
-                    class'DemoSettings'.default.Format=Format.GetValue();
-                    break;
-            }
-    }
+	switch(E)
+	{
+		case DE_Change:    //combo
+			switch(C)
+			{
+				case Activate:
+					class'DemoSettings'.default.LevelRecord=Activate.GetSelectedIndex();
+				break;
+				case GenerateInfo:
+					break;
+				case RecordWhenSpectating:
+					class'DemoSettings'.default.bRecordWhenSpectating=RecordWhenSpectating.bChecked;
+					class'DemoSettings'.SaveConfig();
+					break;
+				case Format:
+					//check bad characters:
+					C.NotifyWindow=none;
+					Str=Format.GetValue();
+					for (j = 0; j<Len(Str); j++)
+					{
+						if (InStr("\\/*?<:>\"|", Mid(str, j, 1)) != -1)
+							continue;
+						else if (InStr(" ", Mid(str, j, 1)) != -1)
+							str2 = str2 $ "_";
+						else
+							str2 = str2 $ Mid(str, j, 1);
+					}
+					Format.SetValue(str2);
+					C.NotifyWindow=self;
+					class'DemoSettings'.default.Format=Format.GetValue();
+					break;
+			}
+	}
 }
 
 // =============================================================================
@@ -123,7 +123,7 @@ function Notify(UWindowDialogControl C, byte E)
 // =============================================================================
 function Tick(float delta)
 {
-    FormatPreview.SetText(LocPreview$class'demosettings'.static.GetDemoName(GetPlayerOwner(),UWindowComboListItem(DemoMainClientWindow(GetParent(class'demomainclientwindow')).UserWindow.Demos.List.Items))$".dem");
+	FormatPreview.SetText(LocPreview$class'demosettings'.static.GetDemoName(GetPlayerOwner(),UWindowComboListItem(DemoMainClientWindow(GetParent(class'demomainclientwindow')).UserWindow.Demos.List.Items))$".dem");
 }
 
 // =============================================================================
@@ -131,11 +131,11 @@ function Tick(float delta)
 // =============================================================================
 function WriteText(canvas C, string text, out float Y)
 {
-    local float W, H;
+	local float W, H;
 
-    TextSize(C, text, W, H);
-    ClipText(C, (WinWidth - W)/2, Y, text, false);
-    Y+=H;
+	TextSize(C, text, W, H);
+	ClipText(C, (WinWidth - W)/2, Y, text, false);
+	Y+=H;
 }
 
 // =============================================================================
@@ -143,24 +143,24 @@ function WriteText(canvas C, string text, out float Y)
 // =============================================================================
 function Paint(Canvas C, float X, float Y)
 {
-    Super.Paint(C,X,Y);
+	Super.Paint(C,X,Y);
 
-    //Set black:
-    c.drawcolor.R=0;
-    c.drawcolor.G=0;
-    c.drawcolor.B=0;
-    Y=FormatPreview.Wintop+FormatPreview.WinHeight-1;
-    WriteText(C, "", Y);
-    WriteText(C, LocFlags, Y);
-    WriteText(C, "%L - "$LocFlagsLevelName, Y);
-    WriteText(C, "%Y - "$LocFlagsYear$", %M - "$LocFlagsMonth$", %D - "$LocFlagsDay,  Y);
-    WriteText(C, "%H - "$LocFlagsHour$", %O - "$LocFlagsMinutes$", %S - "$LocFlagsSeconds, Y);
+	//Set black:
+	c.drawcolor.R=0;
+	c.drawcolor.G=0;
+	c.drawcolor.B=0;
+	Y=FormatPreview.Wintop+FormatPreview.WinHeight-1;
+	WriteText(C, "", Y);
+	WriteText(C, LocFlags, Y);
+	WriteText(C, "%L - "$LocFlagsLevelName, Y);
+	WriteText(C, "%Y - "$LocFlagsYear$", %M - "$LocFlagsMonth$", %D - "$LocFlagsDay,  Y);
+	WriteText(C, "%H - "$LocFlagsHour$", %O - "$LocFlagsMinutes$", %S - "$LocFlagsSeconds, Y);
 //  WriteText(C, "%H - "$LocFlagsHour, Y);
 //  WriteText(C, "%O - "$LocFlagsMinutes, Y);
 //  WriteText(C, "%S - "$LocFlagsSeconds, Y);
-    WriteText(C, "%V - "$LocFlagsServerName, Y);
-    WriteText(C, "%N - "$LocFlagsConsecutiveNames, Y);
-    WriteText(C, "%% - "$LocFlagsSymbol, Y);
+	WriteText(C, "%V - "$LocFlagsServerName, Y);
+	WriteText(C, "%N - "$LocFlagsConsecutiveNames, Y);
+	WriteText(C, "%% - "$LocFlagsSymbol, Y);
 }
 
 defaultproperties

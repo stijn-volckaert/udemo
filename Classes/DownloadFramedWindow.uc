@@ -13,9 +13,9 @@ class DownloadFramedWindow expands UWindowFramedWindow;
 // =============================================================================
 function Created()
 {
-    ResolutionChanged(0,0);
-    Super.Created();
-    CloseBox.HideWindow();
+	ResolutionChanged(0,0);
+	Super.Created();
+	CloseBox.HideWindow();
 }
 
 // =============================================================================
@@ -23,9 +23,9 @@ function Created()
 // =============================================================================
 function ResolutionChanged(float W, float H)
 {
-    SetSize(280, 130);
-    WinLeft = root.WinWidth - WinWidth;
-    WinTop = 16; //correct relative to menu bar?
+	SetSize(280, 130);
+	WinLeft = root.WinWidth - WinWidth;
+	WinTop = 16; //correct relative to menu bar?
 }
 
 // =============================================================================
@@ -33,7 +33,7 @@ function ResolutionChanged(float W, float H)
 // =============================================================================
 function EscClose()
 {
-    root.Console.CloseUWindow();
+	root.Console.CloseUWindow();
 }
 
 // =============================================================================
@@ -41,7 +41,7 @@ function EscClose()
 // =============================================================================
 function bool IsActive()
 {
-    return true;
+	return true;
 }
 
 // =============================================================================
@@ -49,12 +49,12 @@ function bool IsActive()
 // =============================================================================
 function Paint(Canvas C, float X, float Y)
 {
-    local UWindowWindow Ac;
+	local UWindowWindow Ac;
 
-    Ac=ParentWindow.ActiveWindow;
-    ParentWindow.ActiveWindow=self;
-    super.Paint(C,X,Y);
-    ParentWindow.ActiveWindow=Ac;
+	Ac=ParentWindow.ActiveWindow;
+	ParentWindow.ActiveWindow=self;
+	super.Paint(C,X,Y);
+	ParentWindow.ActiveWindow=Ac;
 }
 
 // =============================================================================

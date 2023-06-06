@@ -91,134 +91,134 @@ var localized string	LocThirdPersonAlwaysTrue;
 // =============================================================================
 function Created()
 {
-    local class<UWindowComboList> OldDefault;
-    local int ControlOffset;
-    local int CenterWidth, CenterPos, CenterWidth2, CenterPos2;
-    local int i;
-    local UWindowLabelControl Ctrl, Ctrl_dem;
+	local class<UWindowComboList> OldDefault;
+	local int ControlOffset;
+	local int CenterWidth, CenterPos, CenterWidth2, CenterPos2;
+	local int i;
+	local UWindowLabelControl Ctrl, Ctrl_dem;
 
-    CenterWidth2 = WinWidth - 20;//(WinWidth/8)*7; //combo width
-    CenterWidth = (WinWidth - 30)/2; //button width
-    CenterPos = 10;//(WinWidth - CenterWidth)/2;
-    CenterPos2 = WinWidth - CenterWidth - 10; //right position for button
-    ControlOffset = 5;
+	CenterWidth2 = WinWidth - 20;//(WinWidth/8)*7; //combo width
+	CenterWidth = (WinWidth - 30)/2; //button width
+	CenterPos = 10;//(WinWidth - CenterWidth)/2;
+	CenterPos2 = WinWidth - CenterWidth - 10; //right position for button
+	ControlOffset = 5;
 
-    super.created();
+	super.created();
 
-    Ctrl_dem = UWindowLabelControl(CreateControl(class'UWindowLabelControl', CenterPos, ControlOffset, CenterWidth, 16));
-    Ctrl_dem.SetFont( F_Bold );
-    Ctrl_dem.SetText(LocDemos);
+	Ctrl_dem = UWindowLabelControl(CreateControl(class'UWindowLabelControl', CenterPos, ControlOffset, CenterWidth, 16));
+	Ctrl_dem.SetFont( F_Bold );
+	Ctrl_dem.SetText(LocDemos);
 
-    demreader = new class'DemoReader'; //create native reader object.
-    demreader.control=DemoMainClientWindow(GetParent(class'DemoMainClientWindow'));   //link to main!
+	demreader = new class'DemoReader'; //create native reader object.
+	demreader.control=DemoMainClientWindow(GetParent(class'DemoMainClientWindow'));   //link to main!
 
-    sizelabel=UMenuLabelControl(CreateWindow(class'UMenuLabelControl', CenterPos2, ControlOffset,CenterWidth, 1));
-    sizelabel.Align = TA_Right;
-    
-    OrderByDate = UWindowCheckBox(CreateControl(class'UWindowCheckBox', CenterPos2 - CenterWidth/2, ControlOffset - 2, CenterWidth - 35, 16));
-    OrderByDate.SetText(LocOrderByDate);
-    OrderByDate.SetHelpText(LocOrderByDateHelp);
-    OrderByDate.Align = TA_Right;
-    OrderByDate.bChecked = Class'DemoSettings'.default.OrderByDate;
+	sizelabel=UMenuLabelControl(CreateWindow(class'UMenuLabelControl', CenterPos2, ControlOffset,CenterWidth, 1));
+	sizelabel.Align = TA_Right;
+	
+	OrderByDate = UWindowCheckBox(CreateControl(class'UWindowCheckBox', CenterPos2 - CenterWidth/2, ControlOffset - 2, CenterWidth - 35, 16));
+	OrderByDate.SetText(LocOrderByDate);
+	OrderByDate.SetHelpText(LocOrderByDateHelp);
+	OrderByDate.Align = TA_Right;
+	OrderByDate.bChecked = Class'DemoSettings'.default.OrderByDate;
 
-    //hack to use modified list class:
-    OldDefault=Class'UwindowComboControl'.default.listclass;
-    Class'UwindowComboControl'.default.listclass=class'UDComboList';
-    ControlOffSet+=14;
+	//hack to use modified list class:
+	OldDefault=Class'UwindowComboControl'.default.listclass;
+	Class'UwindowComboControl'.default.listclass=class'UDComboList';
+	ControlOffSet+=14;
 
-    demos = UWindowComboControl(CreateControl(class'UWindowComboControl', CenterPos, ControlOffset, CenterWidth2, 1));
-    Class'UwindowComboControl'.default.listclass=OldDefault;
-    demos.SetButtons(True);
-    demos.Align = TA_Left;
-    demos.SetHelpText(LocDemosHelp);
-    demos.SetFont(F_Normal);
-    demos.SetEditable(False);
-    demos.editboxwidth=CenterWidth2;
-    ControlOffset+=20;
+	demos = UWindowComboControl(CreateControl(class'UWindowComboControl', CenterPos, ControlOffset, CenterWidth2, 1));
+	Class'UwindowComboControl'.default.listclass=OldDefault;
+	demos.SetButtons(True);
+	demos.Align = TA_Left;
+	demos.SetHelpText(LocDemosHelp);
+	demos.SetFont(F_Normal);
+	demos.SetEditable(False);
+	demos.editboxwidth=CenterWidth2;
+	ControlOffset+=20;
 
-    Play = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos2, ControlOffset, CenterWidth, 16));
-    Play.SetFont(F_bold);
-    Play.SetText(LocPlayDemo);
-    Play.sethelptext(LocPlayDemoHelp);
+	Play = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos2, ControlOffset, CenterWidth, 16));
+	Play.SetFont(F_bold);
+	Play.SetText(LocPlayDemo);
+	Play.sethelptext(LocPlayDemoHelp);
 
-    Record = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos, ControlOffset, CenterWidth, 16));
-    Record.SetText(LocRecordDemo);
-    Record.sethelptext(LocRecordDemoHelp);
+	Record = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos, ControlOffset, CenterWidth, 16));
+	Record.SetText(LocRecordDemo);
+	Record.sethelptext(LocRecordDemoHelp);
 
-    stopb = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos, ControlOffset, CenterWidth, 16));
-    stopb.SetFont(F_bold);
-    stopb.SetText(LocStopDemo);
-    stopb.sethelptext(LocStopDemoHelp);
-    //next buttons row
-    ControlOffset+=20;
+	stopb = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos, ControlOffset, CenterWidth, 16));
+	stopb.SetFont(F_bold);
+	stopb.SetText(LocStopDemo);
+	stopb.sethelptext(LocStopDemoHelp);
+	//next buttons row
+	ControlOffset+=20;
 
-    Rename = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos, ControlOffset, CenterWidth, 16));
-    Rename.SetText(LocRenameDemoFile);
-    Rename.sethelptext(LocRenameDemoFileHelp);
+	Rename = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos, ControlOffset, CenterWidth, 16));
+	Rename.SetText(LocRenameDemoFile);
+	Rename.sethelptext(LocRenameDemoFileHelp);
 //  ControlOffset+=20;
 
-    Delete = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos2, ControlOffset, CenterWidth, 16));
-    Delete.SetText(LocDeleteDemoFile);
-    Delete.sethelptext(LocDeleteDemoFileHelp);
-    ControlOffset+=20;
+	Delete = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos2, ControlOffset, CenterWidth, 16));
+	Delete.SetText(LocDeleteDemoFile);
+	Delete.sethelptext(LocDeleteDemoFileHelp);
+	ControlOffset+=20;
 
-    Write = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos, ControlOffset, CenterWidth2, 1));
-    Write.SetText(LocWriteDemoSummary);
-    Write.sethelptext(LocWriteDemoSummaryHelp);
-    ControlOffset+=20;
+	Write = UWindowSmallButton(CreateControl(class'UWindowSmallButton', CenterPos, ControlOffset, CenterWidth2, 1));
+	Write.SetText(LocWriteDemoSummary);
+	Write.sethelptext(LocWriteDemoSummaryHelp);
+	ControlOffset+=20;
 
-    Ctrl = UWindowLabelControl(CreateControl(class'UWindowLabelControl', CenterPos, ControlOffset, CenterWidth2, 1));
-    Ctrl.SetFont( F_Bold );
-    Ctrl.SetText(LocSelectAdditionalOptions);
-    
-    DateLabel = UMenuLabelControl(CreateWindow(class'UMenuLabelControl', CenterPos2, ControlOffset, CenterWidth, 1));
-    DateLabel.Align = TA_Right;
-    
-    ControlOffset+=16;
+	Ctrl = UWindowLabelControl(CreateControl(class'UWindowLabelControl', CenterPos, ControlOffset, CenterWidth2, 1));
+	Ctrl.SetFont( F_Bold );
+	Ctrl.SetText(LocSelectAdditionalOptions);
+	
+	DateLabel = UMenuLabelControl(CreateWindow(class'UMenuLabelControl', CenterPos2, ControlOffset, CenterWidth, 1));
+	DateLabel.Align = TA_Right;
+	
+	ControlOffset+=16;
 
-    timing = UWindowComboControl(CreateControl(class'UWindowComboControl',CenterPos, ControlOffset, CenterWidth2, 1));
-    timing.SetButtons(True);
-    timing.SetText(LocAOTiming);
-    timing.Align = TA_Left;
-    timing.SetHelpText(LocAOTimingHelp);
-    timing.SetFont(F_Normal);
-    timing.SetEditable(False);
-    timing.editboxwidth=0.7*timing.winwidth;
-    timing.additem(LocAOTimingFrameBased);
-    timing.AddItem(LocAOTimingTimeBased$" (?timebased)");
-    timing.AddItem(LocAOTimingFastAsPossible$" (?noframecap)");
-    timing.setselectedindex(class'DemoSettings'.default.Timing); //FIX ME! SAVED ITEM!
-    ControlOffset+=19;
+	timing = UWindowComboControl(CreateControl(class'UWindowComboControl',CenterPos, ControlOffset, CenterWidth2, 1));
+	timing.SetButtons(True);
+	timing.SetText(LocAOTiming);
+	timing.Align = TA_Left;
+	timing.SetHelpText(LocAOTimingHelp);
+	timing.SetFont(F_Normal);
+	timing.SetEditable(False);
+	timing.editboxwidth=0.7*timing.winwidth;
+	timing.additem(LocAOTimingFrameBased);
+	timing.AddItem(LocAOTimingTimeBased$" (?timebased)");
+	timing.AddItem(LocAOTimingFastAsPossible$" (?noframecap)");
+	timing.setselectedindex(class'DemoSettings'.default.Timing); //FIX ME! SAVED ITEM!
+	ControlOffset+=19;
 
-    Spectate=UWindowCheckBox(CreateControl(class'UWindowCheckBox', CenterPos, ControlOffset, CenterWidth2, 16));
-    Spectate.SetText(LocAOSpectate);
-    Spectate.SetHelpText(SpecHelp);
-    Spectate.bChecked=Class'DemoSettings'.default.SpecDemo;
-    ControlOffset+=16;
-    
-    if (!Class'DemoSettings'.default.bOneTimeUpgrade)
-    {
-    	demreader.SetDemoDriverClass("udemo.uDemoDriver");
-	    Class'DemoSettings'.default.bOneTimeUpgrade = True;
+	Spectate=UWindowCheckBox(CreateControl(class'UWindowCheckBox', CenterPos, ControlOffset, CenterWidth2, 16));
+	Spectate.SetText(LocAOSpectate);
+	Spectate.SetHelpText(SpecHelp);
+	Spectate.bChecked=Class'DemoSettings'.default.SpecDemo;
+	ControlOffset+=16;
+	
+	if (!Class'DemoSettings'.default.bOneTimeUpgrade)
+	{
+		demreader.SetDemoDriverClass("udemo.uDemoDriver");
+		Class'DemoSettings'.default.bOneTimeUpgrade = True;
 	}
-    
-    drivers = UWindowComboControl(CreateControl(class'UWindowComboControl',CenterPos, ControlOffset, CenterWidth2, 1));
-    drivers.SetButtons(True);
-    drivers.SetText(LocDrivers);
-    drivers.Align = TA_Left;
-    drivers.SetHelpText(LocDriversHelp);
-    drivers.SetFont(F_Normal);
-    drivers.SetEditable(False);
-    drivers.EditBoxWidth = 0.7*drivers.WinWidth;
-    drivers.AddItem(LocDriversStock, "Engine.DemoRecDriver");
-    drivers.AddItem("udemo" @ LocDriversUdemo, "udemo.uDemoDriver");
-    i = 0;
-    if (demreader.SetDemoDriverClass("") ~= "udemo.uDemoDriver")
-    	i = 1;
-    drivers.SetSelectedIndex(i); //FIX ME! SAVED ITEM!
-    ControlOffset+=19;
-    
-    Initialized = true;
+	
+	drivers = UWindowComboControl(CreateControl(class'UWindowComboControl',CenterPos, ControlOffset, CenterWidth2, 1));
+	drivers.SetButtons(True);
+	drivers.SetText(LocDrivers);
+	drivers.Align = TA_Left;
+	drivers.SetHelpText(LocDriversHelp);
+	drivers.SetFont(F_Normal);
+	drivers.SetEditable(False);
+	drivers.EditBoxWidth = 0.7*drivers.WinWidth;
+	drivers.AddItem(LocDriversStock, "Engine.DemoRecDriver");
+	drivers.AddItem("udemo" @ LocDriversUdemo, "udemo.uDemoDriver");
+	i = 0;
+	if (demreader.SetDemoDriverClass("") ~= "udemo.uDemoDriver")
+		i = 1;
+	drivers.SetSelectedIndex(i); //FIX ME! SAVED ITEM!
+	ControlOffset+=19;
+	
+	Initialized = true;
 }
 
 // =============================================================================
@@ -226,7 +226,7 @@ function Created()
 // =============================================================================
 function Refresh(optional bool init)
 {
-    SetupDemos(!init);
+	SetupDemos(!init);
 }
 
 // =============================================================================
@@ -234,79 +234,79 @@ function Refresh(optional bool init)
 // =============================================================================
 function SetupDemos(bool Refreshing)
 {
-    local string demoinfo, toadd, size, LastDemo, LastDemoPath;
-    local int pos, pos2;
-    local UDComboList Combo;
-    local UWindowList D, C, T;
-    local int i;
-    
-    if (Refreshing) {
-    	Combo = new class'UDComboList';
-    	Combo.bNoKeyboard = true;
-    	Combo.Created();
-    } else
-    	Combo = UDComboList(demos.List);
+	local string demoinfo, toadd, size, LastDemo, LastDemoPath;
+	local int pos, pos2;
+	local UDComboList Combo;
+	local UWindowList D, C, T;
+	local int i;
+	
+	if (Refreshing) {
+		Combo = new class'UDComboList';
+		Combo.bNoKeyboard = true;
+		Combo.Created();
+	} else
+		Combo = UDComboList(demos.List);
 
-    // Once for each path
-    for (i=0; i<5; i++)
-    {
-        if (!(Class'DemoSettings'.default.DemoPaths[i] ~= class'udpathsclient'.default.Empty))
-        {
-            demoinfo = demreader.getdemo(Class'DemoSettings'.default.DemoPaths[i]);
+	// Once for each path
+	for (i=0; i<5; i++)
+	{
+		if (!(Class'DemoSettings'.default.DemoPaths[i] ~= class'udpathsclient'.default.Empty))
+		{
+			demoinfo = demreader.getdemo(Class'DemoSettings'.default.DemoPaths[i]);
 
-            //Null string=no more demos.
-            while (demoinfo != "")
-            {
-                pos = InStr(demoinfo, "/");
-                toadd = Left(demoinfo, pos - 4);
-                size = Mid(demoinfo, pos + 1);
-                pos2 = InStr(size, "/");
-                
-                Combo.AddItem2(toadd, class'demosettings'.static.Path(i, demreader.BasePath()), int(size), Mid(size, pos2 + 1));
+			//Null string=no more demos.
+			while (demoinfo != "")
+			{
+				pos = InStr(demoinfo, "/");
+				toadd = Left(demoinfo, pos - 4);
+				size = Mid(demoinfo, pos + 1);
+				pos2 = InStr(size, "/");
+				
+				Combo.AddItem2(toadd, class'demosettings'.static.Path(i, demreader.BasePath()), int(size), Mid(size, pos2 + 1));
 
-                if (!Refreshing && toadd ~= class'demosettings'.default.LastDemo) {
-                	LastDemo = toadd;
-                	LastDemoPath = class'demosettings'.static.Path(i, demreader.BasePath());
-                }
+				if (!Refreshing && toadd ~= class'demosettings'.default.LastDemo) {
+					LastDemo = toadd;
+					LastDemoPath = class'demosettings'.static.Path(i, demreader.BasePath());
+				}
 
-                demoinfo = demreader.getdemo("");
-            }
-        }
-    }
+				demoinfo = demreader.getdemo("");
+			}
+		}
+	}
 
-    Combo.sort();
-    if (Refreshing) {
-    	D = demos.List.Items.Next;
-    	C = Combo.Items.Next;
-    	while (D != None || C != None) {
-	    	if (D == None)
-	    		i = 1;
-	    	else if (C == None)
-	    		i = -1;
-	    	else
-	    		i = D.Compare(D, C);
-    		if (i == -1) {
-    			T = D;
-    			D = D.Next;
-    			T.Remove();
-    		} else if (i == 1) {
-    			T = C;
-    			C = C.Next;
-    			demos.List.Items.MoveItemSorted(T);
-    		} else {
-	    		D = D.Next;
-    			C = C.Next;
-    		}
-    	}
-    	if (demos.List.Items.Next == None) {
-	    	Refreshing = false;
+	Combo.sort();
+	if (Refreshing) {
+		D = demos.List.Items.Next;
+		C = Combo.Items.Next;
+		while (D != None || C != None) {
+			if (D == None)
+				i = 1;
+			else if (C == None)
+				i = -1;
+			else
+				i = D.Compare(D, C);
+			if (i == -1) {
+				T = D;
+				D = D.Next;
+				T.Remove();
+			} else if (i == 1) {
+				T = C;
+				C = C.Next;
+				demos.List.Items.MoveItemSorted(T);
+			} else {
+				D = D.Next;
+				C = C.Next;
+			}
+		}
+		if (demos.List.Items.Next == None) {
+			Refreshing = false;
 			demos.SetValue("");
-    	}
-    	Demos.SetValue(Demos.GetValue(),Demos.GetValue2());  //hack :)
+		}
+		Demos.SetValue(Demos.GetValue(),Demos.GetValue2());  //hack :)
 
-	    if (!Refreshing && demos.GetValue() == "")
-	        Demos.SetSelectedIndex(0);
-    } else if (LastDemo != "")
+		if (!Refreshing && demos.GetValue() == "")
+			Demos.SetSelectedIndex(0);
+	} else if (LastDemo != "")
 		demos.SetValue(LastDemo, LastDemoPath);
 }
 
@@ -315,47 +315,47 @@ function SetupDemos(bool Refreshing)
 // =============================================================================
 function demochanged()
 {
-    Write.bdisabled=true;
+	Write.bdisabled=true;
 
-    if (demos.GetValue()=="")
-        return;
+	if (demos.GetValue()=="")
+		return;
 
-    if (LastDemoItem!=none && DemReader.Control.Packages.Next!=none && LastDemoItem.MapName!="") //else would screw up :p
-        LastDemoItem.Packages=DemoList(demreader.control.Packages.next);
+	if (LastDemoItem!=none && DemReader.Control.Packages.Next!=none && LastDemoItem.MapName!="") //else would screw up :p
+		LastDemoItem.Packages=DemoList(demreader.control.Packages.next);
 
-    demreader.control.Packages.DisconnectList();
-    LastDemoItem=UDComboList(Demos.List).FindItem(Demos.GetValue());
-    shottime=0; //safety.
-    sizelabel.SetText(LastDemoItem.sortweight @ "kb");
-    DateLabel.SetText(LastDemoItem.DateTime);
-    demreader.control.PBI.Reset();
-    demreader.control.ScreenShot.SetPending();
+	demreader.control.Packages.DisconnectList();
+	LastDemoItem=UDComboList(Demos.List).FindItem(Demos.GetValue());
+	shottime=0; //safety.
+	sizelabel.SetText(LastDemoItem.sortweight @ "kb");
+	DateLabel.SetText(LastDemoItem.DateTime);
+	demreader.control.PBI.Reset();
+	demreader.control.ScreenShot.SetPending();
 
-    //reset spec stuff:
-    Spectate.bDisabled=false;
-    Spectate.bChecked=Class'DemoSettings'.default.SpecDemo;
-    Spectate.SetHelpText(SpecHelp);
+	//reset spec stuff:
+	Spectate.bDisabled=false;
+	Spectate.bChecked=Class'DemoSettings'.default.SpecDemo;
+	Spectate.SetHelpText(SpecHelp);
 
-     //already read
-    if (LastDemoItem.Packages != none)
-    {
-        DemReader.bblocked=true;  //in case currently analyzing
-        demreader.control.Packages.next=LastDemoItem.Packages;
-        LastDemoItem.Packages.Refresh(demreader.control.PBI);
+	 //already read
+	if (LastDemoItem.Packages != none)
+	{
+		DemReader.bblocked=true;  //in case currently analyzing
+		demreader.control.Packages.next=LastDemoItem.Packages;
+		LastDemoItem.Packages.Refresh(demreader.control.PBI);
 
-        if (bwindowvisible) //can accept ticks
-            ShotTime=2;
-        else
-        {
-            ShotTime=1;
-            Tick(0.0);
-        }
-    }
-    else
-    {
-        DemReader.bblocked=false; //allow analyze :)
-        demreader.DemoRead(LastDemoItem.Value2$LastDemoItem.Value$"?noframecap",GetPlayerOwner().Xlevel);
-    }
+		if (bwindowvisible) //can accept ticks
+			ShotTime=2;
+		else
+		{
+			ShotTime=1;
+			Tick(0.0);
+		}
+	}
+	else
+	{
+		DemReader.bblocked=false; //allow analyze :)
+		demreader.DemoRead(LastDemoItem.Value2$LastDemoItem.Value$"?noframecap",GetPlayerOwner().Xlevel);
+	}
 }
 
 // =============================================================================
@@ -363,73 +363,73 @@ function demochanged()
 // =============================================================================
 function PlayDemo(optional bool noInstallCheck)
 {
-    local string assembled;
-    local int i, j;
+	local string assembled;
+	local int i, j;
 
-    if (demos.getvalue() != "")
-    {
-        if (!noInstallCheck)
-        {
-            // we must call this repeatively, in order to force all linkers to load correctly! up to package amount is max!
-            j = DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).Packages.InternalCount;
+	if (demos.getvalue() != "")
+	{
+		if (!noInstallCheck)
+		{
+			// we must call this repeatively, in order to force all linkers to load correctly! up to package amount is max!
+			j = DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).Packages.InternalCount;
 
-            for (i=0; i<j; i++)
-            {
-                LastInstalled = DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).Packages.AllInstalled();
-                if (LastInstalled!=3) //if is 3, may need to load cached linkers
-                    break;
-            }
+			for (i=0; i<j; i++)
+			{
+				LastInstalled = DemoMainClientWindow(GetParent(class'DemoMainClientWindow')).Packages.AllInstalled();
+				if (LastInstalled!=3) //if is 3, may need to load cached linkers
+					break;
+			}
 
-            switch (LastInstalled)
-            {
-                case 0:
-                    break; //all is good
+			switch (LastInstalled)
+			{
+				case 0:
+					break; //all is good
 
-                case 1:
-                    if (root.FindChildWindow(class'DownloadFramedWindow') == none)
-                        doDlMsg = MessageBox(LocDemoUsesOutdatedVersionsWarning, LocDemoUsesOutdatedVersionsPrefix$" '"$demos.getvalue()$"' "$LocDemoUsesOutdatedVersionsSuffix, MB_YesNoCancel, MR_No, MR_None);
-                    else
-                        doGenWarnMsg = MessageBox(LocDemoUsesOutdatedVersionsWarning, LocDemoUsesOutdatedVersionsPrefix$" '"$demos.getvalue()$"' "$LocDemoUsesOutdatedVersionsSuffix2, MB_YesNo, MR_No, MR_None);
-                    return;
+				case 1:
+					if (root.FindChildWindow(class'DownloadFramedWindow') == none)
+						doDlMsg = MessageBox(LocDemoUsesOutdatedVersionsWarning, LocDemoUsesOutdatedVersionsPrefix$" '"$demos.getvalue()$"' "$LocDemoUsesOutdatedVersionsSuffix, MB_YesNoCancel, MR_No, MR_None);
+					else
+						doGenWarnMsg = MessageBox(LocDemoUsesOutdatedVersionsWarning, LocDemoUsesOutdatedVersionsPrefix$" '"$demos.getvalue()$"' "$LocDemoUsesOutdatedVersionsSuffix2, MB_YesNo, MR_No, MR_None);
+					return;
 
-                case 2:
-                    if (root.FindChildWindow(class'DownloadFramedWindow')==none)
-                        doDlMsg = MessageBox(LocDemoCannotPlay, LocDemoCannotPlayPrefix$" '"$demos.getvalue()$"' "$LocDemoCannotPlaySuffix, MB_YesNoCancel, MR_No, MR_None);
-                    else
-                        MessageBox(LocDemoCannotPlay, LocDemoCannotPlayPrefix$" '"$demos.getvalue()$"' "$LocDemoCannotPlaySuffix2, MB_OK, MR_OK, MR_OK);
-                    return;
+				case 2:
+					if (root.FindChildWindow(class'DownloadFramedWindow')==none)
+						doDlMsg = MessageBox(LocDemoCannotPlay, LocDemoCannotPlayPrefix$" '"$demos.getvalue()$"' "$LocDemoCannotPlaySuffix, MB_YesNoCancel, MR_No, MR_None);
+					else
+						MessageBox(LocDemoCannotPlay, LocDemoCannotPlayPrefix$" '"$demos.getvalue()$"' "$LocDemoCannotPlaySuffix2, MB_OK, MR_OK, MR_OK);
+					return;
 
-                case 3:
-                    MessageBox(LocDemoCannotPlay, LocDemoCannotPlayPrefix$" '"$demos.getvalue()$"' "$LocDemoCannotPlaySuffix3, MB_OK, MR_OK, MR_OK);
-                    return;
+				case 3:
+					MessageBox(LocDemoCannotPlay, LocDemoCannotPlayPrefix$" '"$demos.getvalue()$"' "$LocDemoCannotPlaySuffix3, MB_OK, MR_OK, MR_OK);
+					return;
 
-                case 4:
-                    if (root.FindChildWindow(class'DownloadFramedWindow')==none)
-                        doDlMsg = MessageBox(LocDemoCannotPlay, LocDemoCannotPlayPrefix$" '"$demos.getvalue()$"' "$LocDemoCannotPlaySuffix4, MB_YesNo, MR_No, MR_None);
-                    else
-                        MessageBox(LocDemoCannotPlay, LocDemoCannotPlayPrefix$" '"$demos.getvalue()$"' "$LocDemoCannotPlaySuffix5, MB_OK, MR_OK, MR_OK);
-                    return;
-            }
-        }
+				case 4:
+					if (root.FindChildWindow(class'DownloadFramedWindow')==none)
+						doDlMsg = MessageBox(LocDemoCannotPlay, LocDemoCannotPlayPrefix$" '"$demos.getvalue()$"' "$LocDemoCannotPlaySuffix4, MB_YesNo, MR_No, MR_None);
+					else
+						MessageBox(LocDemoCannotPlay, LocDemoCannotPlayPrefix$" '"$demos.getvalue()$"' "$LocDemoCannotPlaySuffix5, MB_OK, MR_OK, MR_OK);
+					return;
+			}
+		}
 
-        GetParent(class'UWindowFramedWindow').Close();
-        Root.Console.CloseUWindow();
+		GetParent(class'UWindowFramedWindow').Close();
+		Root.Console.CloseUWindow();
 
-        getplayerowner().consolecommand("stopdemo"); //needed?
+		getplayerowner().consolecommand("stopdemo"); //needed?
 
-        assembled="demoplay \""$demos.getvalue2()$demos.getvalue();     //assemble command with options
-        if (Spectate.bchecked)
-            assembled=assembled$"?3rdperson";
-        if (timing.GetSelectedIndex() == 1)
-            assembled=assembled$"?timebased";
-        else if (timing.GetSelectedIndex() == 2)
-            assembled=assembled$"?noframecap";
-        assembled=assembled$"\"";
+		assembled="demoplay \""$demos.getvalue2()$demos.getvalue();     //assemble command with options
+		if (Spectate.bchecked)
+			assembled=assembled$"?3rdperson";
+		if (timing.GetSelectedIndex() == 1)
+			assembled=assembled$"?timebased";
+		else if (timing.GetSelectedIndex() == 2)
+			assembled=assembled$"?noframecap";
+		assembled=assembled$"\"";
 
-        // (Anth) Linux FURL is fucked so we need to store the assembled URL somewhere and restore it in the native...
-        demreader.DemoURL = assembled;
-        getplayerowner().consolecommand(assembled); //play demo!
-    }
+		// (Anth) Linux FURL is fucked so we need to store the assembled URL somewhere and restore it in the native...
+		demreader.DemoURL = assembled;
+		getplayerowner().consolecommand(assembled); //play demo!
+	}
 }
 
 // =============================================================================
@@ -437,17 +437,17 @@ function PlayDemo(optional bool noInstallCheck)
 // =============================================================================
 function RecordDemo()
 {
-    local Uwindowwindow temp;
+	local Uwindowwindow temp;
 
-    if (GetLevel()!=GetEntryLevel())
-    {
-        temp = root.CreateWindow(class'UDnamewindow',10, 10, 200, 100,self);
-        GetParent(class'UWindowFramedWindow').ShowModal(temp);
-        UDnameclient(UWindowFramedWindow(temp).clientarea).NameEdit.SetValue(
-            class'DemoSettings'.static.GetDemoName(GetPlayerOwner(),UWindowComboListItem(LastDemoItem.Sentinel))); //set to autorecord thing!
-    }
-    else //error
-        MessageBox(LocCannotRecordADemoTitle, LocCannotRecordADemoMessage, MB_OK, MR_OK, MR_OK);
+	if (GetLevel()!=GetEntryLevel())
+	{
+		temp = root.CreateWindow(class'UDnamewindow',10, 10, 200, 100,self);
+		GetParent(class'UWindowFramedWindow').ShowModal(temp);
+		UDnameclient(UWindowFramedWindow(temp).clientarea).NameEdit.SetValue(
+			class'DemoSettings'.static.GetDemoName(GetPlayerOwner(),UWindowComboListItem(LastDemoItem.Sentinel))); //set to autorecord thing!
+	}
+	else //error
+		MessageBox(LocCannotRecordADemoTitle, LocCannotRecordADemoMessage, MB_OK, MR_OK, MR_OK);
 }
 
 // =============================================================================
@@ -455,16 +455,16 @@ function RecordDemo()
 // =============================================================================
 function DeleteDemo()
 {
-    local int i;
+	local int i;
 
-    if (demreader.kill(demos.GetValue2()$demos.GetValue()$".dem"))
-    {
-        i=demos.GetSelectedIndex();
-        demos.removeitem(i);
-        demos.setselectedindex(max(0,i-1)); //move list back.
-    }
-    else //failed!
-        MessageBox(LocFailedToRemoveTitle, LocFailedToRemoveMessagePrefix$" "@demos.getvalue()$".dem\\n"$LocFailedToRemoveMessageSuffix, MB_OK, MR_OK, MR_OK);
+	if (demreader.kill(demos.GetValue2()$demos.GetValue()$".dem"))
+	{
+		i=demos.GetSelectedIndex();
+		demos.removeitem(i);
+		demos.setselectedindex(max(0,i-1)); //move list back.
+	}
+	else //failed!
+		MessageBox(LocFailedToRemoveTitle, LocFailedToRemoveMessagePrefix$" "@demos.getvalue()$".dem\\n"$LocFailedToRemoveMessageSuffix, MB_OK, MR_OK, MR_OK);
 }
 
 // =============================================================================
@@ -472,13 +472,13 @@ function DeleteDemo()
 // =============================================================================
 function RenameDemo()
 {
-    local Uwindowwindow temp;
+	local Uwindowwindow temp;
 
-    temp = root.CreateWindow(class'UDnamewindow',10, 10, 200, 100,self);      //create it
-    GetParent(class'UWindowFramedWindow').ShowModal(temp); //show it.
-    UDnameclient(UWindowFramedWindow(temp).clientarea).demreader=demreader; //when demreader!=none renaming occurs.
-    UDnameclient(UWindowFramedWindow(temp).clientarea).NameEdit.SetValue(demos.getValue()); //requested by someone! ;p
-    Uwindowframedwindow(temp).WindowTitle=LocRenameDemoTitle;
+	temp = root.CreateWindow(class'UDnamewindow',10, 10, 200, 100,self);      //create it
+	GetParent(class'UWindowFramedWindow').ShowModal(temp); //show it.
+	UDnameclient(UWindowFramedWindow(temp).clientarea).demreader=demreader; //when demreader!=none renaming occurs.
+	UDnameclient(UWindowFramedWindow(temp).clientarea).NameEdit.SetValue(demos.getValue()); //requested by someone! ;p
+	Uwindowframedwindow(temp).WindowTitle=LocRenameDemoTitle;
 }
 
 // =============================================================================
@@ -486,10 +486,10 @@ function RenameDemo()
 // =============================================================================
 function string BaseDirReplace(UDComboListItem Demo)
 {
-    if (Demo.Value2!="")
-        Return Demo.Value2;
-    else
-        Return demreader.BasePath();
+	if (Demo.Value2!="")
+		Return Demo.Value2;
+	else
+		Return demreader.BasePath();
 }
 
 function DriverChanged()
@@ -505,70 +505,70 @@ function DriverChanged()
 // =============================================================================
 function Notify(UWindowDialogControl C, byte E)
 {
-    Super.Notify(C, E);
+	Super.Notify(C, E);
 
-    switch(E)
-    {
-        case DE_Change:    //combo
-            switch(C)
-            {
-                case demos:
-                    demochanged();
-                    break;
+	switch(E)
+	{
+		case DE_Change:    //combo
+			switch(C)
+			{
+				case demos:
+					demochanged();
+					break;
 
-                case Spectate:
-                    if (!Spectate.bdisabled)
-                        class'DemoSettings'.default.specdemo=Spectate.bchecked;
-                    break;
-                   
-                case OrderByDate:
-                	Class'DemoSettings'.default.OrderByDate = OrderByDate.bChecked;
-                	demos.sort();
-                	break;
-                    
-                case drivers:
-                    DriverChanged();
-                    break;
-            }
-            break;
+				case Spectate:
+					if (!Spectate.bdisabled)
+						class'DemoSettings'.default.specdemo=Spectate.bchecked;
+					break;
+				   
+				case OrderByDate:
+					Class'DemoSettings'.default.OrderByDate = OrderByDate.bChecked;
+					demos.sort();
+					break;
+					
+				case drivers:
+					DriverChanged();
+					break;
+			}
+			break;
 
-        case DE_Click:    //buttons
-            switch(C)
-            {
-                case Record:
-                    RecordDemo();
-                    break;
+		case DE_Click:    //buttons
+			switch(C)
+			{
+				case Record:
+					RecordDemo();
+					break;
 
-                case Play:
-                    PlayDemo();
-                    break;
+				case Play:
+					PlayDemo();
+					break;
 
-                case Write: //write info :)
-                    if (Write.bdisabled)
-                        return;
+				case Write: //write info :)
+					if (Write.bdisabled)
+						return;
 
-                    if (DemReader.SaveInfo())
-                        MessageBox(LocDemoSummarySuccessTitle, LocDemoSummarySuccessPrefix@" "@BaseDirReplace(LastDemoItem)$LastDemoItem.Value$"Info.TXT"$LocDemoSummarySuccessSuffix, MB_OK, MR_OK, MR_OK);
-                    else
-                        MessageBox(LocDemoSummaryErrorTitle, LocDemoSummaryErrorMessage, MB_OK, MR_OK, MR_OK);
-                    break;
+					if (DemReader.SaveInfo())
+						MessageBox(LocDemoSummarySuccessTitle, LocDemoSummarySuccessPrefix@" "@BaseDirReplace(LastDemoItem)$LastDemoItem.Value$"Info.TXT"$LocDemoSummarySuccessSuffix, MB_OK, MR_OK, MR_OK);
+					else
+						MessageBox(LocDemoSummaryErrorTitle, LocDemoSummaryErrorMessage, MB_OK, MR_OK, MR_OK);
+					break;
 
-                case stopb:      //stop demo
-                    stopb.hidewindow();
-                    getplayerowner().consolecommand("stopdemo");
-                    record.showwindow();
-                    break;
+				case stopb:      //stop demo
+					stopb.hidewindow();
+					getplayerowner().consolecommand("stopdemo");
+					record.showwindow();
+					break;
 
-                case Delete:
-                    DeleteMSG = MessageBox(LocDeleteDemoTitle, LocDeleteDemoMessagePrefix$" "$demos.getvalue()$" "$LocDeleteDemoMessageSuffix, MB_YesNo, MR_No, MR_None);
-                    break;
+				case Delete:
+					DeleteMSG = MessageBox(LocDeleteDemoTitle, LocDeleteDemoMessagePrefix$" "$demos.getvalue()$" "$LocDeleteDemoMessageSuffix, MB_YesNo, MR_No, MR_None);
+					break;
 
-                case Rename:
-                    RenameDemo();
-                    break;
-            }
-            break;
-    }
+				case Rename:
+					RenameDemo();
+					break;
+			}
+			break;
+	}
 }
 
 // =============================================================================
@@ -576,26 +576,26 @@ function Notify(UWindowDialogControl C, byte E)
 // =============================================================================
 function MessageBoxDone(UWindowMessageBox W, MessageBoxResult Result)
 {
-    if(Result == MR_Yes)
-    {
-        switch(W)
-        {
-            case DeleteMSG:
-                DeleteDemo(); //user has conformed he wishes to over-write file.
-                break;
+	if(Result == MR_Yes)
+	{
+		switch(W)
+		{
+			case DeleteMSG:
+				DeleteDemo(); //user has conformed he wishes to over-write file.
+				break;
 
-            case doDlMsg: //setup downloader
-                DownloadClient(UWindowFramedWindow(root.CreateWindow(class'DownloadFramedWindow',10, 10, 200, 100,self)).ClientArea).SetPkgList(demreader.control.Packages,LastInstalled);
-                break;
+			case doDlMsg: //setup downloader
+				DownloadClient(UWindowFramedWindow(root.CreateWindow(class'DownloadFramedWindow',10, 10, 200, 100,self)).ClientArea).SetPkgList(demreader.control.Packages,LastInstalled);
+				break;
 
-            case doGenWarnMsg:
-                PlayDemo(true); //play!
-                break;
-        }
-    }
+			case doGenWarnMsg:
+				PlayDemo(true); //play!
+				break;
+		}
+	}
 
-    if (Result == MR_No && (LastInstalled == 1 || LastInstalled == 2) && W == doDlMsg)
-        PlayDemo(true);
+	if (Result == MR_No && (LastInstalled == 1 || LastInstalled == 2) && W == doDlMsg)
+		PlayDemo(true);
 }
 
 // =============================================================================
@@ -603,13 +603,13 @@ function MessageBoxDone(UWindowMessageBox W, MessageBoxResult Result)
 // =============================================================================
 function Close (optional bool bByParent)
 {
-    Super.Close(bByParent);
+	Super.Close(bByParent);
 
-    class'DemoSettings'.default.Timing=Timing.GetSelectedIndex();
-    class'DemoSettings'.default.SpecDemo=Spectate.bchecked;
-    Class'DemoSettings'.default.OrderByDate = OrderByDate.bChecked;
-    class'DemoSettings'.default.LastDemo=Demos.GetValue();
-    class'DemoSettings'.static.StaticSaveConfig();
+	class'DemoSettings'.default.Timing=Timing.GetSelectedIndex();
+	class'DemoSettings'.default.SpecDemo=Spectate.bchecked;
+	Class'DemoSettings'.default.OrderByDate = OrderByDate.bChecked;
+	class'DemoSettings'.default.LastDemo=Demos.GetValue();
+	class'DemoSettings'.static.StaticSaveConfig();
 }
 
 // =============================================================================
@@ -617,39 +617,39 @@ function Close (optional bool bByParent)
 // =============================================================================
 function Tick(float delta)
 {
-    if (ShotTime>0)
-    {
-        Write.bDisabled=false;
-        ShotTime--;
+	if (ShotTime>0)
+	{
+		Write.bDisabled=false;
+		ShotTime--;
 
-        if (LastDemoItem.bServerDemo)
-        {
-            Spectate.bdisabled=true;
-            Spectate.bchecked=true;
-            Spectate.SetHelpText(LocThirdPersonAlwaysTrue);
-        }
+		if (LastDemoItem.bServerDemo)
+		{
+			Spectate.bdisabled=true;
+			Spectate.bchecked=true;
+			Spectate.SetHelpText(LocThirdPersonAlwaysTrue);
+		}
 
-        if (ShotTime==0)
-            DemReader.Control.ScreenShot.SetUDMap(LastDemoItem.MapName,LastDemoItem.bServerDemo,LastDemoItem.NumFrames,LastDemoItem.PlayTime);
-    }
+		if (ShotTime==0)
+			DemReader.Control.ScreenShot.SetUDMap(LastDemoItem.MapName,LastDemoItem.bServerDemo,LastDemoItem.NumFrames,LastDemoItem.PlayTime);
+	}
 
-    //update stop button (can do console command or something else)
-    //needed to check recording with native functions.
-    if (demreader.demoactive(getplayerowner().xlevel) >0)
-    {
-        if (!stopb.bWindowVisible)
-        {
-            stopb.ShowWindow(); //hide if no demo playing.
-            Record.HideWindow();
-        }
-    }
-    else if (stopb.bWindowVisible)
-    {
-        stopb.hidewindow();
-        Record.ShowWindow();
-    }
+	//update stop button (can do console command or something else)
+	//needed to check recording with native functions.
+	if (demreader.demoactive(getplayerowner().xlevel) >0)
+	{
+		if (!stopb.bWindowVisible)
+		{
+			stopb.ShowWindow(); //hide if no demo playing.
+			Record.HideWindow();
+		}
+	}
+	else if (stopb.bWindowVisible)
+	{
+		stopb.hidewindow();
+		Record.ShowWindow();
+	}
 
-    demreader.DispatchTick(delta/GetLevel().timedilation);
+	demreader.DispatchTick(delta/GetLevel().timedilation);
 }
 
 defaultproperties

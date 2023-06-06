@@ -18,7 +18,7 @@ var bool           bIsPlaying; // tells if it is actually a demo playing :p
 // =============================================================================
 function NotifyBeforeLevelChange()
 {
-    Super.NotifyBeforeLevelChange();
+	Super.NotifyBeforeLevelChange();
 
 	LoadHack();
 }
@@ -28,7 +28,7 @@ function NotifyBeforeLevelChange()
 // =============================================================================
 function NotifyAfterLevelChange()
 {
-    Super.NotifyAfterLevelChange();
+	Super.NotifyAfterLevelChange();
 
 	if (Hack == None)
 		LoadHack();
@@ -39,18 +39,18 @@ function NotifyAfterLevelChange()
 // =============================================================================
 function LoadHack()
 {
-    // Hack == none
-    // --> hack hasn't been spawned before!
-    // --> spawn the hack into the entrylevel.
-    if (Hack==none)
-        Hack=GetEntryLevel().Spawn(class'OldSkoolHack');
-    Hack.Rec=self;
-    Hack.OldLevel=string(GetEntryLevel());
+	// Hack == none
+	// --> hack hasn't been spawned before!
+	// --> spawn the hack into the entrylevel.
+	if (Hack==none)
+		Hack=GetEntryLevel().Spawn(class'OldSkoolHack');
+	Hack.Rec=self;
+	Hack.OldLevel=string(GetEntryLevel());
 
-    // We don't want to record a levelchange o_O
-    GetPlayerOwner().ConsoleCommand("stopdemo");
+	// We don't want to record a levelchange o_O
+	GetPlayerOwner().ConsoleCommand("stopdemo");
 
-    Udemo.Refresh();
+	Udemo.Refresh();
 }
 
 // =============================================================================
@@ -59,29 +59,29 @@ function LoadHack()
 // =============================================================================
 function NotifyLevelChange()
 {
-    local string DemoCmd;
+	local string DemoCmd;
 
-    // Level has changed and DemoActive is bigger than 0 so we're either recording OR playing a demo!
-    // Can't be recording cause the only thing that can start the demorec so quickly is this function!
-    bIsPlaying = (Udemo.DemReader.DemoActive(GetPlayerOwner().XLevel) > 0);
+	// Level has changed and DemoActive is bigger than 0 so we're either recording OR playing a demo!
+	// Can't be recording cause the only thing that can start the demorec so quickly is this function!
+	bIsPlaying = (Udemo.DemReader.DemoActive(GetPlayerOwner().XLevel) > 0);
 
-    // Where else would you get the playername eh?
-    if (GetPlayerOwner().PlayerReplicationInfo != None)
-	    GetPlayerOwner().PlayerReplicationInfo.PlayerName = GetPlayerOwner().GetDefaultURL("name");
+	// Where else would you get the playername eh?
+	if (GetPlayerOwner().PlayerReplicationInfo != None)
+		GetPlayerOwner().PlayerReplicationInfo.PlayerName = GetPlayerOwner().GetDefaultURL("name");
 
-    // Check if we have to start the demorec!
-    // (Anth) Added option to prevent recording when spectating
-    if (bIsPlaying || GetLevel() == GetEntryLevel() || (GetPlayerOwner().GetDefaultURL("OverrideClass") ~= "Botpack.CHSpectator" && !class'DemoSettings'.default.bRecordWhenSpectating))
-    {
-        Log("UDEMO: Level changed but udemo won't auto-record");
-        return;
-    }
-    if (class'DemoSettings'.static.ShouldRecord(GetLevel()))
-    {
-        DemoCmd = "demorec \""$class'DemoSettings'.static.GetRecordingDir()$class'DemoSettings'.static.GetDemoName(GetPlayerOwner(),UWindowComboListItem(Udemo.Demos.List.Items))$"\"";
-        Log("UDEMO: Level changed. Auto-Recording started:"@DemoCmd);
-        getplayerowner().consolecommand(DemoCmd);
-    }
+	// Check if we have to start the demorec!
+	// (Anth) Added option to prevent recording when spectating
+	if (bIsPlaying || GetLevel() == GetEntryLevel() || (GetPlayerOwner().GetDefaultURL("OverrideClass") ~= "Botpack.CHSpectator" && !class'DemoSettings'.default.bRecordWhenSpectating))
+	{
+		Log("UDEMO: Level changed but udemo won't auto-record");
+		return;
+	}
+	if (class'DemoSettings'.static.ShouldRecord(GetLevel()))
+	{
+		DemoCmd = "demorec \""$class'DemoSettings'.static.GetRecordingDir()$class'DemoSettings'.static.GetDemoName(GetPlayerOwner(),UWindowComboListItem(Udemo.Demos.List.Items))$"\"";
+		Log("UDEMO: Level changed. Auto-Recording started:"@DemoCmd);
+		getplayerowner().consolecommand(DemoCmd);
+	}
 }
 
 defaultproperties

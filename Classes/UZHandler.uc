@@ -4,7 +4,7 @@
 // Project continued by AnthraX after v3.0
 // =============================================================================
 class UZHandler expands Object
-    native;
+	native;
 
 var const pointer UzAr;        // C++ FArchive*. (as downloading)
 var const pointer UzDeCompAr;  // C++ FArchive*. (decompressed)
