@@ -67,12 +67,13 @@ function CheckRec()
 {
 	local int i;
 
-	i=instr(nameedit.getvalue(),".");  //check for .dem presense
+	i = InStr(NameEdit.GetValue(), ".");  //check for .dem presense
 
-	if (i!=-1)
-		nameedit.editbox.value=left(nameedit.getvalue(),i);
-	if (UDClientWindow(ownerwindow).demos.finditemindex(nameedit.getvalue(),true)!=-1) //prompt user.
-		overwrite=MessageBox(LocConfirmFileOverwrite, LocConfirmFileOverwritePrefix$nameedit.getvalue()$LocConfirmFileOverwriteSuffix, MB_YesNo, MR_No, MR_None);
+	if (i != -1)
+		NameEdit.EditBox.Value = Left(NameEdit.GetValue(), i);
+	if (UDClientWindow(OwnerWindow).demos.FindItemIndex(NameEdit.GetValue(), true) != -1) //prompt user.
+		overwrite = MessageBox(LocConfirmFileOverwrite, LocConfirmFileOverwritePrefix $ 
+			NameEdit.GetValue() $ LocConfirmFileOverwriteSuffix, MB_YesNo, MR_No, MR_None);
 	else
 		record();  //record demo
 }
@@ -84,18 +85,23 @@ function DoRename()
 {
 	local int i;
 
-	i=instr(nameedit.getvalue(),".");  //check for .dem presence
+	i = InStr(NameEdit.GetValue(), ".");  //check for .dem presence
 
-	if (i!=-1)
-		nameedit.editbox.value=left(nameedit.getvalue(),i);
-	if (demreader.rename(UDClientWindow(ownerwindow).demos.getvalue2()$UDClientWindow(ownerwindow).demos.getvalue()$".dem",UDClientWindow(ownerwindow).demos.getvalue2()$nameedit.getvalue()$".dem")) //attempt to rename
+	if (i != -1)
+		NameEdit.EditBox.Value = Left(NameEdit.GetValue(), i);
+	if (DemReader.Rename(UDClientWindow(OwnerWindow).demos.GetValue2() $ 
+		UDClientWindow(OwnerWindow).demos.GetValue() $ ".dem", 
+		UDClientWindow(OwnerWindow).demos.GetValue2() $ NameEdit.GetValue() $ ".dem")) //attempt to rename
 	{
-		UWindowComboListItem(UDclientwindow(ownerwindow).demos.list.items).value=nameedit.getvalue();
-		UDclientwindow(ownerwindow).demos.EditBox.value=nameedit.getvalue();
-		UDClientWindow(ownerwindow).demos.sort(); //resort.
+		UWindowComboListItem(UDclientwindow(OwnerWindow).demos.List.Items).Value = NameEdit.GetValue();
+		UDclientwindow(OwnerWindow).demos.EditBox.Value = NameEdit.GetValue();
+		UDClientWindow(OwnerWindow).demos.Sort(); //resort.
 	}
 	else
-		MessageBox(LocFailedToRenameWarning, LocFailedToRenamePrefix@UDClientWindow(ownerwindow).demos.getvalue()$".dem"$LocFailedToRenameMidfix@nameedit.getvalue()$".dem\\n"$LocFailedToRenameSuffix, MB_OK, MR_OK, MR_OK);
+		MessageBox(LocFailedToRenameWarning, LocFailedToRenamePrefix @ 
+			UDClientWindow(OwnerWindow).demos.GetValue() $ ".dem" $ 
+			LocFailedToRenameMidfix @ NameEdit.GetValue() $ ".dem\\n" $ 
+			LocFailedToRenameSuffix, MB_OK, MR_OK, MR_OK);
 
 	ParentWindow.Close();
 }

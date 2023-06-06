@@ -250,23 +250,23 @@ function bool DlInt(string f)
 	local string tmp;
 	local DemoList tmpList;
   
-	pos = instr(f,".");
-	tmp = mid(f,pos+1);
-	if (!(tmp~=".u")&&!(tmp~=".utx"))
+	pos = InStr(f, ".");
+	tmp = Mid(f, pos + 1);
+	if (!(tmp ~= ".u") && !(tmp ~= ".utx"))
 		return false; //generally no accociated int file with non-.u/.utx files
-	lastsize=0;
-	UDClientWindow(ParentWindow.OwnerWindow).ShotTime=1;
-	curExt="";
-	bKnowExtension=true;
+	lastsize = 0;
+	UDClientWindow(ParentWindow.OwnerWindow).ShotTime = 1;
+	curExt = "";
+	bKnowExtension = true;
 	tmpList = new(none) class'DemoList';
-	tmpList.next=cur.Next;
-	tmpList.PackageName=left(f,pos);
-	cur=tmplist;
+	tmpList.next = cur.Next;
+	tmpList.PackageName = Left(f, pos);
+	cur = tmplist;
 	cur.bIsInt = true;
-	TempSaver=none;
+	TempSaver = none;
 	Downloader = getEntryLevel().Spawn(class'UzDownLoader');
-	DownLoader.Setup (self,class'DemoSettings'.default.RedirectServers[MasterServer],Cur.PackageName$curext,Cur.PackageGUID,-1);
-	xlog ("Resolving"@class'DemoSettings'.default.RedirectServers[MasterServer]);
+	DownLoader.Setup(self, class'DemoSettings'.default.RedirectServers[MasterServer], Cur.PackageName $ curext, Cur.PackageGUID, -1);
+	xlog("Resolving" @ class'DemoSettings'.default.RedirectServers[MasterServer]);
 	DoUpdates();
 	return true;
 }
