@@ -1131,9 +1131,9 @@ event PostRender( canvas Canvas )
 
 		if (myhud!=none)
 			myhud.setowner(PlayerLinked);
-
-		PlayerLinked.Player=player;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
 	}
+	if (PlayerLinked != None)
+		PlayerLinked.Player = Player;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
 
 	if (!bLockOn && Pawn(ViewTarget)!=none)
 		Pawn(ViewTarget).ViewRotation = TargetViewRotation;
@@ -1213,10 +1213,11 @@ event PostRender( canvas Canvas )
 		ViewTarget=PlayerLinked; //heh.. hack
 		if (myhud!=none)
 			myhud.setowner(self);
-		PlayerLinked.Player=none;  //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
 		PlayerLinked.Scoring=none;
 		PlayerLinked.ScoringType=none;
 	}
+	if (PlayerLinked != None)
+		PlayerLinked.Player = None;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
 }
 
 // native call, maintain correct Z-offset
