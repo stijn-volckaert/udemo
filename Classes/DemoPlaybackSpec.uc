@@ -1097,7 +1097,7 @@ event PostRender( canvas Canvas )
 	local int i;
 	local float DamageTime, StatScale, X;
 	local vector HitLocation, HitNormal, StartTrace, EndTrace;
-	local actor Other;
+	local actor Other, OldViewTarget;
 
 	FixPRIArray();
 
@@ -1124,36 +1124,36 @@ event PostRender( canvas Canvas )
 		}
 	}
 
-	if (bLockOn)
+	if (PlayerLinked != None)
 	{
 		// (Added by Anth)
 		if (Scoring == None && ScoringType != None)
 		{
-			Scoring = Spawn(ScoringType,PlayerLinked);
-		if (Scoring != None)
+			Scoring = Spawn(ScoringType, PlayerLinked);
+			if (Scoring != None)
 				Scoring.OwnerHUD = myHUD;
 		}
 
-		PlayerLinked.bShowScores=bShowScores;
-		PlayerLinked.ScoringType=ScoringType;
-		PlayerLinked.Scoring=Scoring;
-		PlayerLinked.GameReplicationInfo=GameReplicationInfo; // hax!
+		PlayerLinked.bShowScores = bShowScores;
+		PlayerLinked.ScoringType = ScoringType;
+		PlayerLinked.Scoring = Scoring;
+		PlayerLinked.GameReplicationInfo = GameReplicationInfo; // hax!
 
-		if (PlayerLinked != none &&
-			WarheadLauncher(PlayerLinked.Weapon) != none &&
-			GuidedWarShell(PlayerLinked.ViewTarget) != none)
-		{		
+		if (WarheadLauncher(PlayerLinked.Weapon) != None && GuidedWarShell(PlayerLinked.ViewTarget) != None)
 			WarheadLauncher(PlayerLinked.Weapon).GuidedShell = GuidedWarShell(PlayerLinked.ViewTarget);
-		}
 
-		if (myhud!=none)
+		if (myhud != None)
 			myhud.setowner(PlayerLinked);
-	}
-	if (PlayerLinked != None)
-	{
+
 		PlayerLinked.Player = Player;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
 		if (ChallengeHUD(PlayerLinked.myHud) != None && PlayerLinked.myHud.PlayerOwner == None)
 			ChallengeHUD(PlayerLinked.myHud).HUDSetup(Canvas);
+			
+		OldViewTarget = PlayerLinked.ViewTarget;
+		if (ViewTarget != PlayerLinked)
+			PlayerLinked.ViewTarget = ViewTarget;
+		else
+			PlayerLinked.ViewTarget = None;
 	}
 
 	if (!bLockOn && Pawn(ViewTarget)!=none)
@@ -1230,15 +1230,18 @@ event PostRender( canvas Canvas )
 		PlayerReplicationInfo.bIsSpectator=true;
 
 	if (bLockOn)
-	{
-		ViewTarget=PlayerLinked; //heh.. hack
-		if (myhud!=none)
-			myhud.setowner(self);
-		PlayerLinked.Scoring=none;
-		PlayerLinked.ScoringType=none;
-	}
+		ViewTarget = PlayerLinked; //heh.. hack
 	if (PlayerLinked != None)
+	{
+		if (myhud != none)
+			myhud.setOwner(self);
+		PlayerLinked.Scoring = None;
+		PlayerLinked.ScoringType = None;
+		
+		PlayerLinked.ViewTarget = OldViewTarget;
+		
 		PlayerLinked.Player = None;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
+	}
 }
 
 // native call, maintain correct Z-offset
