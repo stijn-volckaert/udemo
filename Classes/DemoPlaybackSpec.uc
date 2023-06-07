@@ -905,6 +905,17 @@ function CheckFx()
 event PreRender( canvas Canvas )
 {
 	local ENetRole oldrole;
+	local HUD HUD;
+	
+	// try use exists HUD before create new one
+	if (myHud == None && HUDType != None)
+		foreach AllActors(class'HUD', HUD)
+			if (HUD.Class == HUDType)
+			{
+				myHud = HUD;
+				myHud.setOwner(self);
+				break;
+			}
 
 	super.PreRender(Canvas);
 
