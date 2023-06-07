@@ -814,8 +814,6 @@ function StealRef()
 		h=spawn(class'InterceptHUD',PlayerLinked);
 		h.SetOwner(PlayerLinked);
 		h.Real=self;
-		h.PawnOwner = PlayerLinked;
-		h.PlayerOwner = PlayerLinked;
 		PlayerLinked.MyHud=h;
 	}
 }
@@ -1135,7 +1133,11 @@ event PostRender( canvas Canvas )
 			myhud.setowner(PlayerLinked);
 	}
 	if (PlayerLinked != None)
+	{
 		PlayerLinked.Player = Player;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
+		if (ChallengeHUD(PlayerLinked.myHud) != None && PlayerLinked.myHud.PlayerOwner == None)
+			ChallengeHUD(PlayerLinked.myHud).HUDSetup(Canvas);
+	}
 
 	if (!bLockOn && Pawn(ViewTarget)!=none)
 		Pawn(ViewTarget).ViewRotation = TargetViewRotation;
