@@ -814,6 +814,8 @@ function StealRef()
 		h=spawn(class'InterceptHUD',PlayerLinked);
 		h.SetOwner(PlayerLinked);
 		h.Real=self;
+		h.PawnOwner = PlayerLinked;
+		h.PlayerOwner = PlayerLinked;
 		PlayerLinked.MyHud=h;
 	}
 }
