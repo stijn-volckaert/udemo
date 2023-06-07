@@ -47,11 +47,14 @@ var bool bSeeking;              // true when seeking = ignore messages!
 var bool bInitGRI;              // (Anth) did we steal GRI ref?
 var bool oldPaused;             // restore pause state after seeking has finished!
 var Weapon OldWeapon;           // for sound hacking!
-var bool oldShHide;             // if true must unhide belt!
 var Ammo DummyAmmo;             // hack!
 var InterCeptHud h;
 var float oldltsoffset;
 var Actor OldViewTarget;
+
+// list for bOwnerNoSee actors hidden during render
+var Actor HideActors[16384];
+var int HideActorsCount;
 
 // (Anth) support for following projectiles such as guided warshells	
 var bool bWasFollowingProjectile;
@@ -841,15 +844,15 @@ function GenRef()
 // Called from PreRender!!
 function CheckFx()
 {
-	local ut_shieldbelteffect belt;
+	local Actor ChildActor;
 
 	// Belt stuff!
-	if (ViewTarget!=none && !bBehindView)
-		foreach ViewTarget.Childactors(class'ut_shieldbelteffect', belt)
-			if (!belt.bhidden)
+	if (ViewTarget != None && !bBehindView)
+		foreach ViewTarget.ChildActors(class'Actor', ChildActor)
+			if (ChildActor.bOwnerNoSee && !ChildActor.bHidden && HideActorsCount < ArrayCount(HideActors))
 			{
-				belt.bhidden = true;
-				oldShHide = true;
+				ChildActor.bHidden = true;
+				HideActors[HideActorsCount++] = ChildActor;
 			}
 
 	if (PlayerLinked==none)
@@ -1093,7 +1096,6 @@ event PostRender( canvas Canvas )
 {
 	local int i;
 	local float DamageTime, StatScale, X;
-	local ut_shieldbelteffect belt;
 	local vector HitLocation, HitNormal, StartTrace, EndTrace;
 	local actor Other;
 
@@ -1102,11 +1104,15 @@ event PostRender( canvas Canvas )
 	// (Added by Anth) new 3.3 fix
 	BuildFlagArray();
 
-	if (oldShHide)
+	if (HideActorsCount > 0)
 	{
-		OldShHide=false;
-		foreach ViewTarget.Childactors(class'ut_shieldbelteffect', belt)
-			belt.bhidden=false;
+		for (i = 0; i < HideActorsCount; i++)
+		{
+			Other = HideActors[i];
+			if (Other != None)
+				Other.bHidden = False;
+		}
+		HideActorsCount = 0;
 	}
 
 	// smartctf hack
