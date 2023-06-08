@@ -914,6 +914,7 @@ event PreRender( canvas Canvas )
 			if (HUD.Class == HUDType)
 			{
 				myHud = HUD;
+				myHud.Role = ROLE_Authority; // like we spawn it, not get from rep
 				myHud.setOwner(self);
 				break;
 			}
