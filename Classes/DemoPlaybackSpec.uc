@@ -52,6 +52,11 @@ var InterCeptHud h;
 var float oldltsoffset;
 var Actor OldViewTarget;
 
+var int EndGameCam;
+const EGC_NotDetected = 0;
+const EGC_TrackViewTarget = 1;
+const EGC_Done = 2;
+
 // list for bOwnerNoSee actors hidden during render
 var Actor HideActors[16384];
 var int HideActorsCount;
@@ -930,6 +935,27 @@ event PreRender( canvas Canvas )
 	// Keep cam on the player and call prerender on playerlinked (hax!)
 	if (PlayerLinked!=none)
 	{
+		if (EndGameCam == EGC_NotDetected && PlayerLinked.IsInState('GameEnded'))
+		{
+			EndGameCam = EGC_TrackViewTarget;
+			bLockOn = false;
+			ViewTarget = PlayerLinked.ViewTarget;
+			if (ViewTarget == None)
+				ViewTarget = PlayerLinked;
+			else
+				EndGameCam = EGC_Done;
+			ViewRotation = PlayerLinked.ViewRotation;
+			bBehindView = PlayerLinked.bBehindView;
+			GotoState('GameEnded'); // setup end cam
+			GotoState('CheatFlying'); // return back to our state
+		}
+		if (EndGameCam == EGC_TrackViewTarget)
+		{
+			if (ViewTarget == PlayerLinked && PlayerLinked.ViewTarget != None)
+				ViewTarget = PlayerLinked.ViewTarget;
+			if (ViewTarget != PlayerLinked)
+				EndGameCam = EGC_Done;
+		}
 		if (bLockOn)
 			SetLocation(PlayerLinked.Location);
 		oldRole=PlayerLinked.Role;
