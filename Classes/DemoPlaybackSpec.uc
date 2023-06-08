@@ -635,6 +635,13 @@ function BackUpRefs()
 {
 	if (Pawn(ViewTarget) != None && Pawn(ViewTarget).PlayerReplicationInfo != None)
 		ViewTargetID = Pawn(ViewTarget).PlayerReplicationInfo.PlayerID;
+		
+	// destroy Scoreboard spawned by us (Info actors ignore on reset demo) for recreate it after seek
+	if (Scoring != None && ScoringType != None && Scoring.Role == ROLE_Authority)
+	{
+		Scoring.Destroy();
+		Scoring = None;
+	}
 }
 
 // Not used... :/
