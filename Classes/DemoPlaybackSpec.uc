@@ -129,6 +129,8 @@ exec function SeekTo(string Point) {
 		T = Driver.GetTotalTime()*T/100.0;
 	if (sign == "+" || sign == "-")
 		T = FMax(0.0, Driver.GetCurrentTime() + T);
+	if (T < Driver.GetCurrentTime())
+		EndGameCam = EGC_NotDetected;
 	SetSeek(T);
 }
 
@@ -935,26 +937,29 @@ event PreRender( canvas Canvas )
 	// Keep cam on the player and call prerender on playerlinked (hax!)
 	if (PlayerLinked!=none)
 	{
-		if (EndGameCam == EGC_NotDetected && PlayerLinked.IsInState('GameEnded'))
+		if (SeekTick == 0)
 		{
-			EndGameCam = EGC_TrackViewTarget;
-			bLockOn = false;
-			ViewTarget = PlayerLinked.ViewTarget;
-			if (ViewTarget == None)
-				ViewTarget = PlayerLinked;
-			else
-				EndGameCam = EGC_Done;
-			ViewRotation = PlayerLinked.ViewRotation;
-			bBehindView = PlayerLinked.bBehindView;
-			GotoState('GameEnded'); // setup end cam
-			GotoState('CheatFlying'); // return back to our state
-		}
-		if (EndGameCam == EGC_TrackViewTarget)
-		{
-			if (ViewTarget == PlayerLinked && PlayerLinked.ViewTarget != None)
+			if (EndGameCam == EGC_NotDetected && PlayerLinked.IsInState('GameEnded'))
+			{
+				EndGameCam = EGC_TrackViewTarget;
+				bLockOn = false;
 				ViewTarget = PlayerLinked.ViewTarget;
-			if (ViewTarget != PlayerLinked)
-				EndGameCam = EGC_Done;
+				if (ViewTarget == None)
+					ViewTarget = PlayerLinked;
+				else
+					EndGameCam = EGC_Done;
+				ViewRotation = PlayerLinked.ViewRotation;
+				bBehindView = PlayerLinked.bBehindView;
+				GotoState('GameEnded'); // setup end cam
+				GotoState('CheatFlying'); // return back to our state
+			}
+			if (EndGameCam == EGC_TrackViewTarget)
+			{
+				if (ViewTarget == PlayerLinked && PlayerLinked.ViewTarget != None)
+					ViewTarget = PlayerLinked.ViewTarget;
+				if (ViewTarget != PlayerLinked)
+					EndGameCam = EGC_Done;
+			}
 		}
 		if (bLockOn)
 			SetLocation(PlayerLinked.Location);
