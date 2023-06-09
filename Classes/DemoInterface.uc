@@ -41,6 +41,7 @@ native final function PauseDemo(bool bPause); //safely controls demo pausing.
 native final function byte IsPaused(); //0=no, 1=paused in demo (ex. admin hit pause), 2=user requested
 native final function SetPlayBackMode(byte a); //playback modes: 0=timebased, 1=framebased, 2=nocap
 native final function float GetStartTime(); //returns the time demo was at when starting play (After player spawned)
+native final function Player GetStubPlayer(Player Proxy); //returns new instance for StubPlayer
 
 //non-native functions:
 function GotoFrame (float Time)
@@ -99,6 +100,13 @@ event LinkToPlayer (PlayerPawn p, bool LockOn)
 
 	if (bDebug)
 		Log("UDEMO: Trying to link to player :"@p);
+		
+	if (p != None && p.Player == None)
+	{
+		p.Player = GetStubPlayer(DemoSpec.Player);
+		p.Player.Actor = p;
+		DemoPlaybackSpec(DemoSpec).StubPlayer = p.Player;
+	}
 
 	if (!DemoPlaybackSpec(DemoSpec).bInit)
 	{

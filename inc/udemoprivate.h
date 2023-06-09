@@ -153,6 +153,55 @@ class UDEMO_API UuDemoConnection : public UDemoRecConnection
 	void HandleClientPlayer( APlayerPawn* Pawn );	
 };
 
+/*-----------------------------------------------------------------------------
+	UStubPlayer - Stub UPlayer for use in LinkedPlayer for make some mods works properly	
+-----------------------------------------------------------------------------*/
+class UDEMO_API UStubPlayer : public UPlayer
+{
+	DECLARE_CLASS(UStubPlayer, UPlayer, CLASS_Transient, udemo)
+
+	UPlayer* Proxy;
+
+	UStubPlayer(){}
+
+	UStubPlayer(UPlayer* InProxy):
+		Proxy(InProxy)
+	{
+		guard(UStubPlayer::UStubPlayer);
+		CopyFromProxy();
+		unguard;
+	}
+
+	void CopyFromProxy()
+	{
+		guard(UStubPlayer::CopyFromProxy);
+		if (!Proxy)
+			return;
+		Console = Proxy->Console;
+		bWindowsMouseAvailable = Proxy->bWindowsMouseAvailable;
+		bShowWindowsMouse = Proxy->bShowWindowsMouse;
+		bSuspendPrecaching = Proxy->bSuspendPrecaching;
+		WindowsMouseX = Proxy->WindowsMouseX;
+		WindowsMouseY = Proxy->WindowsMouseY;
+		CurrentNetSpeed = Proxy->CurrentNetSpeed;
+		ConfiguredInternetSpeed = Proxy->ConfiguredInternetSpeed;
+		ConfiguredLanSpeed = Proxy->ConfiguredLanSpeed;
+		SelectedCursor = Proxy->SelectedCursor;
+		unguard;
+	}
+
+	// FArchive interface.
+	void Serialize( const TCHAR* Data, EName MsgType ){}
+	
+	// UPlayer interface.
+	void ReadInput( FLOAT DeltaSeconds )
+	{
+		guard(UStubPlayer::ReadInput);
+		CopyFromProxy();
+		unguard;
+	}
+};
+
 #if __STATIC_LINK
 void InitUdemo();
 #endif

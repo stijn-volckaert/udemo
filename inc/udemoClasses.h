@@ -119,6 +119,7 @@ public:
     FStringNoInit IllegalActors[20];
     BITFIELD bDebug:1;
     BITFIELD bAnthDebug:1;
+    DECLARE_FUNCTION(execGetStubPlayer);
     DECLARE_FUNCTION(execGetStartTime);
     DECLARE_FUNCTION(execSetPlayBackMode);
     DECLARE_FUNCTION(execIsPaused);
@@ -164,6 +165,7 @@ AUTOGENERATE_FUNCTION(Uudnative,-1,execBasePath);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execRename);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execkill);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execgetdemo);
+AUTOGENERATE_FUNCTION(UDemoInterface,-1,execGetStubPlayer);
 AUTOGENERATE_FUNCTION(UDemoInterface,-1,execGetStartTime);
 AUTOGENERATE_FUNCTION(UDemoInterface,-1,execSetPlayBackMode);
 AUTOGENERATE_FUNCTION(UDemoInterface,-1,execIsPaused);

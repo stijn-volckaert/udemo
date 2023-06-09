@@ -51,6 +51,7 @@ var Ammo DummyAmmo;             // hack!
 var InterCeptHud h;
 var float oldltsoffset;
 var Actor OldViewTarget;
+var Player StubPlayer;          // Stub player used in PlayerLinked
 
 // list for bOwnerNoSee actors hidden during render
 var Actor HideActors[16384];
@@ -727,6 +728,8 @@ state CheatFlying
 		// DLO Gameclass to get hud & sb
 		else if (PlayerLinked == None && HudType == None)
 			GenRef();
+		if (PlayerLinked != None && PlayerLinked.Player == None)
+			PlayerLinked.Player = StubPlayer;
 	}
 	
 	// (Sp0ngeb0b)
@@ -1238,7 +1241,7 @@ event PostRender( canvas Canvas )
 		PlayerLinked.ScoringType=none;
 	}
 	if (PlayerLinked != None)
-		PlayerLinked.Player = None;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
+		PlayerLinked.Player = StubPlayer;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
 }
 
 // native call, maintain correct Z-offset

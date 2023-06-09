@@ -194,8 +194,14 @@ void UuDemoDriver::TickDispatch( FLOAT Delta )
 			float oldDilation = 0.0;
 			if (GetLevel() && GetLevel()->GetLevelInfo())
 				oldDilation = GetLevel()->GetLevelInfo()->TimeDilation;
+			UPlayer* OldPlayer = NULL;
 			if (SoundPlayer)
+			{
+				OldPlayer = SoundPlayer->Player;
 				SoundPlayer->Player = GetLevel()->Engine->Client->Viewports(0);
+				if (OldPlayer == SoundPlayer->Player) // pass actual viewport to tick loop can destroy input
+					OldPlayer = NULL;
+			}
 
 			// (Anth) Being called in normal playback mode...
 			CheckActors();
@@ -205,7 +211,7 @@ void UuDemoDriver::TickDispatch( FLOAT Delta )
 			TimeSync(ServerPacketTime,Time);
 
 			if (SoundPlayer)
-				SoundPlayer->Player=NULL;
+				SoundPlayer->Player = OldPlayer;
 			if (GetLevel() && GetLevel()->GetLevelInfo() && Abs(GetLevel()->GetLevelInfo()->TimeDilation-oldDilation) >0.01)
 			{
 				RealDilation=GetLevel()->GetLevelInfo()->TimeDilation;
