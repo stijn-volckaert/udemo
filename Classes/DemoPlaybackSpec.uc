@@ -1575,10 +1575,17 @@ function FlagPickup(PlayerReplicationInfo PRI, Object OptionalObject)
 
 function FlagReturn(Object OptionalObject)
 {
-	local int i;
+	local int i, FlagTeam;
+	
+	if (CTFFlag(OptionalObject) != None)
+		FlagTeam = CTFFlag(OptionalObject).Team;
+	else if (TeamInfo(OptionalObject) != None)
+		FlagTeam = TeamInfo(OptionalObject).TeamIndex;
+	else
+		return; // passed unknown object or None - ignore
 
 	for (i = 0; i < ArrayCount(FI); i++)
-		if (FI[i].HasFlag != None && FI[i].HasFlag.Team == TeamInfo(OptionalObject).TeamIndex)
+		if (FI[i].HasFlag != None && FI[i].HasFlag.Team == FlagTeam)
 		{
 			FI[i].HasFlag = None;
 			return;
