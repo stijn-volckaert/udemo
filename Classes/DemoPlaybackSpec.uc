@@ -1345,6 +1345,11 @@ function InitPlayerReplicationInfo()
 	PlayerReplicationInfo.PlayerName=GetDefaultURL("Name");
 	DummyAmmo=spawn(class'NullAmmo',self);
 	DummyAmmo.AmmoAmount=0;
+	DummyAmmo.BecomeItem();
+	DummyAmmo.GotoState('');
+	// pretend be replicated client item
+	DummyAmmo.Role = DummyAmmo.RemoteRole;
+	DummyAmmo.RemoteRole = ROLE_Authority;
 }
 
 //accessed none's suck:
