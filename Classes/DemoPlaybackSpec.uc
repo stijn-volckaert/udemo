@@ -1142,8 +1142,8 @@ event PostRender( canvas Canvas )
 		if (WarheadLauncher(PlayerLinked.Weapon) != None && GuidedWarShell(PlayerLinked.ViewTarget) != None)
 			WarheadLauncher(PlayerLinked.Weapon).GuidedShell = GuidedWarShell(PlayerLinked.ViewTarget);
 
-		if (myhud != None)
-			myhud.setowner(PlayerLinked);
+		if (bLockOn && myHud != None)
+			myHud.setOwner(PlayerLinked);
 
 		PlayerLinked.Player = Player;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
 		if (ChallengeHUD(PlayerLinked.myHud) != None && PlayerLinked.myHud.PlayerOwner == None)
@@ -1233,8 +1233,8 @@ event PostRender( canvas Canvas )
 		ViewTarget = PlayerLinked; //heh.. hack
 	if (PlayerLinked != None)
 	{
-		if (myhud != none)
-			myhud.setOwner(self);
+		if (myHud != none)
+			myHud.setOwner(self);
 		PlayerLinked.Scoring = None;
 		PlayerLinked.ScoringType = None;
 		
