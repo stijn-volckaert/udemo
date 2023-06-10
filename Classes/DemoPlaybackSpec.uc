@@ -730,6 +730,8 @@ state CheatFlying
 			GenRef();
 		if (PlayerLinked != None && PlayerLinked.Player == None)
 			PlayerLinked.Player = StubPlayer;
+		if (PlayerLinked != None)
+			PlayerLinked.Disable('PlayerTick'); // for avoid ruin play by wrong local prediction
 	}
 	
 	// (Sp0ngeb0b)

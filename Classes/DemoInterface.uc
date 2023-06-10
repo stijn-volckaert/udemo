@@ -106,6 +106,7 @@ event LinkToPlayer (PlayerPawn p, bool LockOn)
 		p.Player = GetStubPlayer(DemoSpec.Player);
 		p.Player.Actor = p;
 		DemoPlaybackSpec(DemoSpec).StubPlayer = p.Player;
+		p.Disable('PlayerTick'); // for avoid ruin play by wrong local prediction
 	}
 
 	if (!DemoPlaybackSpec(DemoSpec).bInit)
