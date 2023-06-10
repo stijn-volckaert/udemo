@@ -107,7 +107,9 @@ event LinkToPlayer (PlayerPawn p, bool LockOn)
 		DemoPlaybackSpec(DemoSpec).bLockOn = LockOn;
 
 		if (p!=none&&!bDoingMessagePlay)
-			DemoSpec.spawn(class'DemoNotify'); //used for voice pack interception!
+			DemoSpec.spawn(class'DemoNotify', p).Init(class'VoicePack'); //used for voice pack interception!
+		// WindowReplicationInfo - WRI - fix show map vote and other windows during demo play
+		DemoSpec.spawn(class'DemoNotify', p).Init(class'ReplicationInfo', "WRI");
 	}
 
 	DemoPlaybackSpec(DemoSpec).PlayerLinked = p;
