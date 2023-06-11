@@ -257,12 +257,37 @@ exec function PlayBack(byte a)
 // set behindview stuff (duh?)
 exec function BehindView( Bool B )
 {
+	if (bLockOn)
+		B = false;
 	bBehindView = B;
 	bChaseCam = bBehindView;
 	if ( ViewTarget == None )
 	  bBehindView = false;
 	if (PlayerLinked!=none && bLockOn)
 	  PlayerLinked.bBehindView = B;
+}
+
+// hacks for deal with XConsole 3.5.0rc71 and similar, 
+// which use own implementation of spectator keys handling
+exec function ViewSelf()
+{
+	if (bLockOn)
+		return;
+	Super.ViewSelf();
+}
+
+exec function Fire( optional float F )
+{
+	if (bLockOn)
+		return;
+	Super.Fire(F);
+}
+
+exec function AltFire( optional float F )
+{
+	if (bLockOn)
+		return;
+	Super.AltFire(F);
 }
 
 exec function Say( string Msg )
@@ -382,6 +407,9 @@ exec function ViewPlayerNum(optional int num)
 	local Pawn P;
 	local int i;
 	local bool bTargetSet;
+	
+	if (bLockOn)
+		return;
 
 	bChaseCam = true;
 	bBehindView = true;
