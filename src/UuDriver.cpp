@@ -83,6 +83,15 @@ void UuDemoDriver::TickDispatch( FLOAT Delta )
 {
 	guard(UuDemoDriver:TickDispatch);	
 	
+	// rollback seconds spent to seeking demo
+	if (Interface && Interface->bFixLevelTime)
+	{
+		Interface->bFixLevelTime = FALSE;
+		if (Interface->DemoSpec)
+			Interface->DemoSpec->XLevel->TimeSeconds += -Delta*Interface->DemoSpec->Level->TimeDilation;
+		Delta = 0;
+	}
+
 	// Calc deltatime
 	FLOAT DeltaTime = Delta;
 	if(ServerConnection)
@@ -438,7 +447,7 @@ FTime UuDemoDriver::ReadTo(FTime GoalTime, UBOOL bPacketRead)
 			}
 			Time = ServerPacketTime;			//synch everything on jumps!
 			FrameNum=ServerFrameNum;
-//			debugf(TEXT("udemo: seekto succeeded - requested %lf - now at %lf - atend %d - iserror %d"), GoalTime.GetDouble(), ServerPacketTime.GetDouble(), FileAr->AtEnd(), FileAr->IsError());
+			debugf(TEXT("udemo: seekto succeeded - requested %lf - now at %lf - atend %d - iserror %d"), GoalTime.GetDouble(), ServerPacketTime.GetDouble(), FileAr->AtEnd(), FileAr->IsError());
 			Seeking = FALSE;
 			return OutTime;
 		}

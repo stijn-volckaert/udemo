@@ -116,6 +116,7 @@ public:
     BYTE PlayBackMode;
     BITFIELD bDoingMessagePlay:1 GCC_PACK(INT_ALIGNMENT);
     FLOAT ltsoffset;
+    BITFIELD bFixLevelTime:1;
     FStringNoInit IllegalActors[20];
     BITFIELD bDebug:1;
     BITFIELD bAnthDebug:1;

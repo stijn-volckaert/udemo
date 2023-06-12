@@ -743,6 +743,7 @@ state CheatFlying
 			ClearHUD();
 			Driver.GotoFrame(SeekTime);
 			SeekTick = 3;
+			Driver.bFixLevelTime = True;
 			return;
 		}
 
