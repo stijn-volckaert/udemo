@@ -1525,6 +1525,18 @@ function ClientVoiceMessage(PlayerReplicationInfo Sender, PlayerReplicationInfo 
 		Super.ClientVoiceMessage(Sender,Recipient,messagetype,messageID);
 }
 
+simulated event ClientHearSound (
+	actor Actor,
+	int Id,
+	sound S,
+	vector SoundLocation,
+	vector Parameters
+) 
+{ 
+	if (!bSeeking)
+		Super.ClientHearSound(Actor, Id, S, SoundLocation, Parameters);
+}
+
 //JOLT MESSAGE FILTERING (BASED ON TNSe's CODE!!!)
 //entry point of localized messages!
 function ReceiveLocalizedMessage( class<LocalMessage> Message, optional int Switch, optional PlayerReplicationInfo RelatedPRI_1, optional PlayerReplicationInfo RelatedPRI_2, optional Object OptionalObject )
@@ -1552,7 +1564,8 @@ function bool CheckMessage(class<LocalMessage> Message, int Swi, PlayerReplicati
 		case class'MultiKillMessage':
 			if (bLockOn||ViewTarget==PlayerLinked)
 				return true;
-			ClientMessage(RelatedPRI_1.PlayerName@"did a"@Class'MultiKillMessage'.static.GetString(Swi,RelatedPRI_1)); //lame msg thing!
+			if (!bSeeking)
+				ClientMessage(RelatedPRI_1.PlayerName@"did a"@Class'MultiKillMessage'.static.GetString(Swi,RelatedPRI_1)); //lame msg thing!
 			return false;
 		case class'DeathMessagePlus':
 		case class'EradicatedDeathMessage':
@@ -1568,7 +1581,8 @@ function bool CheckMessage(class<LocalMessage> Message, int Swi, PlayerReplicati
 			}
 			return true;
 		case Class'CTFMessage':
-			if (Swi == 0)
+			if (bSeeking); // ignore
+			else if (Swi == 0)
 				FlagCap(RelatedPRI_1); // Fix missing cap sound in demos
 			else if (Swi == 2)
 				FlagDrop(RelatedPRI_1);
@@ -1738,7 +1752,8 @@ function KillTime(PlayerReplicationInfo PRI, PlayerReplicationInfo PRI2)
 	{
 		// Spree time
 		ReceiveLocalizedMessage( class'KillingSpreeMessage', x-1, PRI, none );
-		ClientPlaySound(Class'KillingSpreeMessage'.Default.SpreeSound[x-1], ,True);
+		if (!bSeeking)
+			ClientPlaySound(Class'KillingSpreeMessage'.Default.SpreeSound[x-1], ,True);
 	}
 }
 
