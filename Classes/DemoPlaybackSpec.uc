@@ -629,6 +629,7 @@ function EndSeek()
 	local ScoreBoard sb; // (Anth)
 
 	CurTime();
+	Log(Level.TimeSeconds @ "EndSeek at" @ Driver.GetCurrentTime());
 
 	bSeeking=false;
 	lts=level.timeseconds;
