@@ -447,7 +447,7 @@ FTime UuDemoDriver::ReadTo(FTime GoalTime, UBOOL bPacketRead)
 			}
 			Time = ServerPacketTime;			//synch everything on jumps!
 			FrameNum=ServerFrameNum;
-			debugf(TEXT("udemo: seekto succeeded - requested %lf - now at %lf - atend %d - iserror %d"), GoalTime.GetDouble(), ServerPacketTime.GetDouble(), FileAr->AtEnd(), FileAr->IsError());
+//			debugf(TEXT("udemo: seekto succeeded - requested %lf - now at %lf - atend %d - iserror %d"), GoalTime.GetDouble(), ServerPacketTime.GetDouble(), FileAr->AtEnd(), FileAr->IsError());
 			Seeking = FALSE;
 			return OutTime;
 		}
