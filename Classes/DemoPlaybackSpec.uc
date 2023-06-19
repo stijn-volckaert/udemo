@@ -1295,7 +1295,7 @@ event UpdateEyeHeight(float DeltaTime)
 			PP.EyeHeight = oldEyeH;
 			PP.ViewShake(DeltaTime);
 			//PP.UpdateEyeHeight(DeltaTime);
-			if (PP == ViewTarget && PP.Base != None && PP.GetAnimGroup(PP.AnimSequence) != 'Dodge') {
+			if (PP == ViewTarget && PP.Base != None && (PP.Mesh == None || PP.GetAnimGroup(PP.AnimSequence) != 'Dodge')) {
 				GetAxes(PP.Rotation,X,Y,Z);
 				OldRole = PP.Role;
 				PP.Role = ROLE_Authority; // hack for apply bob when spectate another players, not demo recorder
