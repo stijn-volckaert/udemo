@@ -200,6 +200,18 @@ class UDEMO_API UStubPlayer : public UPlayer
 		CopyFromProxy();
 		unguard;
 	}
+
+	void Destroy()
+	{
+		guard(UStubPlayer::Destroy);
+		if (Actor)
+		{
+			Actor->Player = NULL;
+			Actor = NULL;
+		}
+		Super::Destroy();
+		unguard;
+	}
 };
 
 #if __STATIC_LINK
