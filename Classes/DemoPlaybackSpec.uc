@@ -962,6 +962,10 @@ event PreRender( canvas Canvas )
 	// Used for the interpolation stuff!
 	if (!bLockOn && Pawn(ViewTarget)!=none)
 		Pawn(ViewTarget).ViewRotation=LastViewRot;
+		
+	// hack for fix RypelCam rotation
+	if (CHSpectator(ViewTarget) != None && ViewTarget.isA('CamControl') && ViewTarget.Role == Role_Authority)
+		CHSpectator(ViewTarget).ViewRotation = ViewTarget.Rotation;
 
 	// Keep cam on the player and call prerender on playerlinked (hax!)
 	if (PlayerLinked!=none)
