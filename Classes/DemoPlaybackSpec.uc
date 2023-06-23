@@ -1282,7 +1282,7 @@ event UpdateEyeHeight(float DeltaTime)
 {
 	local vector x, y, z;
 	local PlayerPawn PP;
-	local bool bKeepZoom;
+	local bool bKeepZoom, bOldIsWalking;
 	local ENetRole OldRole;
 
 	Super.UpdateEyeHeight(DeltaTime);
@@ -1297,10 +1297,13 @@ event UpdateEyeHeight(float DeltaTime)
 			//PP.UpdateEyeHeight(DeltaTime);
 			if (PP == ViewTarget && PP.Base != None && (PP.Mesh == None || PP.GetAnimGroup(PP.AnimSequence) != 'Dodge')) {
 				GetAxes(PP.Rotation,X,Y,Z);
+				bOldIsWalking = PP.bIsWalking;
+				PP.bIsWalking = true; // for suppress additional unwanted step sounds
 				OldRole = PP.Role;
 				PP.Role = ROLE_Authority; // hack for apply bob when spectate another players, not demo recorder
 				PP.CheckBob(DeltaTime, sqrt(PP.Velocity.X * PP.Velocity.X + PP.Velocity.Y * PP.Velocity.Y), Y);
 				PP.Role = OldRole;
+				PP.bIsWalking = bOldIsWalking;
 			} else {
 				PP.BobTime = 0;
 				PP.WalkBob = PP.WalkBob * (1 - FMin(1, 8 * DeltaTime));
