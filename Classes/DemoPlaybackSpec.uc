@@ -1292,7 +1292,11 @@ event UpdateEyeHeight(float DeltaTime)
 		PP = PlayerPawn(ViewTarget.Owner);
 	if (PP != None) {
 		if (Level.Pauser == "") {
-			PP.EyeHeight = oldEyeH;
+			if (PP == ViewTarget && PP.Base != None && PP.Mesh != None && PP.GetAnimGroup(PP.AnimSequence) == 'Ducking')
+				PP.BaseEyeHeight = 0;
+			else
+				PP.BaseEyeHeight = PP.default.BaseEyeHeight;
+			//PP.EyeHeight = oldEyeH;
 			PP.ViewShake(DeltaTime);
 			//PP.UpdateEyeHeight(DeltaTime);
 			if (PP == ViewTarget && PP.Base != None && (PP.Mesh == None || PP.GetAnimGroup(PP.AnimSequence) != 'Dodge')) {
@@ -1436,7 +1440,7 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
 			if (!bLockOn)
 				PlayerLinked.bBehindView = bBehindView;
 
-			PlayerLinked.EyeHeight = oldEyeH; //double hack
+			//PlayerLinked.EyeHeight = oldEyeH; //double hack
 			PlayerPawn(PTarget).PlayerCalcView(ViewActor,CameraLocation,CameraRotation); //utpure hack!
 			CameraLocation = PTarget.Location;
 			CameraLocation.z+=oldEyeH; //?
@@ -1449,7 +1453,7 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
 			   PlayerPawn(PTarget) != none)
 			{
 				// (Changed by Anth) Also calculate if viewtarget != demorecorder!!!
-				PlayerLinked.EyeHeight = oldEyeH; //double hack
+				//PlayerLinked.EyeHeight = oldEyeH; //double hack
 				PlayerPawn(PTarget).PlayerCalcView(ViewActor,CameraLocation,CameraRotation); //utpure hack!
 
 				// Roll might not be 0 for non-recording viewtargets :o
