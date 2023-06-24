@@ -16,10 +16,10 @@ function Close(optional bool bByParent)
 {
 	Super.Close(bByParent);
 
-	if (MemHolder==None)
-		MemHolder=AutoRecorder(root.createwindow(class'AutoRecorder',0,0,1,1,self));
+	if (MemHolder == None)
+		MemHolder = AutoRecorder(root.createwindow(class'AutoRecorder', 0, 0, 1, 1, self, true));
 
-	MemHolder.UDemo=DemoMainClientWindow(ClientArea).UserWindow;
+	MemHolder.UDemo = DemoMainClientWindow(ClientArea).UserWindow;
 	MemHolder.SendToBack();
 }
 
