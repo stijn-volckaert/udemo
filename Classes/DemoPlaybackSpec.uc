@@ -699,6 +699,14 @@ state CheatFlying
 		local Actor Cam;
 		local vector CamLoc;
 		local rotator CamRot;
+		
+		// handle event PreTick
+		if (Delta < 0)
+		{
+			Delta = -Delta;
+
+			return;
+		}
 
 		if (SeekTick == 3)
 			EndSeek();
