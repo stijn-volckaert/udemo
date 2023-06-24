@@ -1460,6 +1460,10 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
 				PlayerLinked.EyeHeight = oldEyeH; //double hack
 				PlayerPawn(PTarget).PlayerCalcView(ViewActor,CameraLocation,CameraRotation); //utpure hack!
 
+				// hack for fix RypelCam rotation
+				if (CHSpectator(ViewTarget) != None && ViewTarget.isA('CamControl') && ViewTarget.Role == Role_Authority)
+					CameraRotation = ViewTarget.Rotation;
+
 				// Roll might not be 0 for non-recording viewtargets :o
 				if (PTarget != PlayerLinked)
 				{
