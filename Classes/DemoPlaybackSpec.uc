@@ -1302,8 +1302,9 @@ event UpdateEyeHeight(float DeltaTime)
 		PP = PlayerPawn(ViewTarget.Owner);
 	if (PP != None) {
 		if (Level.Pauser == "") {
-			PP.EyeHeight = oldEyeH;
+			//PP.EyeHeight = oldEyeH;
 			PP.ViewShake(DeltaTime);
+			PP.ShakeVert = 0; // used replicated EyeHeight
 			//PP.UpdateEyeHeight(DeltaTime);
 			if (PP == ViewTarget && PP.Base != None && (PP.Mesh == None || PP.GetAnimGroup(PP.AnimSequence) != 'Dodge')) {
 				GetAxes(PP.Rotation,X,Y,Z);
