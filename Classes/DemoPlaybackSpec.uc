@@ -704,7 +704,9 @@ state CheatFlying
 		if (Delta < 0)
 		{
 			Delta = -Delta;
-
+			// hack for turn off local update EyeHeight and use only replicated values
+			if (PlayerLinked != None)
+				PlayerLinked.BaseEyeHeight = PlayerLinked.EyeHeight;
 			return;
 		}
 
@@ -1444,10 +1446,10 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
 			if (!bLockOn)
 				PlayerLinked.bBehindView = bBehindView;
 
-			PlayerLinked.EyeHeight = oldEyeH; //double hack
+			//PlayerLinked.EyeHeight = oldEyeH; //double hack
 			PlayerPawn(PTarget).PlayerCalcView(ViewActor,CameraLocation,CameraRotation); //utpure hack!
 			CameraLocation = PTarget.Location;
-			CameraLocation.z+=oldEyeH; //?
+			CameraLocation.z += PTarget.EyeHeight; //?
 			LastViewRot=CameraRotation;
 			return;
 		}
@@ -1457,7 +1459,7 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
 			   PlayerPawn(PTarget) != none)
 			{
 				// (Changed by Anth) Also calculate if viewtarget != demorecorder!!!
-				PlayerLinked.EyeHeight = oldEyeH; //double hack
+				//PlayerLinked.EyeHeight = oldEyeH; //double hack
 				PlayerPawn(PTarget).PlayerCalcView(ViewActor,CameraLocation,CameraRotation); //utpure hack!
 
 				// Roll might not be 0 for non-recording viewtargets :o
@@ -1469,7 +1471,7 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
 
 				TargetViewRotation=CameraRotation;
 				CameraLocation = PTarget.Location;
-				TargetEyeHeight=oldEyeH;
+				TargetEyeHeight = PTarget.EyeHeight;
 				ViewActor=ViewTarget;
 			}
 			else
