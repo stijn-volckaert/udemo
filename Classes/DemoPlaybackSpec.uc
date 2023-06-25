@@ -1477,7 +1477,10 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
 
 				// hack for fix RypelCam rotation
 				if (class'DemoSettings'.default.bFixRypelCam && CHSpectator(ViewTarget) != None && ViewTarget.isA('CamControl') && ViewTarget.Role == Role_Authority)
+				{
 					CameraRotation = ViewTarget.Rotation;
+					delta = 0; // turn off interpolation
+				}
 
 				// Roll might not be 0 for non-recording viewtargets :o
 				if (PTarget != PlayerLinked)
