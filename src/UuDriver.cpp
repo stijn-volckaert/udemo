@@ -165,7 +165,7 @@ void UuDemoDriver::TickDispatch( FLOAT Delta )
 				// Busy-wait until it's time to play the frame.
 				// WARNING: use appSleep() if appSeconds() isn't using CPU timestamp!
 				// appSleep(ServerPacketTime - Time);
-				appSleep(ServerPacketTime - Time);
+				appSleepLong(ServerPacketTime - Time);
 			}
 			//sync level time with demo!
 			else if (NoFrameCap && GetLevel() && GetLevel()->GetLevelInfo() ) 
