@@ -399,6 +399,7 @@ void UDemoInterface::execJumpBack (FFrame& Stack, RESULT_DECL)
 
 	// Reset Demo driver
 	DemoDriver->ServerPacketTime	= FTime(0.0);
+	DemoDriver->GameTime			= FTime(0.0);
 	DemoDriver->Time				= FTime(0.0);
 	DemoDriver->ServerFrameNum		= 0;
 	DemoDriver->FrameNum			= 0;

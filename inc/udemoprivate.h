@@ -88,6 +88,7 @@ class UDEMO_API UuDemoDriver : public UDemoRecDriver
 	UBOOL Paused;                  // true if demo client has paused demo!
 	FTime StartTime;               // time when player joined?
 	FTime TotalTime;               // total time in demo.  		
+	FTime GameTime;				   // helper for calculate game time.
 	int TotalFrames;               // total frames in demo
 	float RealDilation;            // the real time dilation!
 	INT ServerFrameNum;            // demo frame #
@@ -108,7 +109,7 @@ class UDEMO_API UuDemoDriver : public UDemoRecDriver
 	ULevel* GetLevel();            // the assertion pissed me off
 	
 	// (Anth) Semi-working attempt to sync level.timeseconds properly...
-	void TimeSync(FTime NewTime, FTime OldTime, FLOAT Delta);
+	void TimeSync(FTime NewTime, FTime OldTime);
 
 	//custom init connect for more options!
 	UBOOL InitConnect( FNetworkNotify* InNotify, FURL& ConnectURL, FString& Error );
