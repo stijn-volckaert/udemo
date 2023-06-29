@@ -476,7 +476,7 @@ FTime UuDemoDriver::ReadTo(FTime GoalTime, UBOOL bPacketRead)
 			return ServerPacketTime;
 		}
 		// update TimeSeconds for use in TimeSync
-		FLOAT Delta = (ServerPacketTime.GetFloat() - OldTime.GetFloat())*RealDilation;
+		FLOAT Delta = (ServerPacketTime - OldTime)*RealDilation;
 		if (GetLevel())
 		{
 			GetLevel()->TimeSeconds += Delta;
