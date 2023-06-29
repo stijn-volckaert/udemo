@@ -1476,7 +1476,8 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
 				PlayerPawn(PTarget).PlayerCalcView(ViewActor,CameraLocation,CameraRotation); //utpure hack!
 
 				// hack for fix RypelCam rotation
-				if (class'DemoSettings'.default.bFixRypelCam && CHSpectator(ViewTarget) != None && ViewTarget.isA('CamControl') && ViewTarget.Role == Role_Authority)
+				if (class'DemoSettings'.default.bFixRypelCam && CHSpectator(ViewTarget) != None && ViewTarget.Role == Role_Authority && 
+					(ViewTarget.isA('CamControl') || ViewTarget.isA('Viewer')))
 				{
 					CameraRotation = ViewTarget.Rotation;
 					delta = 0; // turn off interpolation
