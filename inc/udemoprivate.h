@@ -73,6 +73,8 @@ class UDEMO_API UDReader : public ULevelBase
 class UuDemoDriver;
 class UDemoRecConnection;
 
+#define LTS_OFFSET 1000.0F
+
 /*-----------------------------------------------------------------------------
 	UuDemoDriver - Advanced Demo Driver, supports speed toggling etc	
 -----------------------------------------------------------------------------*/
@@ -106,7 +108,7 @@ class UDEMO_API UuDemoDriver : public UDemoRecDriver
 	ULevel* GetLevel();            // the assertion pissed me off
 	
 	// (Anth) Semi-working attempt to sync level.timeseconds properly...
-	void TimeSync(FTime NewTime, FTime OldTime);
+	void TimeSync(FTime NewTime, FTime OldTime, FLOAT Delta);
 
 	//custom init connect for more options!
 	UBOOL InitConnect( FNetworkNotify* InNotify, FURL& ConnectURL, FString& Error );
