@@ -96,7 +96,15 @@ var localized string LocServerDemosHaveNoPlayerRecorders;
 // =============================================================================
 
 exec function SloMo( float T ) {
+	local CHSpectator CamControl;
+	local float OldSpeed;
+	OldSpeed = Driver.MySpeed;
 	Driver.SetSpeed(T);
+	// hack for make rypelcam not dependent from changes speed
+	if (class'DemoSettings'.default.bFixRypelCam)
+		foreach AllActors(class'CHSpectator', CamControl)
+			if (CamControl.isA('CamControl'))
+				CamControl.TimerRate *= Driver.MySpeed/OldSpeed;
 }
 
 exec function CurTime() {
@@ -1182,6 +1190,13 @@ event PostRender( canvas Canvas )
 	local float DamageTime, StatScale, X;
 	local vector HitLocation, HitNormal, StartTrace, EndTrace;
 	local actor Other, OldViewTarget;
+	local CHSpectator CamControl;
+	
+	// hack for make rypelcam not dependent from changes speed
+	if (class'DemoSettings'.default.bFixRypelCam)
+		foreach AllActors(class'CHSpectator', CamControl)
+			if (CamControl.isA('CamControl') && CamControl.TimerCounter == 0.0)
+				CamControl.TimerRate *= Driver.MySpeed;
 
 	FixPRIArray();
 
@@ -1506,6 +1521,14 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
 				// (Changed by Anth) Also calculate if viewtarget != demorecorder!!!
 				//PlayerLinked.EyeHeight = oldEyeH; //double hack
 				PlayerPawn(PTarget).PlayerCalcView(ViewActor,CameraLocation,CameraRotation); //utpure hack!
+
+				// hack for fix RypelCam rotation
+				if (class'DemoSettings'.default.bFixRypelCam && CHSpectator(ViewTarget) != None && ViewTarget.Role == Role_Authority && 
+					(ViewTarget.isA('CamControl') || ViewTarget.isA('Viewer')))
+				{
+					CameraRotation = ViewTarget.Rotation;
+					delta = 0; // turn off interpolation
+				}
 
 				// Roll might not be 0 for non-recording viewtargets :o
 				if (PTarget != PlayerLinked)
