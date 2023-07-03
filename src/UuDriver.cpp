@@ -83,6 +83,15 @@ void UuDemoDriver::TickDispatch( FLOAT Delta )
 {
 	guard(UuDemoDriver:TickDispatch);	
 	
+	// rollback seconds spent to seeking demo
+	if (Interface && Interface->bFixLevelTime)
+	{
+		Interface->bFixLevelTime = FALSE;
+		if (Interface->DemoSpec)
+			Interface->DemoSpec->XLevel->TimeSeconds += -Delta*Interface->DemoSpec->Level->TimeDilation;
+		Delta = 0;
+	}
+
 	// Calc deltatime
 	FLOAT DeltaTime = Delta;
 	if(ServerConnection)

@@ -637,6 +637,7 @@ function EndSeek()
 	local ScoreBoard sb; // (Anth)
 
 	CurTime();
+	Log(Level.TimeSeconds @ "EndSeek at" @ Driver.GetCurrentTime());
 
 	bSeeking=false;
 	lts=level.timeseconds;
@@ -759,6 +760,7 @@ state CheatFlying
 			ClearHUD();
 			Driver.GotoFrame(SeekTime);
 			SeekTick = 3;
+			Driver.bFixLevelTime = True;
 			return;
 		}
 
