@@ -51,6 +51,7 @@ var Ammo DummyAmmo;             // hack!
 var InterCeptHud h;
 var float oldltsoffset;
 var Actor OldViewTarget;
+var Player StubPlayer;          // Stub player used in PlayerLinked
 
 var int EndGameCam;
 const EGC_NotDetected = 0;
@@ -777,6 +778,10 @@ state CheatFlying
 		// DLO Gameclass to get hud & sb
 		else if (PlayerLinked == None && HudType == None)
 			GenRef();
+		if (PlayerLinked != None && PlayerLinked.Player == None)
+			PlayerLinked.Player = StubPlayer;
+		if (PlayerLinked != None)
+			PlayerLinked.Disable('PlayerTick'); // for avoid ruin play by wrong local prediction
 	}
 	
 	// (Sp0ngeb0b)
@@ -1315,7 +1320,7 @@ event PostRender( canvas Canvas )
 		
 		PlayerLinked.ViewTarget = OldViewTarget;
 		
-		PlayerLinked.Player = None;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
+		PlayerLinked.Player = StubPlayer;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
 	}
 }
 
