@@ -1546,7 +1546,8 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
 				}
 
 				// Roll might not be 0 for non-recording viewtargets :o
-				if (PTarget != PlayerLinked)
+				// Ignore locally spawned actors like RypelCam
+				if (PTarget != PlayerLinked && PTarget.Role != Role_Authority)
 				{
 					PlayerPawn(PTarget).ViewRotation.Roll = 0;
 					CameraRotation.Roll = 0;
