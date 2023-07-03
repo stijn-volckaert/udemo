@@ -19,7 +19,6 @@ var const uDemoDriver DemoDriver; //the demo driver. only valid in cpp
 var const float mySpeed; //current speed of demo
 var const byte PlayBackMode; //current playback mode
 var const bool bDoingMessagePlay; //if true, no rendering is taking place.  This is only for message grabbing!
-var const float ltsoffset;   // (Anth) Sync time thingie
 var const bool bFixLevelTime; // if true, need rollback time spent to seek
 
 // (Anth) Destroying illegal actors is native now (because of serverside demos)

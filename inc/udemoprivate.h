@@ -73,6 +73,8 @@ class UDEMO_API UDReader : public ULevelBase
 class UuDemoDriver;
 class UDemoRecConnection;
 
+#define LTS_OFFSET 1000.0F
+
 /*-----------------------------------------------------------------------------
 	UuDemoDriver - Advanced Demo Driver, supports speed toggling etc	
 -----------------------------------------------------------------------------*/
@@ -86,6 +88,7 @@ class UDEMO_API UuDemoDriver : public UDemoRecDriver
 	UBOOL Paused;                  // true if demo client has paused demo!
 	FTime StartTime;               // time when player joined?
 	FTime TotalTime;               // total time in demo.  		
+	FTime GameTime;				   // helper for calculate game time.
 	int TotalFrames;               // total frames in demo
 	float RealDilation;            // the real time dilation!
 	INT ServerFrameNum;            // demo frame #

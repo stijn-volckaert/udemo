@@ -57,19 +57,29 @@ void UuDemoDriver::TimeSync(FTime NewTime, FTime OldTime)
 		Interface->DemoSpec && 
 		Interface->DemoSpec->GameReplicationInfo)
 	{
-		if (GetLevel()->GetLevelInfo()->Pauser == TEXT("") && 
-			GetLevel()->GetLevelInfo()->TimeSeconds + Interface->ltsoffset - Interface->DemoSpec->GameReplicationInfo->SecondCount > RealDilation)
+		// disable stock counter
+		Interface->DemoSpec->GameReplicationInfo->SecondCount = GetLevel()->GetLevelInfo()->TimeSeconds + LTS_OFFSET;
+		if (GetLevel()->GetLevelInfo()->Pauser == TEXT(""))
 		{
-			Interface->DemoSpec->GameReplicationInfo->ElapsedTime++;
-			if (Interface->DemoSpec->GameReplicationInfo->RemainingMinute != 0)
+			// next code based on GameReplicationInfo uscript code with some changes
+			if (ServerPacketTime - GameTime >= 1.0)
 			{
-				Interface->DemoSpec->GameReplicationInfo->RemainingTime = Interface->DemoSpec->GameReplicationInfo->RemainingMinute;
-				Interface->DemoSpec->GameReplicationInfo->RemainingMinute = 0;
+				Interface->DemoSpec->GameReplicationInfo->ElapsedTime++;
+				if (Interface->DemoSpec->GameReplicationInfo->RemainingMinute != 0)
+				{
+					Interface->DemoSpec->GameReplicationInfo->RemainingTime = Interface->DemoSpec->GameReplicationInfo->RemainingMinute;
+					Interface->DemoSpec->GameReplicationInfo->RemainingMinute = 0;
+				}
+				if (Interface->DemoSpec->GameReplicationInfo->RemainingTime > 0 && !Interface->DemoSpec->GameReplicationInfo->bStopCountDown)
+					Interface->DemoSpec->GameReplicationInfo->RemainingTime--;
+				GameTime += 1.0;
 			}
-			if (Interface->DemoSpec->GameReplicationInfo->RemainingTime > 0 && !Interface->DemoSpec->GameReplicationInfo->bStopCountDown)
-				Interface->DemoSpec->GameReplicationInfo->RemainingTime--;
-			Interface->DemoSpec->GameReplicationInfo->SecondCount += RealDilation;
-
+		}
+		else
+		{
+			// Prevent time goes during pause by server (client pause not change ServerPacketTime, so ignored)
+			if (!Paused)
+				GameTime += NewTime - OldTime;
 		}
 	}
 
@@ -104,6 +114,7 @@ void UuDemoDriver::TickDispatch( FLOAT Delta )
 			{
 				FLOAT DeltaSeconds = Delta*Interface->DemoSpec->Level->TimeDilation;
 				Interface->DemoSpec->Tick(DeltaSeconds, LEVELTICK_All);
+				TimeSync(ServerPacketTime, ServerPacketTime);
 			}
 			return;		
 		}
@@ -217,7 +228,7 @@ void UuDemoDriver::TickDispatch( FLOAT Delta )
 			
 			UuReceivedRawPacket( Data, PacketBytes );
 
-			TimeSync(ServerPacketTime,Time);
+			TimeSync(ServerPacketTime, OldTime);
 
 			if (SoundPlayer)
 				SoundPlayer->Player = OldPlayer;
@@ -428,6 +439,8 @@ FTime UuDemoDriver::ReadTo(FTime GoalTime, UBOOL bPacketRead)
 	int seekTo;
 	DWORD PacketBytes; 
 	FTime OldTime;
+	FTime OffsetTime = GetLevel() ? GetLevel()->TimeSeconds : FTime(0.0);
+	FTime BaseTime = ServerPacketTime;
 	int oldFrame;
 	BYTE Data[520]; //512+8
 	check(ServerConnection);
@@ -478,13 +491,31 @@ FTime UuDemoDriver::ReadTo(FTime GoalTime, UBOOL bPacketRead)
 			Seeking = FALSE;
 			return ServerPacketTime;
 		}
+		// update TimeSeconds - can be used by some mods
+		if (GetLevel())
+		{
+			GetLevel()->TimeSeconds = OffsetTime + (ServerPacketTime - BaseTime)*RealDilation;
+			if (GetLevel()->GetLevelInfo())
+				GetLevel()->GetLevelInfo()->TimeSeconds = GetLevel()->TimeSeconds.GetFloat();
+		}
 		if (!bPacketRead)
 			FileAr->Seek(seekTo); //move ahead by packetbytes
 		else
 		{
-			TimeSync(ServerPacketTime,OldTime);
+			TimeSync(ServerPacketTime, OldTime);
 			FileAr->Serialize( Data, PacketBytes );
+			FLOAT oldDilation = 0.0;
+			if (GetLevel() && GetLevel()->GetLevelInfo())
+				oldDilation = GetLevel()->GetLevelInfo()->TimeDilation;
 			ServerConnection->ReceivedRawPacket( Data, PacketBytes );
+			if (GetLevel() && GetLevel()->GetLevelInfo() && Abs(GetLevel()->GetLevelInfo()->TimeDilation - oldDilation) > 0.01)
+			{
+				OffsetTime = GetLevel()->TimeSeconds;
+				BaseTime = ServerPacketTime;
+				RealDilation = GetLevel()->GetLevelInfo()->TimeDilation;
+				if (!NoFrameCap)
+					GetLevel()->GetLevelInfo()->TimeDilation *= Speed;
+			}
 		}
 	}
 

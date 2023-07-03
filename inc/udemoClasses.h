@@ -115,7 +115,6 @@ public:
     FLOAT mySpeed;
     BYTE PlayBackMode;
     BITFIELD bDoingMessagePlay:1 GCC_PACK(INT_ALIGNMENT);
-    FLOAT ltsoffset;
     BITFIELD bFixLevelTime:1;
     FStringNoInit IllegalActors[20];
     BITFIELD bDebug:1;
@@ -203,7 +202,6 @@ VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,DemoSpec)
 VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,DemoDriver)
 VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,mySpeed)
 VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,PlayBackMode)
-VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,ltsoffset)
 VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,IllegalActors)
 VERIFY_CLASS_SIZE_NODIE(UDemoInterface)
 #endif // VERIFY_CLASS_SIZES

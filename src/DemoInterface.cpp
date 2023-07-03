@@ -187,7 +187,6 @@ void UDemoInterface::execReadCache (FFrame& Stack, RESULT_DECL)
 	check(DemoSpec->XLevel->Actors.Num());
 
 	DemoDriver->bNoTick=true;
-	ltsoffset += (TimeTo-DemoDriver->ServerPacketTime.GetFloat())*DemoDriver->RealDilation;
 
 	// Looping until diff between TimeTo and ServerPacketTime is less than inc
 	while(!Done)
@@ -230,8 +229,6 @@ void UDemoInterface::execReadTo (FFrame& Stack, RESULT_DECL)
 	P_GET_FLOAT(TimeTo);
 	P_FINISH;
 
-	//update timeseconds
-	ltsoffset += (TimeTo-DemoDriver->ServerPacketTime.GetFloat())*DemoDriver->RealDilation;
 	GLog->Logf(*FString::Printf(TEXT("udemo: ReadTo %f. Now = %f. Dilation = %f."),TimeTo,DemoDriver->ServerPacketTime.GetFloat(),DemoDriver->RealDilation));
 	DemoDriver->ReadTo(FTime(TimeTo));
 
@@ -403,6 +400,7 @@ void UDemoInterface::execJumpBack (FFrame& Stack, RESULT_DECL)
 
 	// Reset Demo driver
 	DemoDriver->ServerPacketTime	= FTime(0.0);
+	DemoDriver->GameTime			= FTime(0.0);
 	DemoDriver->Time				= FTime(0.0);
 	DemoDriver->ServerFrameNum		= 0;
 	DemoDriver->FrameNum			= 0;
@@ -410,7 +408,8 @@ void UDemoInterface::execJumpBack (FFrame& Stack, RESULT_DECL)
 
 	// Reset Level time
 	DemoSpec->Level->TimeSeconds	= 0;
-	ltsoffset = 0.0; // resync level.TimeSeconds
+	if (DemoSpec->GameReplicationInfo)
+		DemoSpec->GameReplicationInfo->SecondCount = LTS_OFFSET;
 
 	// Anth: Put the socket state back in USOCK_Pending so the engine calls HandleClientPlayer on our connection again once the linked player has respawned.
 	DemoDriver->ServerConnection->State = USOCK_Pending;

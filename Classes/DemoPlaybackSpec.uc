@@ -49,7 +49,6 @@ var bool oldPaused;             // restore pause state after seeking has finishe
 var Weapon OldWeapon;           // for sound hacking!
 var Ammo DummyAmmo;             // hack!
 var InterCeptHud h;
-var float oldltsoffset;
 var Actor OldViewTarget;
 var Player StubPlayer;          // Stub player used in PlayerLinked
 
@@ -170,7 +169,7 @@ exec function TeamSay( string Msg ) {
 }
 
 exec function Now() {
-	clientmessage("Level.TimeSeconds="@Level.TimeSeconds@PlayerLinked.Level.TimeSeconds@Driver.ltsoffset@GameReplicationInfo.ElapsedTime@GameReplicationInfo.RemainingMinute@GameReplicationInfo.RemainingTime);
+	clientmessage("Level.TimeSeconds =" @ Level.TimeSeconds @ PlayerLinked.Level.TimeSeconds @ GameReplicationInfo.ElapsedTime @ GameReplicationInfo.RemainingMinute @ GameReplicationInfo.RemainingTime @ GameReplicationInfo.SecondCount @ Level.TimeDilation);
 }
 
 // (Added by Anth) Stats hax
@@ -559,7 +558,6 @@ function FixPRIArray()
 	// Pure fix
 	if (GameReplicationInfo != None)
 	{
-		oldltsoffset = Driver.ltsoffset;
 		foreach Level.AllActors(class'PlayerReplicationInfo', zzMyPRI)
 		{
 			if (zzMyPRI.Owner == Self)
@@ -661,6 +659,7 @@ function EndSeek()
 	local ScoreBoard sb; // (Anth)
 
 	CurTime();
+	Now();
 	Log(Level.TimeSeconds @ "EndSeek at" @ Driver.GetCurrentTime());
 
 	bSeeking=false;
