@@ -229,6 +229,13 @@ void UuDemoDriver::TickDispatch( FLOAT Delta )
 		}
 	}
 
+	// call event PreTick
+	if (Interface)
+	{
+		FLOAT DeltaSeconds = Delta*Interface->DemoSpec->Level->TimeDilation;
+		Interface->DemoSpec->eventPlayerTick(-DeltaSeconds);
+	}
+
 	unguard;
  }
 

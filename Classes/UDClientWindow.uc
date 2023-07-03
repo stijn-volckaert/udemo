@@ -303,11 +303,11 @@ function SetupDemos(bool Refreshing)
 			demos.SetValue("");
 		}
 		Demos.SetValue(Demos.GetValue(),Demos.GetValue2());  //hack :)
-
-		if (!Refreshing && demos.GetValue() == "")
-			Demos.SetSelectedIndex(0);
 	} else if (LastDemo != "")
 		demos.SetValue(LastDemo, LastDemoPath);
+		
+	if (!Refreshing && demos.GetValue() == "")
+		Demos.SetSelectedIndex(0);
 }
 
 // =============================================================================
@@ -605,10 +605,10 @@ function Close (optional bool bByParent)
 {
 	Super.Close(bByParent);
 
-	class'DemoSettings'.default.Timing=Timing.GetSelectedIndex();
-	class'DemoSettings'.default.SpecDemo=Spectate.bchecked;
+	class'DemoSettings'.default.Timing = Timing.GetSelectedIndex();
+	class'DemoSettings'.default.SpecDemo = Spectate.bchecked;
 	Class'DemoSettings'.default.OrderByDate = OrderByDate.bChecked;
-	class'DemoSettings'.default.LastDemo=Demos.GetValue();
+	class'DemoSettings'.default.LastDemo = Demos.GetValue();
 	class'DemoSettings'.static.StaticSaveConfig();
 }
 

@@ -53,6 +53,11 @@ var float oldltsoffset;
 var Actor OldViewTarget;
 var Player StubPlayer;          // Stub player used in PlayerLinked
 
+var int EndGameCam;
+const EGC_NotDetected = 0;
+const EGC_TrackViewTarget = 1;
+const EGC_Done = 2;
+
 // list for bOwnerNoSee actors hidden during render
 var Actor HideActors[16384];
 var int HideActorsCount;
@@ -125,6 +130,8 @@ exec function SeekTo(string Point) {
 		T = Driver.GetTotalTime()*T/100.0;
 	if (sign == "+" || sign == "-")
 		T = FMax(0.0, Driver.GetCurrentTime() + T);
+	if (T < Driver.GetCurrentTime())
+		EndGameCam = EGC_NotDetected;
 	SetSeek(T);
 }
 
@@ -258,12 +265,37 @@ exec function PlayBack(byte a)
 // set behindview stuff (duh?)
 exec function BehindView( Bool B )
 {
+	if (bLockOn)
+		B = false;
 	bBehindView = B;
 	bChaseCam = bBehindView;
 	if ( ViewTarget == None )
 	  bBehindView = false;
 	if (PlayerLinked!=none && bLockOn)
 	  PlayerLinked.bBehindView = B;
+}
+
+// hacks for deal with XConsole 3.5.0rc71 and similar, 
+// which use own implementation of spectator keys handling
+exec function ViewSelf()
+{
+	if (bLockOn)
+		return;
+	Super.ViewSelf();
+}
+
+exec function Fire( optional float F )
+{
+	if (bLockOn)
+		return;
+	Super.Fire(F);
+}
+
+exec function AltFire( optional float F )
+{
+	if (bLockOn)
+		return;
+	Super.AltFire(F);
 }
 
 exec function Say( string Msg )
@@ -383,6 +415,9 @@ exec function ViewPlayerNum(optional int num)
 	local Pawn P;
 	local int i;
 	local bool bTargetSet;
+	
+	if (bLockOn)
+		return;
 
 	bChaseCam = true;
 	bBehindView = true;
@@ -636,6 +671,13 @@ function BackUpRefs()
 {
 	if (Pawn(ViewTarget) != None && Pawn(ViewTarget).PlayerReplicationInfo != None)
 		ViewTargetID = Pawn(ViewTarget).PlayerReplicationInfo.PlayerID;
+		
+	// destroy Scoreboard spawned by us (Info actors ignore on reset demo) for recreate it after seek
+	if (Scoring != None && ScoringType != None && Scoring.Role == ROLE_Authority)
+	{
+		Scoring.Destroy();
+		Scoring = None;
+	}
 }
 
 // Not used... :/
@@ -665,6 +707,14 @@ state CheatFlying
 		local Actor Cam;
 		local vector CamLoc;
 		local rotator CamRot;
+		
+		// handle event PreTick
+		if (Delta < 0)
+		{
+			Delta = -Delta;
+
+			return;
+		}
 
 		if (SeekTick == 3)
 			EndSeek();
@@ -919,6 +969,7 @@ event PreRender( canvas Canvas )
 			if (HUD.Class == HUDType)
 			{
 				myHud = HUD;
+				myHud.Role = ROLE_Authority; // like we spawn it, not get from rep
 				myHud.setOwner(self);
 				break;
 			}
@@ -935,6 +986,30 @@ event PreRender( canvas Canvas )
 	// Keep cam on the player and call prerender on playerlinked (hax!)
 	if (PlayerLinked!=none)
 	{
+		if (SeekTick == 0)
+		{
+			if (EndGameCam == EGC_NotDetected && PlayerLinked.IsInState('GameEnded'))
+			{
+				EndGameCam = EGC_TrackViewTarget;
+				bLockOn = false;
+				ViewTarget = PlayerLinked.ViewTarget;
+				if (ViewTarget == None)
+					ViewTarget = PlayerLinked;
+				else
+					EndGameCam = EGC_Done;
+				ViewRotation = PlayerLinked.ViewRotation;
+				bBehindView = PlayerLinked.bBehindView;
+				GotoState('GameEnded'); // setup end cam
+				GotoState('CheatFlying'); // return back to our state
+			}
+			if (EndGameCam == EGC_TrackViewTarget)
+			{
+				if (ViewTarget == PlayerLinked && PlayerLinked.ViewTarget != None)
+					ViewTarget = PlayerLinked.ViewTarget;
+				if (ViewTarget != PlayerLinked)
+					EndGameCam = EGC_Done;
+			}
+		}
 		if (bLockOn)
 			SetLocation(PlayerLinked.Location);
 		oldRole=PlayerLinked.Role;
@@ -1102,7 +1177,7 @@ event PostRender( canvas Canvas )
 	local int i;
 	local float DamageTime, StatScale, X;
 	local vector HitLocation, HitNormal, StartTrace, EndTrace;
-	local actor Other;
+	local actor Other, OldViewTarget;
 
 	FixPRIArray();
 
@@ -1129,36 +1204,36 @@ event PostRender( canvas Canvas )
 		}
 	}
 
-	if (bLockOn)
+	if (PlayerLinked != None)
 	{
 		// (Added by Anth)
 		if (Scoring == None && ScoringType != None)
 		{
-			Scoring = Spawn(ScoringType,PlayerLinked);
-		if (Scoring != None)
+			Scoring = Spawn(ScoringType, PlayerLinked);
+			if (Scoring != None)
 				Scoring.OwnerHUD = myHUD;
 		}
 
-		PlayerLinked.bShowScores=bShowScores;
-		PlayerLinked.ScoringType=ScoringType;
-		PlayerLinked.Scoring=Scoring;
-		PlayerLinked.GameReplicationInfo=GameReplicationInfo; // hax!
+		PlayerLinked.bShowScores = bShowScores;
+		PlayerLinked.ScoringType = ScoringType;
+		PlayerLinked.Scoring = Scoring;
+		PlayerLinked.GameReplicationInfo = GameReplicationInfo; // hax!
 
-		if (PlayerLinked != none &&
-			WarheadLauncher(PlayerLinked.Weapon) != none &&
-			GuidedWarShell(PlayerLinked.ViewTarget) != none)
-		{		
+		if (WarheadLauncher(PlayerLinked.Weapon) != None && GuidedWarShell(PlayerLinked.ViewTarget) != None)
 			WarheadLauncher(PlayerLinked.Weapon).GuidedShell = GuidedWarShell(PlayerLinked.ViewTarget);
-		}
 
-		if (myhud!=none)
-			myhud.setowner(PlayerLinked);
-	}
-	if (PlayerLinked != None)
-	{
+		if (bLockOn && myHud != None)
+			myHud.setOwner(PlayerLinked);
+
 		PlayerLinked.Player = Player;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
 		if (ChallengeHUD(PlayerLinked.myHud) != None && PlayerLinked.myHud.PlayerOwner == None)
 			ChallengeHUD(PlayerLinked.myHud).HUDSetup(Canvas);
+			
+		OldViewTarget = PlayerLinked.ViewTarget;
+		if (ViewTarget != PlayerLinked)
+			PlayerLinked.ViewTarget = ViewTarget;
+		else
+			PlayerLinked.ViewTarget = None;
 	}
 
 	if (!bLockOn && Pawn(ViewTarget)!=none)
@@ -1235,15 +1310,18 @@ event PostRender( canvas Canvas )
 		PlayerReplicationInfo.bIsSpectator=true;
 
 	if (bLockOn)
-	{
-		ViewTarget=PlayerLinked; //heh.. hack
-		if (myhud!=none)
-			myhud.setowner(self);
-		PlayerLinked.Scoring=none;
-		PlayerLinked.ScoringType=none;
-	}
+		ViewTarget = PlayerLinked; //heh.. hack
 	if (PlayerLinked != None)
+	{
+		if (myHud != none)
+			myHud.setOwner(self);
+		PlayerLinked.Scoring = None;
+		PlayerLinked.ScoringType = None;
+		
+		PlayerLinked.ViewTarget = OldViewTarget;
+		
 		PlayerLinked.Player = StubPlayer;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
+	}
 }
 
 // native call, maintain correct Z-offset
@@ -1264,7 +1342,7 @@ event UpdateEyeHeight(float DeltaTime)
 			PP.EyeHeight = oldEyeH;
 			PP.ViewShake(DeltaTime);
 			//PP.UpdateEyeHeight(DeltaTime);
-			if (PP == ViewTarget && PP.Base != None && PP.GetAnimGroup(PP.AnimSequence) != 'Dodge') {
+			if (PP == ViewTarget && PP.Base != None && (PP.Mesh == None || PP.GetAnimGroup(PP.AnimSequence) != 'Dodge')) {
 				GetAxes(PP.Rotation,X,Y,Z);
 				OldRole = PP.Role;
 				PP.Role = ROLE_Authority; // hack for apply bob when spectate another players, not demo recorder
@@ -1349,6 +1427,11 @@ function InitPlayerReplicationInfo()
 	PlayerReplicationInfo.PlayerName=GetDefaultURL("Name");
 	DummyAmmo=spawn(class'NullAmmo',self);
 	DummyAmmo.AmmoAmount=0;
+	DummyAmmo.BecomeItem();
+	DummyAmmo.GotoState('');
+	// pretend be replicated client item
+	DummyAmmo.Role = DummyAmmo.RemoteRole;
+	DummyAmmo.RemoteRole = ROLE_Authority;
 }
 
 //accessed none's suck:
@@ -1579,10 +1662,17 @@ function FlagPickup(PlayerReplicationInfo PRI, Object OptionalObject)
 
 function FlagReturn(Object OptionalObject)
 {
-	local int i;
+	local int i, FlagTeam;
+	
+	if (CTFFlag(OptionalObject) != None)
+		FlagTeam = CTFFlag(OptionalObject).Team;
+	else if (TeamInfo(OptionalObject) != None)
+		FlagTeam = TeamInfo(OptionalObject).TeamIndex;
+	else
+		return; // passed unknown object or None - ignore
 
 	for (i = 0; i < ArrayCount(FI); i++)
-		if (FI[i].HasFlag != None && FI[i].HasFlag.Team == TeamInfo(OptionalObject).TeamIndex)
+		if (FI[i].HasFlag != None && FI[i].HasFlag.Team == FlagTeam)
 		{
 			FI[i].HasFlag = None;
 			return;
