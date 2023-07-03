@@ -10,18 +10,26 @@
 // ===============================================================
 class DemoNotify expands SpawnNotify;
 
+var string Substr;
+
 simulated event PreBeginPlay();
 
-simulated function PostBeginPlay()
+simulated function Init(class<Actor> InActorClass, optional string InSubstr)
 {
-	Super.PostBeginPlay();
-	Log("Voice Pack Intercepter Generated!", 'Udemo');
+	ActorClass = InActorClass;
+	Substr = Caps(InSubstr);
+	Log(ActorClass.Name @ InSubstr @ "Intercepter Installed!", 'Udemo');
 }
+
 //add tick add thing?
 simulated event Actor SpawnNotification(Actor A)
 {
 	//A.bDifficulty3 = false; //HACK
-	A.SetOwner(Owner);
+	if (Substr == "" || InStr(Caps(string(A.Class.Name)), Substr) != -1)
+	{
+		//Log("SetOwner for" @ A @ "to" @ Owner, 'Udemo');
+		A.SetOwner(Owner);
+	}
 	return A;
 }
 

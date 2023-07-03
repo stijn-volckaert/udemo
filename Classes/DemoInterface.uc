@@ -20,6 +20,7 @@ var const float mySpeed; //current speed of demo
 var const byte PlayBackMode; //current playback mode
 var const bool bDoingMessagePlay; //if true, no rendering is taking place.  This is only for message grabbing!
 var const float ltsoffset;   // (Anth) Sync time thingie
+var const bool bFixLevelTime; // if true, need rollback time spent to seek
 
 // (Anth) Destroying illegal actors is native now (because of serverside demos)
 var config string IllegalActors[20];
@@ -41,6 +42,7 @@ native final function PauseDemo(bool bPause); //safely controls demo pausing.
 native final function byte IsPaused(); //0=no, 1=paused in demo (ex. admin hit pause), 2=user requested
 native final function SetPlayBackMode(byte a); //playback modes: 0=timebased, 1=framebased, 2=nocap
 native final function float GetStartTime(); //returns the time demo was at when starting play (After player spawned)
+native final function Player GetStubPlayer(Player Proxy); //returns new instance for StubPlayer
 
 //non-native functions:
 function GotoFrame (float Time)
@@ -99,6 +101,15 @@ event LinkToPlayer (PlayerPawn p, bool LockOn)
 
 	if (bDebug)
 		Log("UDEMO: Trying to link to player :"@p);
+		
+	if (p != None && p.Player == None)
+	{
+		if (DemoPlaybackSpec(DemoSpec).StubPlayer == None)
+			DemoPlaybackSpec(DemoSpec).StubPlayer = GetStubPlayer(DemoSpec.Player);
+		p.Player = DemoPlaybackSpec(DemoSpec).StubPlayer;
+		p.Player.Actor = p;
+		p.Disable('PlayerTick'); // for avoid ruin play by wrong local prediction
+	}
 
 	if (!DemoPlaybackSpec(DemoSpec).bInit)
 	{
@@ -107,7 +118,9 @@ event LinkToPlayer (PlayerPawn p, bool LockOn)
 		DemoPlaybackSpec(DemoSpec).bLockOn = LockOn;
 
 		if (p!=none&&!bDoingMessagePlay)
-			DemoSpec.spawn(class'DemoNotify'); //used for voice pack interception!
+			DemoSpec.spawn(class'DemoNotify', p).Init(class'VoicePack'); //used for voice pack interception!
+		// WindowReplicationInfo - WRI - fix show map vote and other windows during demo play
+		DemoSpec.spawn(class'DemoNotify', p).Init(class'ReplicationInfo', "WRI");
 	}
 
 	DemoPlaybackSpec(DemoSpec).PlayerLinked = p;
