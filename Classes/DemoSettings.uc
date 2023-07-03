@@ -46,6 +46,8 @@ var config float CacheSeconds; //amount of seconds to cache for when jumping (i.
 var config float TickSize; //how big the update tick should be during cache... (i.e. tick by this deltatime.. lower=more accurate)
 var config bool InterpolateView; //if garfield's interpolation rotator thing should be used in 1st person view
 
+var config bool bFixRypelCam; // enable hacks for RyphelCam (rotation and independent playback speed)
+
 //functions for easy reading:
 static function int ReDirectIndex(String ServerURL)
 {
@@ -289,4 +291,5 @@ defaultproperties
 	CacheSeconds=7.000000
 	TickSize=0.400000
 	InterpolateView=True
+	bFixRypelCam=True
 }

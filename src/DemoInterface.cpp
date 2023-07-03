@@ -24,6 +24,7 @@ IMPLEMENT_CLASS(UuDemoConnection);
 IMPLEMENT_CLASS(UuDemoPackageMap);
 IMPLEMENT_CLASS(Uudnative);
 IMPLEMENT_CLASS(UDReader);
+IMPLEMENT_CLASS(UStubPlayer);
 
 // Register names & functions
 #define NAMES_ONLY
@@ -430,6 +431,18 @@ void UDemoInterface::execSetSpeed (FFrame& Stack, RESULT_DECL)
 	if (PlayBackMode != 2) //not in NoFrameCap!
 		DemoSpec->Level->TimeDilation=newSpeed*(DemoDriver->RealDilation); //ratios own!
 	DemoDriver->Speed = newSpeed;
+	unguard;
+}
+
+/*-----------------------------------------------------------------------------
+	execGetStubPlayer - Return new instance for UStubPlayer
+-----------------------------------------------------------------------------*/
+void UDemoInterface::execGetStubPlayer(FFrame& Stack, RESULT_DECL)
+{
+	guard (UDemoInterface::execGetStubPlayer);
+	P_GET_OBJECT(UPlayer, Proxy);
+	P_FINISH;
+	*(UPlayer**)Result = new UStubPlayer(Proxy);
 	unguard;
 }
 

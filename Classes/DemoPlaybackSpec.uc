@@ -50,6 +50,12 @@ var Weapon OldWeapon;           // for sound hacking!
 var Ammo DummyAmmo;             // hack!
 var InterCeptHud h;
 var Actor OldViewTarget;
+var Player StubPlayer;          // Stub player used in PlayerLinked
+
+var int EndGameCam;
+const EGC_NotDetected = 0;
+const EGC_TrackViewTarget = 1;
+const EGC_Done = 2;
 
 // list for bOwnerNoSee actors hidden during render
 var Actor HideActors[16384];
@@ -89,7 +95,31 @@ var localized string LocServerDemosHaveNoPlayerRecorders;
 // =============================================================================
 
 exec function SloMo( float T ) {
+	local CHSpectator CamControl;
+	local float OldSpeed;
+	OldSpeed = Driver.MySpeed;
 	Driver.SetSpeed(T);
+	// hack for make rypelcam not dependent from changes speed
+	if (class'DemoSettings'.default.bFixRypelCam)
+		foreach AllActors(class'CHSpectator', CamControl)
+			if (CamControl.isA('CamControl'))
+				CamControl.TimerRate *= Driver.MySpeed/OldSpeed;
+}
+
+exec function SloMo2(string Point) {
+	local float T;
+	local string sign;
+	
+	T = float(Point);
+	sign = Mid(Point, 0, 1);
+	while (Right(Point, 1) == " ")
+		Point = Mid(Point, 0, Len(Point) - 1);
+	if (Right(Point, 1) == "%")
+		T = Driver.MySpeed*T/100.0;
+	if (sign == "+" || sign == "-")
+		T = FMax(0.0, Driver.MySpeed + T);
+		
+	SloMo(T);
 }
 
 exec function CurTime() {
@@ -123,6 +153,8 @@ exec function SeekTo(string Point) {
 		T = Driver.GetTotalTime()*T/100.0;
 	if (sign == "+" || sign == "-")
 		T = FMax(0.0, Driver.GetCurrentTime() + T);
+	if (T < Driver.GetCurrentTime())
+		EndGameCam = EGC_NotDetected;
 	SetSeek(T);
 }
 
@@ -628,6 +660,7 @@ function EndSeek()
 
 	CurTime();
 	Now();
+	Log(Level.TimeSeconds @ "EndSeek at" @ Driver.GetCurrentTime());
 
 	bSeeking=false;
 	lts=level.timeseconds;
@@ -703,7 +736,9 @@ state CheatFlying
 		if (Delta < 0)
 		{
 			Delta = -Delta;
-
+			// hack for turn off local update EyeHeight and use only replicated values
+			if (PlayerLinked != None)
+				PlayerLinked.BaseEyeHeight = PlayerLinked.EyeHeight;
 			return;
 		}
 
@@ -750,6 +785,7 @@ state CheatFlying
 			ClearHUD();
 			Driver.GotoFrame(SeekTime);
 			SeekTick = 3;
+			Driver.bFixLevelTime = True;
 			return;
 		}
 
@@ -769,6 +805,10 @@ state CheatFlying
 		// DLO Gameclass to get hud & sb
 		else if (PlayerLinked == None && HudType == None)
 			GenRef();
+		if (PlayerLinked != None && PlayerLinked.Player == None)
+			PlayerLinked.Player = StubPlayer;
+		if (PlayerLinked != None)
+			PlayerLinked.Disable('PlayerTick'); // for avoid ruin play by wrong local prediction
 	}
 	
 	// (Sp0ngeb0b)
@@ -973,6 +1013,30 @@ event PreRender( canvas Canvas )
 	// Keep cam on the player and call prerender on playerlinked (hax!)
 	if (PlayerLinked!=none)
 	{
+		if (SeekTick == 0)
+		{
+			if (EndGameCam == EGC_NotDetected && PlayerLinked.IsInState('GameEnded'))
+			{
+				EndGameCam = EGC_TrackViewTarget;
+				bLockOn = false;
+				ViewTarget = PlayerLinked.ViewTarget;
+				if (ViewTarget == None)
+					ViewTarget = PlayerLinked;
+				else
+					EndGameCam = EGC_Done;
+				ViewRotation = PlayerLinked.ViewRotation;
+				bBehindView = PlayerLinked.bBehindView;
+				GotoState('GameEnded'); // setup end cam
+				GotoState('CheatFlying'); // return back to our state
+			}
+			if (EndGameCam == EGC_TrackViewTarget)
+			{
+				if (ViewTarget == PlayerLinked && PlayerLinked.ViewTarget != None)
+					ViewTarget = PlayerLinked.ViewTarget;
+				if (ViewTarget != PlayerLinked)
+					EndGameCam = EGC_Done;
+			}
+		}
 		if (bLockOn)
 			SetLocation(PlayerLinked.Location);
 		oldRole=PlayerLinked.Role;
@@ -1140,7 +1204,14 @@ event PostRender( canvas Canvas )
 	local int i;
 	local float DamageTime, StatScale, X;
 	local vector HitLocation, HitNormal, StartTrace, EndTrace;
-	local actor Other;
+	local actor Other, OldViewTarget;
+	local CHSpectator CamControl;
+	
+	// hack for make rypelcam not dependent from changes speed
+	if (class'DemoSettings'.default.bFixRypelCam)
+		foreach AllActors(class'CHSpectator', CamControl)
+			if (CamControl.isA('CamControl') && CamControl.TimerCounter == 0.0)
+				CamControl.TimerRate *= Driver.MySpeed;
 
 	FixPRIArray();
 
@@ -1167,36 +1238,36 @@ event PostRender( canvas Canvas )
 		}
 	}
 
-	if (bLockOn)
+	if (PlayerLinked != None)
 	{
 		// (Added by Anth)
 		if (Scoring == None && ScoringType != None)
 		{
-			Scoring = Spawn(ScoringType,PlayerLinked);
-		if (Scoring != None)
+			Scoring = Spawn(ScoringType, PlayerLinked);
+			if (Scoring != None)
 				Scoring.OwnerHUD = myHUD;
 		}
 
-		PlayerLinked.bShowScores=bShowScores;
-		PlayerLinked.ScoringType=ScoringType;
-		PlayerLinked.Scoring=Scoring;
-		PlayerLinked.GameReplicationInfo=GameReplicationInfo; // hax!
+		PlayerLinked.bShowScores = bShowScores;
+		PlayerLinked.ScoringType = ScoringType;
+		PlayerLinked.Scoring = Scoring;
+		PlayerLinked.GameReplicationInfo = GameReplicationInfo; // hax!
 
-		if (PlayerLinked != none &&
-			WarheadLauncher(PlayerLinked.Weapon) != none &&
-			GuidedWarShell(PlayerLinked.ViewTarget) != none)
-		{		
+		if (WarheadLauncher(PlayerLinked.Weapon) != None && GuidedWarShell(PlayerLinked.ViewTarget) != None)
 			WarheadLauncher(PlayerLinked.Weapon).GuidedShell = GuidedWarShell(PlayerLinked.ViewTarget);
-		}
 
-		if (myhud!=none)
-			myhud.setowner(PlayerLinked);
-	}
-	if (PlayerLinked != None)
-	{
+		if (bLockOn && myHud != None)
+			myHud.setOwner(PlayerLinked);
+
 		PlayerLinked.Player = Player;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
 		if (ChallengeHUD(PlayerLinked.myHud) != None && PlayerLinked.myHud.PlayerOwner == None)
 			ChallengeHUD(PlayerLinked.myHud).HUDSetup(Canvas);
+			
+		OldViewTarget = PlayerLinked.ViewTarget;
+		if (ViewTarget != PlayerLinked)
+			PlayerLinked.ViewTarget = ViewTarget;
+		else
+			PlayerLinked.ViewTarget = None;
 	}
 
 	if (!bLockOn && Pawn(ViewTarget)!=none)
@@ -1273,15 +1344,18 @@ event PostRender( canvas Canvas )
 		PlayerReplicationInfo.bIsSpectator=true;
 
 	if (bLockOn)
-	{
-		ViewTarget=PlayerLinked; //heh.. hack
-		if (myhud!=none)
-			myhud.setowner(self);
-		PlayerLinked.Scoring=none;
-		PlayerLinked.ScoringType=none;
-	}
+		ViewTarget = PlayerLinked; //heh.. hack
 	if (PlayerLinked != None)
-		PlayerLinked.Player = None;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
+	{
+		if (myHud != none)
+			myHud.setOwner(self);
+		PlayerLinked.Scoring = None;
+		PlayerLinked.ScoringType = None;
+		
+		PlayerLinked.ViewTarget = OldViewTarget;
+		
+		PlayerLinked.Player = StubPlayer;   //UNCONSTED.. CANNOT COMPILE THIS CODE WITHOUT BYTEHACKING ENGINE.U!!!
+	}
 }
 
 // native call, maintain correct Z-offset
@@ -1289,7 +1363,7 @@ event UpdateEyeHeight(float DeltaTime)
 {
 	local vector x, y, z;
 	local PlayerPawn PP;
-	local bool bKeepZoom;
+	local bool bKeepZoom, bOldIsWalking;
 	local ENetRole OldRole;
 
 	Super.UpdateEyeHeight(DeltaTime);
@@ -1299,15 +1373,19 @@ event UpdateEyeHeight(float DeltaTime)
 		PP = PlayerPawn(ViewTarget.Owner);
 	if (PP != None) {
 		if (Level.Pauser == "") {
-			PP.EyeHeight = oldEyeH;
+			//PP.EyeHeight = oldEyeH;
 			PP.ViewShake(DeltaTime);
+			PP.ShakeVert = 0; // used replicated EyeHeight
 			//PP.UpdateEyeHeight(DeltaTime);
 			if (PP == ViewTarget && PP.Base != None && (PP.Mesh == None || PP.GetAnimGroup(PP.AnimSequence) != 'Dodge')) {
 				GetAxes(PP.Rotation,X,Y,Z);
+				bOldIsWalking = PP.bIsWalking;
+				PP.bIsWalking = true; // for suppress additional unwanted step sounds
 				OldRole = PP.Role;
 				PP.Role = ROLE_Authority; // hack for apply bob when spectate another players, not demo recorder
 				PP.CheckBob(DeltaTime, sqrt(PP.Velocity.X * PP.Velocity.X + PP.Velocity.Y * PP.Velocity.Y), Y);
 				PP.Role = OldRole;
+				PP.bIsWalking = bOldIsWalking;
 			} else {
 				PP.BobTime = 0;
 				PP.WalkBob = PP.WalkBob * (1 - FMin(1, 8 * DeltaTime));
@@ -1443,10 +1521,10 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
 			if (!bLockOn)
 				PlayerLinked.bBehindView = bBehindView;
 
-			PlayerLinked.EyeHeight = oldEyeH; //double hack
+			//PlayerLinked.EyeHeight = oldEyeH; //double hack
 			PlayerPawn(PTarget).PlayerCalcView(ViewActor,CameraLocation,CameraRotation); //utpure hack!
 			CameraLocation = PTarget.Location;
-			CameraLocation.z+=oldEyeH; //?
+			CameraLocation.z += PTarget.EyeHeight; //?
 			LastViewRot=CameraRotation;
 			return;
 		}
@@ -1456,8 +1534,16 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
 			   PlayerPawn(PTarget) != none)
 			{
 				// (Changed by Anth) Also calculate if viewtarget != demorecorder!!!
-				PlayerLinked.EyeHeight = oldEyeH; //double hack
+				//PlayerLinked.EyeHeight = oldEyeH; //double hack
 				PlayerPawn(PTarget).PlayerCalcView(ViewActor,CameraLocation,CameraRotation); //utpure hack!
+
+				// hack for fix RypelCam rotation
+				if (class'DemoSettings'.default.bFixRypelCam && CHSpectator(ViewTarget) != None && ViewTarget.Role == Role_Authority && 
+					(ViewTarget.isA('CamControl') || ViewTarget.isA('Viewer')))
+				{
+					CameraRotation = ViewTarget.Rotation;
+					delta = 0; // turn off interpolation
+				}
 
 				// Roll might not be 0 for non-recording viewtargets :o
 				if (PTarget != PlayerLinked)
@@ -1468,7 +1554,7 @@ event PlayerCalcView(out actor ViewActor, out vector CameraLocation, out rotator
 
 				TargetViewRotation=CameraRotation;
 				CameraLocation = PTarget.Location;
-				TargetEyeHeight=oldEyeH;
+				TargetEyeHeight = PTarget.EyeHeight;
 				ViewActor=ViewTarget;
 			}
 			else
@@ -1532,6 +1618,18 @@ function ClientVoiceMessage(PlayerReplicationInfo Sender, PlayerReplicationInfo 
 		Super.ClientVoiceMessage(Sender,Recipient,messagetype,messageID);
 }
 
+simulated event ClientHearSound (
+	actor Actor,
+	int Id,
+	sound S,
+	vector SoundLocation,
+	vector Parameters
+) 
+{ 
+	if (!bSeeking)
+		Super.ClientHearSound(Actor, Id, S, SoundLocation, Parameters);
+}
+
 //JOLT MESSAGE FILTERING (BASED ON TNSe's CODE!!!)
 //entry point of localized messages!
 function ReceiveLocalizedMessage( class<LocalMessage> Message, optional int Switch, optional PlayerReplicationInfo RelatedPRI_1, optional PlayerReplicationInfo RelatedPRI_2, optional Object OptionalObject )
@@ -1559,7 +1657,8 @@ function bool CheckMessage(class<LocalMessage> Message, int Swi, PlayerReplicati
 		case class'MultiKillMessage':
 			if (bLockOn||ViewTarget==PlayerLinked)
 				return true;
-			ClientMessage(RelatedPRI_1.PlayerName@"did a"@Class'MultiKillMessage'.static.GetString(Swi,RelatedPRI_1)); //lame msg thing!
+			if (!bSeeking)
+				ClientMessage(RelatedPRI_1.PlayerName@"did a"@Class'MultiKillMessage'.static.GetString(Swi,RelatedPRI_1)); //lame msg thing!
 			return false;
 		case class'DeathMessagePlus':
 		case class'EradicatedDeathMessage':
@@ -1575,7 +1674,8 @@ function bool CheckMessage(class<LocalMessage> Message, int Swi, PlayerReplicati
 			}
 			return true;
 		case Class'CTFMessage':
-			if (Swi == 0)
+			if (bSeeking); // ignore
+			else if (Swi == 0)
 				FlagCap(RelatedPRI_1); // Fix missing cap sound in demos
 			else if (Swi == 2)
 				FlagDrop(RelatedPRI_1);
@@ -1745,7 +1845,8 @@ function KillTime(PlayerReplicationInfo PRI, PlayerReplicationInfo PRI2)
 	{
 		// Spree time
 		ReceiveLocalizedMessage( class'KillingSpreeMessage', x-1, PRI, none );
-		ClientPlaySound(Class'KillingSpreeMessage'.Default.SpreeSound[x-1], ,True);
+		if (!bSeeking)
+			ClientPlaySound(Class'KillingSpreeMessage'.Default.SpreeSound[x-1], ,True);
 	}
 }
 
