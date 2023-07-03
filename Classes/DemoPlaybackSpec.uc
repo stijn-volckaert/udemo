@@ -107,6 +107,22 @@ exec function SloMo( float T ) {
 				CamControl.TimerRate *= Driver.MySpeed/OldSpeed;
 }
 
+exec function SloMo2(string Point) {
+	local float T;
+	local string sign;
+	
+	T = float(Point);
+	sign = Mid(Point, 0, 1);
+	while (Right(Point, 1) == " ")
+		Point = Mid(Point, 0, Len(Point) - 1);
+	if (Right(Point, 1) == "%")
+		T = Driver.MySpeed*T/100.0;
+	if (sign == "+" || sign == "-")
+		T = FMax(0.0, Driver.MySpeed + T);
+		
+	SloMo(T);
+}
+
 exec function CurTime() {
 	clientmessage(LocCurrentlyAt$" "$Driver.GetCurrentTime()$"s");
 }
