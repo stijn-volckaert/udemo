@@ -201,6 +201,8 @@ class UDEMO_API UStubPlayer : public UPlayer
 	{
 		guard(UStubPlayer::ReadInput);
 		CopyFromProxy();
+		if (DeltaSeconds > 0 && Actor && Actor->Role == ROLE_AutonomousProxy && Actor->Physics != PHYS_None)
+			Actor->performPhysics(DeltaSeconds);
 		unguard;
 	}
 
