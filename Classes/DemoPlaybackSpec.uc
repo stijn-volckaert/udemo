@@ -164,6 +164,18 @@ exec function FollowMyCam(bool Follow)
 	class'DemoSettings'.static.StaticSaveConfig();
 }
 
+exec function SmoothRecorderMovement(string In)
+{
+	if (In ~= "all")
+		class'DemoSettings'.default.SmoothRecorderMovement = Smooth_All;
+	else if (In ~= "3rdperson")
+		class'DemoSettings'.default.SmoothRecorderMovement = Smooth_3rdperson;
+	else
+		class'DemoSettings'.default.SmoothRecorderMovement = Smooth_None;
+	Driver.SmoothRecorderMovement = class'DemoSettings'.default.SmoothRecorderMovement;
+	class'DemoSettings'.static.StaticSaveConfig();
+}
+
 exec function TeamSay( string Msg ) {
 	Say(Msg);
 }

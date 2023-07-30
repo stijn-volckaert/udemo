@@ -442,7 +442,7 @@ void UDemoInterface::execGetStubPlayer(FFrame& Stack, RESULT_DECL)
 	guard (UDemoInterface::execGetStubPlayer);
 	P_GET_OBJECT(UPlayer, Proxy);
 	P_FINISH;
-	*(UPlayer**)Result = new UStubPlayer(Proxy);
+	*(UPlayer**)Result = new UStubPlayer(Proxy, this);
 	unguard;
 }
 

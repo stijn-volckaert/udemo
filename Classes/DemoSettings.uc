@@ -46,6 +46,8 @@ var config float CacheSeconds; //amount of seconds to cache for when jumping (i.
 var config float TickSize; //how big the update tick should be during cache... (i.e. tick by this deltatime.. lower=more accurate)
 var config bool InterpolateView; //if garfield's interpolation rotator thing should be used in 1st person view
 
+var config DemoInterface.ESmoothRecorderMovement SmoothRecorderMovement; //apply smooth for recorder movement via physics prediction, make playback smooth on low speed, but make it less precise and can introduce some glitches
+
 var config bool bFixRypelCam; // enable hacks for RyphelCam (rotation and independent playback speed)
 
 //functions for easy reading:
@@ -291,5 +293,6 @@ defaultproperties
 	CacheSeconds=7.000000
 	TickSize=0.400000
 	InterpolateView=True
+	SmoothRecorderMovement=Smooth_3rdperson
 	bFixRypelCam=True
 }

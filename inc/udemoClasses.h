@@ -98,6 +98,13 @@ public:
     NO_DEFAULT_CONSTRUCTOR(Uudnative)
 };
 
+enum ESmoothRecorderMovement
+{
+    Smooth_None             =0,
+    Smooth_3rdperson        =1,
+    Smooth_All              =2,
+    Smooth_MAX              =3,
+};
 
 struct UDemoInterface_eventNetPacketReceived_Parms
 {
@@ -116,6 +123,7 @@ public:
     BYTE PlayBackMode;
     BITFIELD bDoingMessagePlay:1 GCC_PACK(INT_ALIGNMENT);
     BITFIELD bFixLevelTime:1;
+    BYTE SmoothRecorderMovement GCC_PACK(INT_ALIGNMENT);
     FStringNoInit IllegalActors[20];
     BITFIELD bDebug:1;
     BITFIELD bAnthDebug:1;
@@ -202,6 +210,7 @@ VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,DemoSpec)
 VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,DemoDriver)
 VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,mySpeed)
 VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,PlayBackMode)
+VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,SmoothRecorderMovement)
 VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,IllegalActors)
 VERIFY_CLASS_SIZE_NODIE(UDemoInterface)
 #endif // VERIFY_CLASS_SIZES
