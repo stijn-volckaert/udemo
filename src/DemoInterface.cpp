@@ -261,19 +261,7 @@ void UDemoInterface::execJumpBack (FFrame& Stack, RESULT_DECL)
 
 	// (Anth) New uber hack here. This was fun to figure out.
 #if !BUILD_64
-	if (iVer > 436 && iVer < 469)
-	{
-		// Must be UTPG patch...
-		InPacketId		= (INT*)							( (DWORD)DemoDriver->ServerConnection + 0x0E68 );
-		OutPacketId		= (INT*)							( (DWORD)DemoDriver->ServerConnection + 0x0E6C );
-		OutAckPacketId	= (INT*)							( (DWORD)DemoDriver->ServerConnection + 0x0E70 );
-		Channels		= (UChannel**)						( (DWORD)DemoDriver->ServerConnection + 0x0E74 );
-		OutReliable		= (INT*)							( (DWORD)DemoDriver->ServerConnection + 0x1E70 );
-		InReliable		= (INT*)							( (DWORD)DemoDriver->ServerConnection + 0x2E6C );
-		OpenChannels	= (TArray<UChannel*>*)				( (DWORD)DemoDriver->ServerConnection + 0x3E80 );
-		ActorChannels	= (TMap<AActor*,UActorChannel*>*)	( (DWORD)DemoDriver->ServerConnection + 0x3E98 );
-	}
-	else if (iVer > 400 && iVer <= 436)
+	if ((iVer <= 400) || (iVer > 400 && iVer <= 436)) // with fallback on pre v400, just in case, for make compiler happy
 	{
 		// Standard v432 structures
 		InPacketId		= (INT*)							( (DWORD)DemoDriver->ServerConnection + 0x0E54 );
@@ -284,9 +272,9 @@ void UDemoInterface::execJumpBack (FFrame& Stack, RESULT_DECL)
 		InReliable		= (INT*)							( (DWORD)DemoDriver->ServerConnection + 0x2E58 );
 		OpenChannels	= (TArray<UChannel*>*)				( (DWORD)DemoDriver->ServerConnection + 0x3E6C );
 		ActorChannels	= (TMap<AActor*,UActorChannel*>*)	( (DWORD)DemoDriver->ServerConnection + 0x3E84 );
-	}
-	else if (iVer >= 469)
+	} else if ((iVer > 436 && iVer < 469) || (iVer >= 469) || true) // for make compiler happy
 	{
+		// Must be UTPG patch... (iVer < 469)
 		// Anth: after calculating all of the new offsets, I realized they're identical to the UTPG patches :D
 		InPacketId		= (INT*)							( (DWORD)DemoDriver->ServerConnection + 0x0E68 );
 		OutPacketId		= (INT*)							( (DWORD)DemoDriver->ServerConnection + 0x0E6C );
