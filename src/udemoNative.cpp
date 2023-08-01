@@ -24,6 +24,7 @@ UudnativeNativeInfo GudemoUudnativeNatives[] =
 {
 	MAP_NATIVE(Uudnative, execDispatchTick)
 	MAP_NATIVE(Uudnative, execDemoRead)
+	MAP_NATIVE(Uudnative, execSetDemoDriverClass)
 	MAP_NATIVE(Uudnative, execIsMisMatch)
 	MAP_NATIVE(Uudnative, execGUIDString)
 	MAP_NATIVE(Uudnative, execDemoActive)
@@ -34,13 +35,13 @@ UudnativeNativeInfo GudemoUudnativeNatives[] =
 	MAP_NATIVE(Uudnative, execRename)
 	MAP_NATIVE(Uudnative, execkill)
 	MAP_NATIVE(Uudnative, execgetdemo)
-	MAP_NATIVE(Uudnative, execSetDemoDriverClass)
 	{NULL, NULL}
 };
 IMPLEMENT_NATIVE_HANDLER(udemo, Uudnative);
 
 UDemoInterfaceNativeInfo GudemoUDemoInterfaceNatives[] =
 {
+	MAP_NATIVE(UDemoInterface, execGetStubPlayer)
 	MAP_NATIVE(UDemoInterface, execGetStartTime)
 	MAP_NATIVE(UDemoInterface, execSetPlayBackMode)
 	MAP_NATIVE(UDemoInterface, execIsPaused)
