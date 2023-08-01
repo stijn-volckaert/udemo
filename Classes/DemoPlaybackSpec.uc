@@ -1072,7 +1072,7 @@ event RenderOverLays(Canvas Canvas)
 	// (Added by Anth)
 	local bool bWasHidden;
 	local rotator CamRot;
-	local vector CamLoc,newLoc,nLoc;
+	local vector CamLoc,newLoc,nLoc, OldLoc;
 	local ENetRole oldRole;
 	local Actor Dummy;
 	local bool bFollowingProjectile;
@@ -1089,6 +1089,7 @@ event RenderOverLays(Canvas Canvas)
 	// render a "new" weapon
 	if (PlayerPawn(ViewTarget) != None && !bBehindview)
 	{
+		OldLoc = PlayerPawn(ViewTarget).Location;
 		// Uber uber hack!!! This will fix the weird
 		// weapon bobs that occur at high speed collisions
 		PlayerPawn(ViewTarget).bCollideWorld = false;
@@ -1145,13 +1146,10 @@ event RenderOverLays(Canvas Canvas)
 			NewLoc+=(OldEyeH-PlayerPawn(ViewTarget).EyeHeight)*vect(0,0,1);			
 		}
 
-		// Set the location, Only if not paused!
-		// Will cause camera to float away if we do it while paused as well
-		if (Level != None && (Level.Pauser == "" || bFollowingProjectile)) {
-			if (PlayerPawn(ViewTarget).Weapon != None) // Apply WalkBob
-				NewLoc -= PlayerPawn(ViewTarget).WalkBob;
-			PlayerPawn(ViewTarget).SetLocation(NewLoc);
-		}
+		// Set the location, 
+		if (PlayerPawn(ViewTarget).Weapon != None) // Apply WalkBob
+			NewLoc -= PlayerPawn(ViewTarget).WalkBob;
+		PlayerPawn(ViewTarget).SetLocation(NewLoc);
 
 		// Reset PlayerLinked.Role
 		PlayerPawn(ViewTarget).Role=oldRole;
@@ -1190,8 +1188,8 @@ event RenderOverLays(Canvas Canvas)
 			PlayerPawn(ViewTarget).myHUD.renderoverlays(canvas);
 
 		// Restore loc...
-		if (Level != None && (Level.Pauser == "" || bFollowingProjectile))
-			PlayerPawn(ViewTarget).SetLocation(nLoc);
+		if (PlayerPawn(ViewTarget).Location != OldLoc)
+			PlayerPawn(ViewTarget).SetLocation(OldLoc);
 
 		// Reset bHideWeapon if needed
 		if (bWasHidden)
