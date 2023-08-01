@@ -1142,7 +1142,7 @@ event RenderOverLays(Canvas Canvas)
 			nLoc=NewLoc;
 
 			// Adjust EyeHeight
-			NewLoc+=(OldEyeH-PlayerPawn(ViewTarget).EyeHeight)*vect(0,0,1);			
+			//NewLoc+=(OldEyeH-PlayerPawn(ViewTarget).EyeHeight)*vect(0,0,1);
 		}
 
 		// Set the location, Only if not paused!
