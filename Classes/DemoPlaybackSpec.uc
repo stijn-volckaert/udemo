@@ -1322,7 +1322,7 @@ event PostRender( canvas Canvas )
 		StartTrace = PlayerLinked.Location;
 		StartTrace.Z += PlayerLinked.BaseEyeHeight;
 		EndTrace = StartTrace + vector(PlayerLinked.ViewRotation)*10000.0;
-		Other = Trace(HitLocation, HitNormal, EndTrace, StartTrace, true);
+		Other = PlayerLinked.Trace(HitLocation, HitNormal, EndTrace, StartTrace, true);
 
 		if (Pawn(Other) != None && !Other.bHidden )
 			for (i = 0; i < ArrayCount(PInfo); i++)
