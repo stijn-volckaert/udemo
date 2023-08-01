@@ -97,6 +97,7 @@ v3.6.0:
 * [FIXED] Camera look during crouch and feign death in first-person view
 * [FIXED] Game time broke after SeekTo
 * [FIXED] Not precise demo play in frame-based mode on high FPS
+* [FIXED] Show own nickname in HUD in some cases, like walk on stairs or slopes
 * [ADDED] "Cancel" button in the dialog for files mismatch and allow anyway try play demo
 * [ADDED] Camera can be moved during pause, however, for use mouse look you must use fullscreen mode
 * [ADDED] SeekTo command now accept relative values (use "+" or "-" before number) and/or percentage values (use "%" after number)
