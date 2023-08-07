@@ -98,9 +98,12 @@ v3.6.0:
 * [FIXED] Game time broke after SeekTo
 * [FIXED] Not precise demo play in frame-based mode on high FPS
 * [FIXED] Show own nickname in HUD in some cases, like walk on stairs or slopes
+* [FIXED] Game stuck on SeekTo in some cases
+* [FIXED] Jerking movement on slomo for recorder player
+* [FIXED] NewNet/UTPure broken view rotation/weapon position
 * [ADDED] "Cancel" button in the dialog for files mismatch and allow anyway try play demo
 * [ADDED] Camera can be moved during pause, however, for use mouse look you must use fullscreen mode
-* [ADDED] SeekTo command now accept relative values (use "+" or "-" before number) and/or percentage values (use "%" after number)
+* [ADDED] SeekTo command now accept relative values (use "+" or "-" before number) and/or percentage values (use "%" after number), and/or hours/minutes values (like `1:42` or `1:8:37`)
 * [ADDED] Command "SetPauseText", which allow alter or hide pause message:
 	SetPauseText hide - hide pause message
 	SetPauseText Some text - make pause message as "Some text"
@@ -204,7 +207,7 @@ report bugs.
 
 Playback {0/1/2} - Switch to specified demo playback mode: 0 = timebased, 1 = framebased, 2 = noframecap.
 SloMo speed - Change demo playback speed. Accept only absolute decimal value, like 0.1 0.5 1.0 2.0 and so on. 1.0 is normal speed.
-SloMo2 [+/-]speed[%] - Change demo playback speed. Accept absolute decimal value, relative decimal value (use "+" or "-" before number) and/or percentage values (use "%" after number).
+SloMo2 [+/-]speed[%] - Change demo playback speed. Accept absolute decimal value, relative decimal value (use "+" or "-" before number) and/or percentage values (use "%" after number). Can specify speed with minutes or hours like `1:42` or `1:8:36`.
 CurTime - Show current time position in the demo.
 CurFrame - Show current frame position in the demo
 TotalTime - Snow total time in the demo
