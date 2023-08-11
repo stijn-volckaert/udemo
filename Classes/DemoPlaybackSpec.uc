@@ -751,6 +751,14 @@ state CheatFlying
 			// hack for turn off local update EyeHeight and use only replicated values
 			if (PlayerLinked != None)
 				PlayerLinked.BaseEyeHeight = PlayerLinked.EyeHeight;
+				
+			// Hack for solve fuck up by UTPure and NewNet (replicate ViewRotation with set yaw and pitch to random values)
+			if (PlayerLinked.isA('bbPlayer'))
+			{
+				PlayerLinked.PlayerCalcView(Cam, CamLoc, CamRot);
+				if (Cam == PlayerLinked)
+					PlayerLinked.ViewRotation = CamRot;
+			}
 			return;
 		}
 
@@ -1377,6 +1385,7 @@ event UpdateEyeHeight(float DeltaTime)
 	local PlayerPawn PP;
 	local bool bKeepZoom, bOldIsWalking;
 	local ENetRole OldRole;
+	local rotator OldViewRot;
 
 	Super.UpdateEyeHeight(DeltaTime);
 
@@ -1386,7 +1395,10 @@ event UpdateEyeHeight(float DeltaTime)
 	if (PP != None) {
 		if (Level.Pauser == "") {
 			//PP.EyeHeight = oldEyeH;
+			OldViewRot = PP.ViewRotation; // Hack for solve fuck up by UTPure and NewNet (set yaw and pitch to random values)
 			PP.ViewShake(DeltaTime);
+			OldViewRot.Roll = PP.ViewRotation.Roll; // use only actually changed value
+			PP.ViewRotation = OldViewRot; // restore all back
 			PP.ShakeVert = 0; // used replicated EyeHeight
 			//PP.UpdateEyeHeight(DeltaTime);
 			if (PP == ViewTarget && PP.Base != None && (PP.Mesh == None || PP.GetAnimGroup(PP.AnimSequence) != 'Dodge')) {
