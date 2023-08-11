@@ -1683,6 +1683,13 @@ function ReceiveLocalizedMessage( class<LocalMessage> Message, optional int Swit
 		Super.ReceiveLocalizedMessage(Message,Switch,RelatedPRI_1,RelatedPRI_2,OptionalObject);
 }
 
+function Pawn GetPawnOwner(Actor Actor)
+{
+	while (Pawn(Actor) == None && Actor != None)
+		Actor = Actor.Owner;
+	return Pawn(Actor);
+}
+
 //message handler: boolean is only used for "local player" type messages
 function bool CheckMessage(class<LocalMessage> Message, int Swi, PlayerReplicationInfo RelatedPRI_1, PlayerReplicationInfo RelatedPRI_2, Object OptionalObject)
 {
@@ -1697,9 +1704,9 @@ function bool CheckMessage(class<LocalMessage> Message, int Swi, PlayerReplicati
 		case class'ItemMessagePlus':
 		case class'PickupMessagePlus':
 		case class'KillerMessagePlus':
-			return (bLockOn||ViewTarget==PlayerLinked);
+			return (bLockOn || GetPawnOwner(ViewTarget) == PlayerLinked);
 		case class'MultiKillMessage':
-			if (bLockOn||ViewTarget==PlayerLinked)
+			if (bLockOn || GetPawnOwner(ViewTarget) == PlayerLinked)
 				return true;
 			if (!bSeeking)
 				ClientMessage(RelatedPRI_1.PlayerName@"did a"@Class'MultiKillMessage'.static.GetString(Swi,RelatedPRI_1)); //lame msg thing!
@@ -1823,7 +1830,8 @@ function Suicidal(PlayerReplicationInfo DumbGuy)
 function KillTime(PlayerReplicationInfo PRI, PlayerReplicationInfo PRI2)
 {
 	local int x;
-	local UDPlayerInfo P,P2;
+	local UDPlayerInfo P, P2;
+	local Pawn ViewTargetOwner;
 
 	if (PRI == None || PRI2 == None)
 		return;
@@ -1833,43 +1841,44 @@ function KillTime(PlayerReplicationInfo PRI, PlayerReplicationInfo PRI2)
 
 	if (P == None || P2 == None)
 	{
-		Log("DemoPlaybackSpec.KillTime(): Failed to get DEPI!",'udemo');
+		Log("DemoPlaybackSpec.KillTime(): Failed to get DEPI!", 'udemo');
 		return;
 	}
 
 	//check for you killed/killed by.. whatever
-	if (!bSeeking&&Pawn(ViewTarget)!=none && !bLockOn && PlayerLinked!=ViewTarget &&
-		Pawn(ViewTarget).PlayerReplicationInfo!=none)
+	if (!bSeeking)
+		ViewTargetOwner = GetPawnOwner(ViewTarget);
+	if (!bSeeking && ViewTargetOwner != None && !bLockOn && PlayerLinked != ViewTargetOwner &&
+		ViewTargetOwner.PlayerReplicationInfo != None)
 	{
-		if (Pawn(ViewTarget).PlayerReplicationInfo==PRI2)
-			myHUD.LocalizedMessage( class'VictimMessage', 0, PRI, PRI2 );
-		else if (Pawn(ViewTarget).PlayerReplicationInfo==PRI&&myhud!=none)
-			myHUD.LocalizedMessage( Class'KillerMessagePlus', 0, PRI, PRI2);
+		if (ViewTargetOwner.PlayerReplicationInfo == PRI2)
+			myHUD.LocalizedMessage(Class'VictimMessage', 0, PRI, PRI2);
+		else if (ViewTargetOwner.PlayerReplicationInfo == PRI && myHUD != None)
+			myHUD.LocalizedMessage(Class'KillerMessagePlus', 0, PRI, PRI2);
 	}
 
 	// Did you just end someones spree?
-	if (P2.Spree > 4 && PlayerLinked==none)
-		ReceiveLocalizedMessage( class'KillingSpreeMessage', 0, PRI2, PRI );
+	if (P2.Spree > 4 && PlayerLinked == None)
+		ReceiveLocalizedMessage(class'KillingSpreeMessage', 0, PRI2, PRI);
 
 	P2.Spree = 0;
 	P2.MultiLevel = 0;
 	P2.LastKillTime = 0.0;
 
 	// MultiKillCheck
-	if (!bseeking && (Level.TimeSeconds - P.LastKillTime) < 3.0)
+	if (!bSeeking && (Level.TimeSeconds - P.LastKillTime) < 3.0)
 	{
-		if (PlayerLinked==none||PlayerLinked.PlayerReplicationInfo!=PRI)
+		if (PlayerLinked == none || PlayerLinked.PlayerReplicationInfo != PRI)
 		{
-			if (!bLockOn&&pawn(ViewTarget)!=none&&Pawn(ViewTarget).PlayerREplicationInfo==PRI)
-				Class'MultiKillMessage'.Static.ClientReceive(self,++P.MultiLevel,PRI);
+			if (!bLockOn&&pawn(ViewTarget) != None && Pawn(ViewTarget).PlayerREplicationInfo == PRI)
+				Class'MultiKillMessage'.Static.ClientReceive(self, ++P.MultiLevel, PRI);
 			else
-				ClientMessage(PRI.PlayerName@"did a"@Class'MultiKillMessage'.static.GetString(++P.MultiLevel,PRI)); //lame msg thing!
+				ClientMessage(PRI.PlayerName @ "did a" @ 
+					Class'MultiKillMessage'.static.GetString(++P.MultiLevel, PRI)); //lame msg thing!
 		}
 	}
 	else
-	{
 		P.MultiLevel = 0; // More than 3 seconds since last kill, reset.
-	}
 
 	P.LastKillTime = Level.TimeSeconds;
 
@@ -1877,20 +1886,20 @@ function KillTime(PlayerReplicationInfo PRI, PlayerReplicationInfo PRI2)
 	x = 0;
 	switch(++P.Spree)
 	{
-		case 25:x++;
-		case 20:x++;
-		case 15:x++;
-		case 10:x++;
-		case 5 :x++;
-		break;
+		case 25: x++;
+		case 20: x++;
+		case 15: x++;
+		case 10: x++;
+		case 5 : x++;
+			break;
 	}
 
-	if (x > 0 && PlayerLinked==none)
+	if (x > 0 && PlayerLinked == None)
 	{
 		// Spree time
-		ReceiveLocalizedMessage( class'KillingSpreeMessage', x-1, PRI, none );
+		ReceiveLocalizedMessage(class'KillingSpreeMessage', x - 1, PRI, none);
 		if (!bSeeking)
-			ClientPlaySound(Class'KillingSpreeMessage'.Default.SpreeSound[x-1], ,True);
+			ClientPlaySound(Class'KillingSpreeMessage'.Default.SpreeSound[x - 1], , True);
 	}
 }
 
