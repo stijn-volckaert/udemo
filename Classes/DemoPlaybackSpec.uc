@@ -1803,7 +1803,8 @@ function KillTime(PlayerReplicationInfo PRI, PlayerReplicationInfo PRI2)
 	}
 
 	//check for you killed/killed by.. whatever
-	ViewTargetOwner = GetPawnOwner(ViewTarget);
+	if (!bSeeking)
+		ViewTargetOwner = GetPawnOwner(ViewTarget);
 	if (!bSeeking && ViewTargetOwner != None && !bLockOn && PlayerLinked != ViewTargetOwner &&
 		ViewTargetOwner.PlayerReplicationInfo != None)
 	{
