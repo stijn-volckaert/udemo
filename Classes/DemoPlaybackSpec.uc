@@ -142,10 +142,31 @@ exec function StartTime() {
 	clientmessage(LocDemoInitialTimestamp$" "$Driver.GetStartTime());
 }
 
+function float GetFloat(string Str)
+{
+	local float T;
+	local int sign, pos;
+	
+	T = float(Str);
+	if (T < 0)
+		sign = -1;
+	else
+		sign = 1;
+	while (true)
+	{
+		pos = InStr(Str, ":");
+		if (pos == -1)
+			break;
+		Str = Mid(Str, pos + 1);
+		T = T*60 + float(Str)*sign;
+	}
+	return T;
+}
+
 exec function SeekTo(string Point) {
 	local float T;
 	local string sign;
-	T = float(Point);
+	T = GetFloat(Point);
 	sign = Mid(Point, 0, 1);
 	while (Right(Point, 1) == " ")
 		Point = Mid(Point, 0, Len(Point) - 1);
