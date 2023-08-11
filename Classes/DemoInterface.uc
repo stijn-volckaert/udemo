@@ -20,6 +20,13 @@ var const float mySpeed; //current speed of demo
 var const byte PlayBackMode; //current playback mode
 var const bool bDoingMessagePlay; //if true, no rendering is taking place.  This is only for message grabbing!
 var const bool bFixLevelTime; // if true, need rollback time spent to seek
+enum ESmoothRecorderMovement
+{
+	Smooth_None,
+	Smooth_3rdperson,
+	Smooth_All
+};
+var ESmoothRecorderMovement SmoothRecorderMovement; // propagate setting from DemoSettings
 
 // (Anth) Destroying illegal actors is native now (because of serverside demos)
 var config string IllegalActors[20];
@@ -103,6 +110,7 @@ event LinkToPlayer (PlayerPawn p, bool LockOn)
 		
 	if (p != None && p.Player == None)
 	{
+		SmoothRecorderMovement = class'DemoSettings'.default.SmoothRecorderMovement;
 		if (DemoPlaybackSpec(DemoSpec).StubPlayer == None)
 			DemoPlaybackSpec(DemoSpec).StubPlayer = GetStubPlayer(DemoSpec.Player);
 		p.Player = DemoPlaybackSpec(DemoSpec).StubPlayer;

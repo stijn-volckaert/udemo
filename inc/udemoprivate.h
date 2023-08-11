@@ -164,11 +164,13 @@ class UDEMO_API UStubPlayer : public UPlayer
 	DECLARE_CLASS(UStubPlayer, UPlayer, CLASS_Transient, udemo)
 
 	UPlayer* Proxy;
+	UDemoInterface* Interface;
 
-	UStubPlayer(){}
+	UStubPlayer(): Proxy(NULL), Interface(NULL) {}
 
-	UStubPlayer(UPlayer* InProxy):
-		Proxy(InProxy)
+	UStubPlayer(UPlayer* InProxy, UDemoInterface* InInterface):
+		Proxy(InProxy),
+		Interface(InInterface)
 	{
 		guard(UStubPlayer::UStubPlayer);
 		CopyFromProxy();
@@ -201,6 +203,43 @@ class UDEMO_API UStubPlayer : public UPlayer
 	{
 		guard(UStubPlayer::ReadInput);
 		CopyFromProxy();
+
+		// apply smooth movement via perform physics as prediction
+		if (Interface && Interface->SmoothRecorderMovement != Smooth_None && 
+			DeltaSeconds > 0 && Actor && Actor->Role == ROLE_AutonomousProxy && Actor->Physics != PHYS_None &&
+			//HIWORD(GetKeyState(VK_SHIFT)) && // dbg: apply only when hold SHIFT
+			Actor->Level && Actor->Level->Pauser == TEXT("") && // ignore pause
+			// detect if we need apply it in first person view
+			(Interface->SmoothRecorderMovement == Smooth_All || !Proxy || !Proxy->Actor || Proxy->Actor->ViewTarget != Actor || Proxy->Actor->bBehindView))
+		{
+			Actor->Role = ROLE_DumbProxy; // hack for avoid call scripts events, produce unwanted sounds and so on
+			const UBOOL bCollideWorld = Actor->bCollideWorld;
+			Actor->bCollideWorld = TRUE; // avoid prediction goes inside level geometry
+			const BYTE Physics = Actor->Physics;
+			if (Actor->Velocity.Z != 0 && Actor->Physics == PHYS_Walking) // PHYS_Walking ALWAYS mean Velocity.Z == 0
+				Actor->Physics = PHYS_Falling;
+			AActor* Base = Actor->Base;
+			// hack for avoid prediction fall from ledges
+			const UBOOL bCanJump = Actor->bCanJump;
+			Actor->bCanJump = FALSE;
+			const UBOOL bAvoidLedges = Actor->bAvoidLedges;
+			Actor->bAvoidLedges = TRUE;
+			const UBOOL bStopAtLedges = Actor->bStopAtLedges;
+			Actor->bStopAtLedges = TRUE;
+			const UBOOL bIsWalking = Actor->bIsWalking;
+			Actor->bIsWalking = TRUE;
+
+			Actor->performPhysics(DeltaSeconds);
+
+			Actor->Role = ROLE_AutonomousProxy;
+			Actor->bCollideWorld = bCollideWorld;
+			Actor->Physics = Physics; // direct assign for avoid call setbase 
+			Actor->Base = Base; // direct assign for avoid call events
+			Actor->bCanJump = bCanJump;
+			Actor->bAvoidLedges = bAvoidLedges;
+			Actor->bStopAtLedges = bStopAtLedges;
+			Actor->bIsWalking = bIsWalking;
+		}
 		unguard;
 	}
 
