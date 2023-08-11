@@ -178,7 +178,7 @@ void UDemoInterface::execReadCache (FFrame& Stack, RESULT_DECL)
 	P_GET_FLOAT(TimeTo);
 	P_GET_FLOAT(inc); //increment
 	P_FINISH;
-	FTime Res;
+	FTime Res, LastTime(0.0);
 	BYTE Done = 0;
 
 	// Assertions
@@ -189,11 +189,12 @@ void UDemoInterface::execReadCache (FFrame& Stack, RESULT_DECL)
 	DemoDriver->bNoTick=true;
 
 	// Looping until diff between TimeTo and ServerPacketTime is less than inc
-	while(!Done)
+	while (!Done)
 	{
 		Res = DemoDriver->ReadTo(DemoDriver->ServerPacketTime + inc);
-		if (TimeTo-Res.GetFloat()<inc)
+		if (TimeTo - Res.GetFloat() < inc || Res == LastTime)
 			Done = 1;
+		LastTime = Res;
 		guard(ActorTick);
 		DemoSpec->GetLevel()->Tick( LEVELTICK_All, DemoDriver->RealDilation*inc );
 		unguard;
