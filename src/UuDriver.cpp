@@ -50,7 +50,7 @@ INT UuDemoDriver::Exec( const TCHAR* Cmd, FOutputDevice& Ar )
 	FString MyDemo = *DemoFilename;
 	FString RenameTo;
 
-	if (ParseCommand(&MyCmd, TEXT("STOPDEMO")))
+	if (!ServerConnection && ParseCommand(&MyCmd, TEXT("STOPDEMO")))
 	{
 		ParseToken(MyCmd, RenameTo, 0);
 		if (RenameTo.Len() > 0 && RenameTo.Right(4) != TEXT(".dem"))
