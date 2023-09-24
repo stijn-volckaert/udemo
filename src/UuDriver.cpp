@@ -41,6 +41,36 @@ void UuDemoDriver::StaticConstructor()
 	unguard;
 }
 
+INT UuDemoDriver::Exec( const TCHAR* Cmd, FOutputDevice& Ar )
+{
+	guard(UuDemoDriver::Exec);
+
+	FString CmdCopy = Cmd;
+	const TCHAR* MyCmd = *CmdCopy;
+	FString MyDemo = *DemoFilename;
+	FString RenameTo;
+
+	if (!ServerConnection && ParseCommand(&MyCmd, TEXT("STOPDEMO")))
+	{
+		ParseToken(MyCmd, RenameTo, 0);
+		if (RenameTo.Len() > 0 && RenameTo.Right(4) != TEXT(".dem"))
+			RenameTo += TEXT(".dem");
+	}
+
+	INT Ret = UDemoRecDriver::Exec(Cmd, Ar);
+
+	if (Ret == 1 && MyDemo.Len() > 0 && RenameTo.Len() > 0)
+	{
+		UBOOL Success = GFileManager->Move(*RenameTo, *MyDemo, 1, 1, 1);
+		FString Log = FString::Printf(TEXT("Rename: %s -> %s - Success: %d"), *MyDemo, *RenameTo, Success);
+		GLog->Log(Log);
+		Ar.Log(Log);
+	}
+
+	return Ret;
+	unguard;
+}
+
 /*-----------------------------------------------------------------------------
 	TimeSync - (Anth) Synchronizes time between demo and game after every packet
 	read from the demo! Also works while seeking/slomo and when the game is paused

@@ -101,6 +101,9 @@ class UDEMO_API UuDemoDriver : public UDemoRecDriver
 	UBOOL Seeking;					// ignore bNetTemporary actors when seeking
 	DOUBLE AccumulatedTime;
 	UuDemoDriver();
+
+	// FExec interface.
+	INT Exec( const TCHAR* Cmd, FOutputDevice& Ar=*GLog );
 	
 	//custom tick to support time control
 	void TickDispatch( FLOAT DeltaTime );
