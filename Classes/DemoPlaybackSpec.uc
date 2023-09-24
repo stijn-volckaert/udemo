@@ -1693,6 +1693,9 @@ function Pawn GetPawnOwner(Actor Actor)
 //message handler: boolean is only used for "local player" type messages
 function bool CheckMessage(class<LocalMessage> Message, int Swi, PlayerReplicationInfo RelatedPRI_1, PlayerReplicationInfo RelatedPRI_2, Object OptionalObject)
 {
+	// prevent appear empty lines in HUD kill messages
+	if (Message != None && Message.Name == 'PureHitSound' && Message.static.GetString(Swi, RelatedPRI_1, RelatedPRI_2, OptionalObject) == "")
+		return false;
 	Switch(Message)
 	{
 		//hud does this anyway! - (Anth) Pure hud doesn't
