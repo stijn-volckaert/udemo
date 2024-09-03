@@ -66,8 +66,10 @@ function NotifyLevelChange()
 	bIsPlaying = (Udemo.DemReader.DemoActive(GetPlayerOwner().XLevel) > 0);
 
 	// Where else would you get the playername eh?
-	if (GetPlayerOwner().PlayerReplicationInfo != None)
-		GetPlayerOwner().PlayerReplicationInfo.PlayerName = GetPlayerOwner().GetDefaultURL("name");
+	// Turn off, since effectively erase any PlayerName corrections.
+	// See https://github.com/OldUnreal/UnrealTournamentPatches/issues/1623
+	//if (GetPlayerOwner().PlayerReplicationInfo != None)
+		//GetPlayerOwner().PlayerReplicationInfo.PlayerName = GetPlayerOwner().GetDefaultURL("name");
 
 	// Check if we have to start the demorec!
 	// (Anth) Added option to prevent recording when spectating
