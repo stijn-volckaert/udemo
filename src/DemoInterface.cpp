@@ -314,13 +314,12 @@ void UDemoInterface::execJumpBack (FFrame& Stack, RESULT_DECL)
 
 				Channels[i]->Connection = DemoDriver->ServerConnection;
 				Channels[i]->Close();
-				Channels[i]->ConditionalDestroy();
 
 				if (Channels[i])
 				{
 					Channels[i]->Connection = DemoDriver->ServerConnection;
 					delete Channels[i];
-					Channels[i] = 0;
+					Channels[i] = NULL;
 				}
 			}
 			// Reset control channel
@@ -337,7 +336,7 @@ void UDemoInterface::execJumpBack (FFrame& Stack, RESULT_DECL)
 		{
 			InReliable[i]	= 0;
 			OutReliable[i]	= 0;
-			Channels[i]		= 0;
+			Channels[i]		= NULL;
 		}
 	}
 
