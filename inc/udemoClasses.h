@@ -23,6 +23,63 @@ AUTOGENERATE_NAME(NetPacketReceived)
 
 #ifndef NAMES_ONLY
 
+enum ESmoothRecorderMovement
+{
+    Smooth_None             =0,
+    Smooth_3rdperson        =1,
+    Smooth_All              =2,
+    Smooth_MAX              =3,
+};
+
+struct UDemoInterface_eventNetPacketReceived_Parms
+{
+};
+struct UDemoInterface_eventLinkToPlayer_Parms
+{
+    class APlayerPawn* P;
+    BITFIELD LockOn;
+};
+class UDEMO_API UDemoInterface : public UObject
+{
+public:
+    class APlayerPawn* DemoSpec;
+    class UuDemoDriver* DemoDriver;
+    FLOAT mySpeed;
+    BYTE PlayBackMode;
+    BITFIELD bDoingMessagePlay:1 GCC_PACK(INT_ALIGNMENT);
+    BITFIELD bFixLevelTime:1;
+    BYTE SmoothRecorderMovement GCC_PACK(INT_ALIGNMENT);
+    FStringNoInit IllegalActors[20];
+    BITFIELD bDebug:1;
+    BITFIELD bAnthDebug:1;
+    DECLARE_FUNCTION(execGetStubPlayer);
+    DECLARE_FUNCTION(execGetStartTime);
+    DECLARE_FUNCTION(execSetPlayBackMode);
+    DECLARE_FUNCTION(execIsPaused);
+    DECLARE_FUNCTION(execPauseDemo);
+    DECLARE_FUNCTION(execGetTotalFrames);
+    DECLARE_FUNCTION(execGetCurrentFrame);
+    DECLARE_FUNCTION(execGetTotalTime);
+    DECLARE_FUNCTION(execGetCurrentTime);
+    DECLARE_FUNCTION(execReadCache);
+    DECLARE_FUNCTION(execReadTo);
+    DECLARE_FUNCTION(execJumpBack);
+    DECLARE_FUNCTION(execSetSpeed);
+    void eventNetPacketReceived()
+    {
+        ProcessEvent(FindFunctionChecked(UDEMO_NetPacketReceived),NULL);
+    }
+    void eventLinkToPlayer(class APlayerPawn* P, BITFIELD LockOn)
+    {
+        UDemoInterface_eventLinkToPlayer_Parms Parms;
+        Parms.P=P;
+        Parms.LockOn=((LockOn) ? FIRST_BITFIELD : 0);
+        ProcessEvent(FindFunctionChecked(UDEMO_LinkToPlayer),&Parms);
+    }
+    DECLARE_CLASS(UDemoInterface,UObject,0|CLASS_Config,udemo)
+    NO_DEFAULT_CONSTRUCTOR(UDemoInterface)
+};
+
 
 class UDEMO_API UUZHandler : public UObject
 {
@@ -98,65 +155,21 @@ public:
     NO_DEFAULT_CONSTRUCTOR(Uudnative)
 };
 
-enum ESmoothRecorderMovement
-{
-    Smooth_None             =0,
-    Smooth_3rdperson        =1,
-    Smooth_All              =2,
-    Smooth_MAX              =3,
-};
-
-struct UDemoInterface_eventNetPacketReceived_Parms
-{
-};
-struct UDemoInterface_eventLinkToPlayer_Parms
-{
-    class APlayerPawn* P;
-    BITFIELD LockOn;
-};
-class UDEMO_API UDemoInterface : public UObject
-{
-public:
-    class APlayerPawn* DemoSpec;
-    class UuDemoDriver* DemoDriver;
-    FLOAT mySpeed;
-    BYTE PlayBackMode;
-    BITFIELD bDoingMessagePlay:1 GCC_PACK(INT_ALIGNMENT);
-    BITFIELD bFixLevelTime:1;
-    BYTE SmoothRecorderMovement GCC_PACK(INT_ALIGNMENT);
-    FStringNoInit IllegalActors[20];
-    BITFIELD bDebug:1;
-    BITFIELD bAnthDebug:1;
-    DECLARE_FUNCTION(execGetStubPlayer);
-    DECLARE_FUNCTION(execGetStartTime);
-    DECLARE_FUNCTION(execSetPlayBackMode);
-    DECLARE_FUNCTION(execIsPaused);
-    DECLARE_FUNCTION(execPauseDemo);
-    DECLARE_FUNCTION(execGetTotalFrames);
-    DECLARE_FUNCTION(execGetCurrentFrame);
-    DECLARE_FUNCTION(execGetTotalTime);
-    DECLARE_FUNCTION(execGetCurrentTime);
-    DECLARE_FUNCTION(execReadCache);
-    DECLARE_FUNCTION(execReadTo);
-    DECLARE_FUNCTION(execJumpBack);
-    DECLARE_FUNCTION(execSetSpeed);
-    void eventNetPacketReceived()
-    {
-        ProcessEvent(FindFunctionChecked(UDEMO_NetPacketReceived),NULL);
-    }
-    void eventLinkToPlayer(class APlayerPawn* P, BITFIELD LockOn)
-    {
-        UDemoInterface_eventLinkToPlayer_Parms Parms;
-        Parms.P=P;
-        Parms.LockOn=((LockOn) ? FIRST_BITFIELD : 0);
-        ProcessEvent(FindFunctionChecked(UDEMO_LinkToPlayer),&Parms);
-    }
-    DECLARE_CLASS(UDemoInterface,UObject,0|CLASS_Config,udemo)
-    NO_DEFAULT_CONSTRUCTOR(UDemoInterface)
-};
-
 #endif
 
+AUTOGENERATE_FUNCTION(UDemoInterface,-1,execGetStubPlayer);
+AUTOGENERATE_FUNCTION(UDemoInterface,-1,execGetStartTime);
+AUTOGENERATE_FUNCTION(UDemoInterface,-1,execSetPlayBackMode);
+AUTOGENERATE_FUNCTION(UDemoInterface,-1,execIsPaused);
+AUTOGENERATE_FUNCTION(UDemoInterface,-1,execPauseDemo);
+AUTOGENERATE_FUNCTION(UDemoInterface,-1,execGetTotalFrames);
+AUTOGENERATE_FUNCTION(UDemoInterface,-1,execGetCurrentFrame);
+AUTOGENERATE_FUNCTION(UDemoInterface,-1,execGetTotalTime);
+AUTOGENERATE_FUNCTION(UDemoInterface,-1,execGetCurrentTime);
+AUTOGENERATE_FUNCTION(UDemoInterface,-1,execReadCache);
+AUTOGENERATE_FUNCTION(UDemoInterface,-1,execReadTo);
+AUTOGENERATE_FUNCTION(UDemoInterface,-1,execJumpBack);
+AUTOGENERATE_FUNCTION(UDemoInterface,-1,execSetSpeed);
 AUTOGENERATE_FUNCTION(UUZHandler,-1,execForceSave);
 AUTOGENERATE_FUNCTION(UUZHandler,-1,execSaveFile);
 AUTOGENERATE_FUNCTION(UUZHandler,-1,execAppend);
@@ -173,19 +186,6 @@ AUTOGENERATE_FUNCTION(Uudnative,-1,execBasePath);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execRename);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execkill);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execgetdemo);
-AUTOGENERATE_FUNCTION(UDemoInterface,-1,execGetStubPlayer);
-AUTOGENERATE_FUNCTION(UDemoInterface,-1,execGetStartTime);
-AUTOGENERATE_FUNCTION(UDemoInterface,-1,execSetPlayBackMode);
-AUTOGENERATE_FUNCTION(UDemoInterface,-1,execIsPaused);
-AUTOGENERATE_FUNCTION(UDemoInterface,-1,execPauseDemo);
-AUTOGENERATE_FUNCTION(UDemoInterface,-1,execGetTotalFrames);
-AUTOGENERATE_FUNCTION(UDemoInterface,-1,execGetCurrentFrame);
-AUTOGENERATE_FUNCTION(UDemoInterface,-1,execGetTotalTime);
-AUTOGENERATE_FUNCTION(UDemoInterface,-1,execGetCurrentTime);
-AUTOGENERATE_FUNCTION(UDemoInterface,-1,execReadCache);
-AUTOGENERATE_FUNCTION(UDemoInterface,-1,execReadTo);
-AUTOGENERATE_FUNCTION(UDemoInterface,-1,execJumpBack);
-AUTOGENERATE_FUNCTION(UDemoInterface,-1,execSetSpeed);
 
 #ifndef NAMES_ONLY
 #undef AUTOGENERATE_NAME
@@ -197,6 +197,13 @@ AUTOGENERATE_FUNCTION(UDemoInterface,-1,execSetSpeed);
 #endif
 
 #ifdef VERIFY_CLASS_SIZES
+VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,DemoSpec)
+VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,DemoDriver)
+VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,mySpeed)
+VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,PlayBackMode)
+VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,SmoothRecorderMovement)
+VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,IllegalActors)
+VERIFY_CLASS_SIZE_NODIE(UDemoInterface)
 VERIFY_CLASS_OFFSET_NODIE(U,UZHandler,UzAr)
 VERIFY_CLASS_OFFSET_NODIE(U,UZHandler,UzDeCompAr)
 VERIFY_CLASS_OFFSET_NODIE(U,UZHandler,Filename)
@@ -206,11 +213,4 @@ VERIFY_CLASS_SIZE_NODIE(UUZHandler)
 VERIFY_CLASS_OFFSET_NODIE(U,udnative,DemoDriver)
 VERIFY_CLASS_OFFSET_NODIE(U,udnative,DemoURL)
 VERIFY_CLASS_SIZE_NODIE(Uudnative)
-VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,DemoSpec)
-VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,DemoDriver)
-VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,mySpeed)
-VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,PlayBackMode)
-VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,SmoothRecorderMovement)
-VERIFY_CLASS_OFFSET_NODIE(U,DemoInterface,IllegalActors)
-VERIFY_CLASS_SIZE_NODIE(UDemoInterface)
 #endif // VERIFY_CLASS_SIZES
