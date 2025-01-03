@@ -98,7 +98,7 @@ native final function DispatchTick (float deltatime);
 //
 // a required package. Called while demo is being read
 //
-event PackageRequired (string package, int size, bool Installed, GUID myGUID, int gen, bool Cached);
+event PackageRequired (string Package, int Size, bool Installed, GUID myGUID, int gen, bool Cached);
 //
 // called when demo done being read.
 //

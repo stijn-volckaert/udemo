@@ -8,7 +8,7 @@ class UZHandler expands Object
 
 var const pointer UzAr;        // C++ FArchive*. (as downloading)
 var const pointer UzDeCompAr;  // C++ FArchive*. (decompressed)
-var const string FileName; // temporary during decompress cycle
+var const string Filename; // temporary during decompress cycle
 var GUID FileGUID;         // required file's GUID!
 var int FileGen;           // required file's generation   Note: if -1, then ignore guid/gen checks (int file)
 

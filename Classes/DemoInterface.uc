@@ -97,7 +97,7 @@ function GotoFrame (float Time)
 /*
 	(Anth) Changed in v3.2. DemoSpawnNotify moved to native...
 */
-event LinkToPlayer (PlayerPawn p, bool LockOn)
+event LinkToPlayer (PlayerPawn P, bool LockOn)
 {
 	DemoPlaybackSpec(DemoSpec).Driver = self;  //give pointer to self
 
