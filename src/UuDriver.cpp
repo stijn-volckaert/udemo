@@ -383,6 +383,7 @@ void UuDemoDriver::UuReceivedPacket(FBitReader& Reader)
 		else
 		{
 			FInBunch Bunch(ServerConnection);
+			INT StartPos = Reader.GetPosBits();
 			BYTE bControl = Reader.ReadBit();
 			Bunch.PacketId = PacketId;
 			Bunch.bOpen = bControl ? Reader.ReadBit() : 0;
@@ -402,6 +403,8 @@ void UuDemoDriver::UuReceivedPacket(FBitReader& Reader)
 				return;
 
 			UChannel* Channel = ServerConnection->Channels[Bunch.ChIndex];
+
+			ServerConnection->ChannelAccs[Bunch.ChIndex].InByteAcc += (Reader.GetPosBits() - StartPos) / 8.f;
 
 			// stijn: demo manager hax. Do not create actor channels for bNetTemporary actors if we're just seeking
 			if (Seeking && !Bunch.bReliable /*&& !Channel*/)
@@ -445,6 +448,7 @@ void UuDemoDriver::UuReceivedPacket(FBitReader& Reader)
 
 			Channel->ReceivedRawBunch(Bunch);
 			ServerConnection->InBunAcc++;
+			ServerConnection->ChannelAccs[Bunch.ChIndex].InBunAcc++;
 		}
 	}
 }
