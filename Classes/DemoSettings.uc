@@ -74,6 +74,8 @@ static function string Path(int i, string base)
 // compare stuff to see if record good:
 static function bool ShouldRecord(LevelInfo level)
 {
+	if (level.Game != None && level.Game.Class == Class'Botpack.UTIntro')
+		return false;
 	return default.LevelRecord == 1 || 
 		(default.LevelRecord == 2 && Level.NetMode == NM_Standalone) || 
 		(default.LevelRecord == 3 && Level.NetMode > NM_DedicatedServer);
