@@ -687,6 +687,27 @@ void UuDemoConnection::HandleClientPlayer( APlayerPawn* Pawn )
 	}
 	GetDemoDriver()->ClientHandled = true;
 
+	// Buggie: We need reregister names on each start demo, or else udemo.dll can hold outdated names,
+	// which already unregistered by previous GC invocation. And in next attempt register udemo.u
+	// name indexese goes be not same as before. Which break native binding by name.
+	// See: https://github.com/OldUnreal/UnrealTournamentPatches/issues/1774
+	guard(ReRegistertNames);
+
+	// Register names & functions
+#define NAMES_ONLY
+	// Redefinition of AUTOGENERATE_NAME
+#define AUTOGENERATE_NAME(name) UDEMO_##name=FName(TEXT(#name));
+	// Redefinition of AUTOGENERATE_FUNCTION (empty)
+#define AUTOGENERATE_FUNCTION(cls,idx,name) 
+	// Reinclude classes header for name registration
+#include "udemoClasses.h"
+	// All done!
+#undef AUTOGENERATE_FUNCTION
+#undef AUTOGENERATE_NAME
+#undef NAMES_ONLY
+
+	unguard;
+
 	guard(SpawnSpectator);
 
 	UClass* SpectatorClass = StaticLoadClass( APawn::StaticClass(), NULL, TEXT("udemo.DemoPlaybackSpec"), NULL, LOAD_NoFail, NULL );
