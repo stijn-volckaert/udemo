@@ -272,11 +272,11 @@ void Uudnative::execWriteDemoInfo (FFrame& Stack, RESULT_DECL)
 }
 
 /*-----------------------------------------------------------------------------
-	execIsMisMatch - Check if the file matches the GUID and the generations
+	execIsMismatch - Check if the file matches the GUID and the generations
 -----------------------------------------------------------------------------*/
-void Uudnative::execIsMisMatch (FFrame& Stack, RESULT_DECL)
+void Uudnative::execIsMismatch (FFrame& Stack, RESULT_DECL)
 { 
-	guard (Uudnative::execIsMisMatch); 
+	guard (Uudnative::execIsMismatch); 
 	P_GET_STR(FileName);
 	P_GET_STRUCT(FGuid,PackageGUID); //guid
 	P_GET_INT(Gen);

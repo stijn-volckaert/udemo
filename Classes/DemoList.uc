@@ -47,14 +47,14 @@ function byte AllInstalled()
 	local byte bRetVal;
 	if (bInstalled == NotInstalled)
 		return NotAllInstalled;
-	bRetVal = IsMisMatch();
+	bRetVal = IsMismatch();
 	if (DemoNext != None)
 		bRetVal = Max(bRetVal, DemoNext.AllInstalled());
 	return bRetVal;
 }
 
 // used by downloader as well!
-function byte IsMisMatch()
+function byte IsMismatch()
 {
 //	local int n;
 	local int ret;

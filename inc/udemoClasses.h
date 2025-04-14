@@ -121,7 +121,7 @@ public:
     DECLARE_FUNCTION(execDispatchTick);
     DECLARE_FUNCTION(execDemoRead);
     DECLARE_FUNCTION(execSetDemoDriverClass);
-    DECLARE_FUNCTION(execIsMisMatch);
+    DECLARE_FUNCTION(execIsMismatch);
     DECLARE_FUNCTION(execGUIDString);
     DECLARE_FUNCTION(execDemoActive);
     DECLARE_FUNCTION(execFindViewPort);
@@ -176,7 +176,7 @@ AUTOGENERATE_FUNCTION(UUZHandler,-1,execAppend);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execDispatchTick);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execDemoRead);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execSetDemoDriverClass);
-AUTOGENERATE_FUNCTION(Uudnative,-1,execIsMisMatch);
+AUTOGENERATE_FUNCTION(Uudnative,-1,execIsMismatch);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execGUIDString);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execDemoActive);
 AUTOGENERATE_FUNCTION(Uudnative,-1,execFindViewPort);
@@ -214,3 +214,77 @@ VERIFY_CLASS_OFFSET_NODIE(U,udnative,DemoDriver)
 VERIFY_CLASS_OFFSET_NODIE(U,udnative,DemoURL)
 VERIFY_CLASS_SIZE_NODIE(Uudnative)
 #endif // VERIFY_CLASS_SIZES
+
+#ifdef NATIVE_DEFS_ONLY
+
+DECLARE_NATIVE_TYPE(udemo,UUZHandler);
+DECLARE_NATIVE_TYPE(udemo,Uudnative);
+DECLARE_NATIVE_TYPE(udemo,UDemoInterface);
+DECLARE_NATIVE_TYPE(udemo,UDReader);
+DECLARE_NATIVE_TYPE(udemo,UuDemoDriver);
+DECLARE_NATIVE_TYPE(udemo,UuDemoPackageMap);
+DECLARE_NATIVE_TYPE(udemo,UuDemoConnection);
+
+#define AUTO_INITIALIZE_REGISTRANTS_UDEMO \
+	UUZHandler::StaticClass(); \
+	GNativeLookupFuncs[Lookup++] = &FindudemoUUZHandlerNative; \
+	Uudnative::StaticClass(); \
+	GNativeLookupFuncs[Lookup++] = &FindudemoUudnativeNative; \
+	UDemoInterface::StaticClass(); \
+	GNativeLookupFuncs[Lookup++] = &FindudemoUDemoInterfaceNative; \
+	UDReader::StaticClass(); \
+	UuDemoDriver::StaticClass(); \
+	UuDemoPackageMap::StaticClass(); \
+	UuDemoConnection::StaticClass(); \
+
+#endif // NATIVE_DEFS_ONLY
+
+#ifdef NATIVES_ONLY
+UUZHandlerNativeInfo GudemoUUZHandlerNatives[] = 
+{ 
+	MAP_NATIVE(UUZHandler,execForceSave)
+	MAP_NATIVE(UUZHandler,execSaveFile)
+	MAP_NATIVE(UUZHandler,execAppend)
+	{NULL,NULL}
+};
+IMPLEMENT_NATIVE_HANDLER(udemo,UUZHandler);
+
+UudnativeNativeInfo GudemoUudnativeNatives[] = 
+{ 
+	MAP_NATIVE(Uudnative,execDispatchTick)
+	MAP_NATIVE(Uudnative,execDemoRead)
+	MAP_NATIVE(Uudnative,execSetDemoDriverClass)
+	MAP_NATIVE(Uudnative,execIsMismatch)
+	MAP_NATIVE(Uudnative,execGUIDString)
+	MAP_NATIVE(Uudnative,execDemoActive)
+	MAP_NATIVE(Uudnative,execFindViewPort)
+	MAP_NATIVE(Uudnative,execGetArray)
+	MAP_NATIVE(Uudnative,execWriteDemoInfo)
+	MAP_NATIVE(Uudnative,execBasePath)
+	MAP_NATIVE(Uudnative,execRename)
+	MAP_NATIVE(Uudnative,execkill)
+	MAP_NATIVE(Uudnative,execgetdemo)
+	{NULL,NULL}
+};
+IMPLEMENT_NATIVE_HANDLER(udemo,Uudnative);
+
+UDemoInterfaceNativeInfo GudemoUDemoInterfaceNatives[] = 
+{ 
+	MAP_NATIVE(UDemoInterface,execGetStubPlayer)
+	MAP_NATIVE(UDemoInterface,execGetStartTime)
+	MAP_NATIVE(UDemoInterface,execSetPlayBackMode)
+	MAP_NATIVE(UDemoInterface,execIsPaused)
+	MAP_NATIVE(UDemoInterface,execPauseDemo)
+	MAP_NATIVE(UDemoInterface,execGetTotalFrames)
+	MAP_NATIVE(UDemoInterface,execGetCurrentFrame)
+	MAP_NATIVE(UDemoInterface,execGetTotalTime)
+	MAP_NATIVE(UDemoInterface,execGetCurrentTime)
+	MAP_NATIVE(UDemoInterface,execReadCache)
+	MAP_NATIVE(UDemoInterface,execReadTo)
+	MAP_NATIVE(UDemoInterface,execJumpBack)
+	MAP_NATIVE(UDemoInterface,execSetSpeed)
+	{NULL,NULL}
+};
+IMPLEMENT_NATIVE_HANDLER(udemo,UDemoInterface);
+
+#endif // NATIVES_ONLY

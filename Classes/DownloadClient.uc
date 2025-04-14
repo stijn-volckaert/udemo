@@ -392,7 +392,7 @@ function bool CheckUntil(DemoList Cur){ //for below
 	if (DownloadType==0)
 		return Cur.bInstalled == 0;
 	//1=guid, 2=generation
-	return (Cur.IsMisMatch() == DownLoadType);
+	return (Cur.IsMismatch() == DownLoadType);
 }
 
 // =============================================================================

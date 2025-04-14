@@ -259,8 +259,20 @@ class UDEMO_API UStubPlayer : public UPlayer
 	}
 };
 
+/*-----------------------------------------------------------------------------
+    Static Linking Support
+-----------------------------------------------------------------------------*/
+
 #if __STATIC_LINK
-void InitUdemo();
+#define NAMES_ONLY
+#define NATIVE_DEFS_ONLY
+#define AUTOGENERATE_NAME(a)
+#define AUTOGENERATE_FUNCTION(a,b,c)
+#include "udemoClasses.h"
+#undef NAMES_ONLY
+#undef NATIVE_DEFS_ONLY
+#undef AUTOGENERATE_NAME
+#undef AUTOGENERATE_FUNCTION
 #endif
 
 #endif

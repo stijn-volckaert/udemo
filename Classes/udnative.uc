@@ -48,7 +48,7 @@ native final static function bool kill(string file);
 //
 // renames a file to a new name.
 //
-native final static function bool rename(string file, string newfile);
+native final static function bool Rename(string file, string newfile);
 //
 // returns the base directory the native is in.
 //
