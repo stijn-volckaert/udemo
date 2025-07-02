@@ -256,7 +256,7 @@ void UDemoInterface::execJumpBack (FFrame& Stack, RESULT_DECL)
 	TMap<AActor*,UActorChannel*>*	ActorChannels;		// Ptr to TMap<AActor*,UActorChannel*> UNetConnection::ActorChannels
 
 	FString	Ver = UTexture::__Client->Viewports(0)->Actor->Level->EngineVersion;
-	INT iVer = strtol(TCHAR_TO_ANSI(*Ver), NULL, 10);
+	INT iVer = appAtoi(*Ver);
 
 	GLog->Logf(TEXT("UDEMO: Calculating Channel Positions..."));
 
