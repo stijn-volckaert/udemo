@@ -39,6 +39,14 @@ function NotifyAfterLevelChange()
 // =============================================================================
 function LoadHack()
 {
+	LoadHackInternal(true);
+}
+
+// =============================================================================
+// LoadHackInternal ~ Version, with allow disable stop demo, for internal use
+// =============================================================================
+function LoadHackInternal(bool WithStopDemo)
+{
 	// Hack == none
 	// --> hack hasn't been spawned before!
 	// --> spawn the hack into the entrylevel.
@@ -48,7 +56,8 @@ function LoadHack()
 	Hack.OldLevel=string(GetEntryLevel());
 
 	// We don't want to record a levelchange o_O
-	GetPlayerOwner().ConsoleCommand("stopdemo");
+	if (WithStopDemo)
+		GetPlayerOwner().ConsoleCommand("stopdemo");
 
 	Udemo.Refresh();
 }

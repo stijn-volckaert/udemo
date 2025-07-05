@@ -20,7 +20,7 @@ function Close(optional bool bByParent)
 		MemHolder = AutoRecorder(root.createwindow(class'AutoRecorder', 0, 0, 1, 1, self, true));
 
 	MemHolder.UDemo = DemoMainClientWindow(ClientArea).UserWindow;
-	MemHolder.LoadHack();
+	MemHolder.LoadHackInternal(false);
 	MemHolder.SendToBack();
 }
 
