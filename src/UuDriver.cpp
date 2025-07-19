@@ -39,6 +39,20 @@ void UuDemoDriver::StaticConstructor()
 	guard(UuDemoDriver::StaticConstructor);
 	new(GetClass(),TEXT("DemoSpectatorClass"), RF_Public)UStrProperty(CPP_PROPERTY(DemoSpectatorClass), TEXT("Client"), CPF_Config);
 	unguard;
+
+	// Register names & functions
+#define NAMES_ONLY
+	// Redefinition of AUTOGENERATE_NAME
+#define AUTOGENERATE_NAME(name) UDEMO_##name=FName(TEXT(#name),FNAME_Intrinsic);
+	// Redefinition of AUTOGENERATE_FUNCTION (empty)
+#define AUTOGENERATE_FUNCTION(cls,idx,name) 
+	// Reinclude classes header for name registration
+#include "udemoClasses.h"
+	// All done!
+#undef AUTOGENERATE_FUNCTION
+#undef AUTOGENERATE_NAME
+#undef NAMES_ONLY
+
 }
 
 INT UuDemoDriver::Exec( const TCHAR* Cmd, FOutputDevice& Ar )
@@ -691,12 +705,12 @@ void UuDemoConnection::HandleClientPlayer( APlayerPawn* Pawn )
 	// which already unregistered by previous GC invocation. And in next attempt register udemo.u
 	// name indexese goes be not same as before. Which break native binding by name.
 	// See: https://github.com/OldUnreal/UnrealTournamentPatches/issues/1774
-	guard(ReRegistertNames);
+	guard(ReRegisterNames);
 
 	// Register names & functions
 #define NAMES_ONLY
 	// Redefinition of AUTOGENERATE_NAME
-#define AUTOGENERATE_NAME(name) UDEMO_##name=FName(TEXT(#name));
+#define AUTOGENERATE_NAME(name) UDEMO_##name=FName(TEXT(#name),FNAME_Intrinsic);
 	// Redefinition of AUTOGENERATE_FUNCTION (empty)
 #define AUTOGENERATE_FUNCTION(cls,idx,name) 
 	// Reinclude classes header for name registration
@@ -707,7 +721,7 @@ void UuDemoConnection::HandleClientPlayer( APlayerPawn* Pawn )
 #undef NAMES_ONLY
 
 	unguard;
-
+	
 	guard(SpawnSpectator);
 
 	UClass* SpectatorClass = StaticLoadClass( APawn::StaticClass(), NULL, TEXT("udemo.DemoPlaybackSpec"), NULL, LOAD_NoFail, NULL );
