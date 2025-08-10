@@ -103,13 +103,37 @@ void UDReader::NotifyReceivedText( UNetConnection* Connection, const TCHAR* Text
 		int Gen;
 		Parse( Text, TEXT("GUID="), Guid );
 		Parse( Text, TEXT("SIZE="), FileSize );
-		Parse( Text, TEXT("PKG="), PackageName, ARRAY_COUNT(PackageName) );
+		Parse( Text, TEXT("PKG="), &PackageName[0], ARRAY_COUNT(PackageName));
 		Parse( Text, TEXT("FNAME="), FName);
 		Parse( Text, TEXT("GEN="), Gen);
-		UBOOL Installed=appFindPackageFile( PackageName, &Guid, Filename );
-		if (FName==TEXT("")||FName.Right(4)==TEXT(".uxx")) //old version or cache file
-			FName = PackageName;
-		Controller->eventPackageRequired(FName,FileSize,Installed,Guid,Gen,appStrstr(Filename,TEXT(".uxx"))!=NULL);
+		const UBOOL Installed = appFindPackageFile(&PackageName[0], &Guid, &Filename[0]);
+		if (FName == TEXT("") || FName.Right(4) == TEXT(".uxx")) //old version or cache file
+		{
+			if (Installed && FString(&Filename[0]).Right(4) != TEXT(".uxx"))
+				FName = appFileBaseName(&Filename[0]);
+			else
+			{
+				FConfigCacheIni CacheIni;
+				TMultiMap<FString, FString>* Sec = CacheIni.GetSectionPrivate(TEXT("Cache"), 0, 1, 
+					*(FString::Printf(TEXT("%ls") PATH_SEPARATOR TEXT("cache.ini"), *GSys->CachePath)));
+				if (Sec)
+				{
+					const FString* CachedEntry = Sec->Find(FName.Left(FName.Len() - 4));
+					if (CachedEntry)
+					{
+						FString CachedFile = *CachedEntry;
+						const INT ExtPos = CachedFile.InStr(TEXT("."));
+						if (ExtPos != -1)
+							CachedFile = CachedFile.Left(ExtPos);
+						if (CachedFile == &PackageName[0])
+							FName = *CachedEntry;
+					}
+				}
+			}
+		}
+		if (FName == TEXT("") || FName.Right(4) == TEXT(".uxx")) //old version or cache file
+			FName = &PackageName[0];
+		Controller->eventPackageRequired(FName, FileSize, Installed, Guid, Gen, appStrstr(&Filename[0], TEXT(".uxx")) != NULL);
 		//note: filename out returns file path!  if it is in cache, there is no .uxx at end and gives Guid!
 	}
 	
