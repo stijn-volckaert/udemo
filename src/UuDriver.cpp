@@ -311,6 +311,12 @@ void UuDemoDriver::CheckActors()
 	// disabled for 469 (which can fix actor issues on the engine side)
 }
 
+struct Exposer : UPackageMap {
+	using UPackageMap::NameIndices;
+	using UPackageMap::MaxObjectIndex;
+	using UPackageMap::MaxNameIndex;
+};
+
 /*-----------------------------------------------------------------------------
 	ReceivedRawPacket
 -----------------------------------------------------------------------------*/
@@ -331,6 +337,36 @@ void UuDemoDriver::UuReceivedRawPacket(void* InData, INT Count)
 				LastByte *= 2;
 				BitSize--;
 			}
+
+			static INT Dumped = -1;
+			if (0 && ServerConnection && Dumped != (ServerConnection->PackageMap->*(&Exposer::NameIndices)).Num()) {
+				Dumped = (ServerConnection->PackageMap->*(&Exposer::NameIndices)).Num();
+				debugf(TEXT("PackageMap->List.Num = %d, %d, %d, %d")
+					, ServerConnection->PackageMap->List.Num()
+					, (ServerConnection->PackageMap->*(&Exposer::NameIndices)).Num()
+					, ServerConnection->PackageMap->*(&Exposer::MaxObjectIndex)
+					, ServerConnection->PackageMap->*(&Exposer::MaxNameIndex)
+				);
+				if (ServerConnection->PackageMap->*(&Exposer::MaxNameIndex) > 0)
+					{for( INT i=0; i<ServerConnection->PackageMap->List.Num(); i++ )
+					{
+						FPackageInfo& Info    = ServerConnection->PackageMap->List(i);
+						Info.ObjectCount      = Info.Linker->ExportMap.Num();
+						Info.NameCount        = Info.Linker->NameMap.Num();
+						Info.LocalGeneration  = Info.Linker->Summary.Generations.Num();
+						if( Info.RemoteGeneration==0 )
+						{
+							Info.RemoteGeneration = Info.LocalGeneration;
+						}
+						if( Info.RemoteGeneration<Info.LocalGeneration )
+						{
+							Info.ObjectCount  = Min( Info.ObjectCount, Info.Linker->Summary.Generations(Info.RemoteGeneration-1).ExportCount );
+							Info.NameCount    = Min( Info.NameCount,   Info.Linker->Summary.Generations(Info.RemoteGeneration-1).NameCount   );
+						}
+						debugf( TEXT("** Package %s: %i objs, %i names, gen %i-%i"), *Info.Parent->GetFName(), Info.ObjectCount, Info.NameCount, Info.LocalGeneration, Info.RemoteGeneration );
+					}}
+			}
+
 			FBitReader Reader(Data, BitSize);
 			UuReceivedPacket(Reader);
 		}
