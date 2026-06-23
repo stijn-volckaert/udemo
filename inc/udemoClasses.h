@@ -217,37 +217,49 @@ VERIFY_CLASS_SIZE_NODIE(Uudnative)
 
 #ifdef NATIVE_DEFS_ONLY
 
-DECLARE_NATIVE_TYPE(udemo,UUZHandler);
-DECLARE_NATIVE_TYPE(udemo,Uudnative);
 DECLARE_NATIVE_TYPE(udemo,UDemoInterface);
-DECLARE_NATIVE_TYPE(udemo,UDReader);
 DECLARE_NATIVE_TYPE(udemo,UuDemoDriver);
-DECLARE_NATIVE_TYPE(udemo,UuDemoPackageMap);
 DECLARE_NATIVE_TYPE(udemo,UuDemoConnection);
+DECLARE_NATIVE_TYPE(udemo,UuDemoPackageMap);
+DECLARE_NATIVE_TYPE(udemo,Uudnative);
+DECLARE_NATIVE_TYPE(udemo,UDReader);
+DECLARE_NATIVE_TYPE(udemo,UStubPlayer);
+DECLARE_NATIVE_TYPE(udemo,UUZHandler);
 
 #define AUTO_INITIALIZE_REGISTRANTS_UDEMO \
-	UUZHandler::StaticClass(); \
-	GNativeLookupFuncs[Lookup++] = &FindudemoUUZHandlerNative; \
-	Uudnative::StaticClass(); \
-	GNativeLookupFuncs[Lookup++] = &FindudemoUudnativeNative; \
 	UDemoInterface::StaticClass(); \
 	GNativeLookupFuncs[Lookup++] = &FindudemoUDemoInterfaceNative; \
-	UDReader::StaticClass(); \
 	UuDemoDriver::StaticClass(); \
-	UuDemoPackageMap::StaticClass(); \
 	UuDemoConnection::StaticClass(); \
+	UuDemoPackageMap::StaticClass(); \
+	Uudnative::StaticClass(); \
+	GNativeLookupFuncs[Lookup++] = &FindudemoUudnativeNative; \
+	UDReader::StaticClass(); \
+	UStubPlayer::StaticClass(); \
+	UUZHandler::StaticClass(); \
+	GNativeLookupFuncs[Lookup++] = &FindudemoUUZHandlerNative; \
 
 #endif // NATIVE_DEFS_ONLY
 
 #ifdef NATIVES_ONLY
-UUZHandlerNativeInfo GudemoUUZHandlerNatives[] = 
+UDemoInterfaceNativeInfo GudemoUDemoInterfaceNatives[] = 
 { 
-	MAP_NATIVE(UUZHandler,execForceSave)
-	MAP_NATIVE(UUZHandler,execSaveFile)
-	MAP_NATIVE(UUZHandler,execAppend)
+	MAP_NATIVE(UDemoInterface,execGetStubPlayer)
+	MAP_NATIVE(UDemoInterface,execGetStartTime)
+	MAP_NATIVE(UDemoInterface,execSetPlayBackMode)
+	MAP_NATIVE(UDemoInterface,execIsPaused)
+	MAP_NATIVE(UDemoInterface,execPauseDemo)
+	MAP_NATIVE(UDemoInterface,execGetTotalFrames)
+	MAP_NATIVE(UDemoInterface,execGetCurrentFrame)
+	MAP_NATIVE(UDemoInterface,execGetTotalTime)
+	MAP_NATIVE(UDemoInterface,execGetCurrentTime)
+	MAP_NATIVE(UDemoInterface,execReadCache)
+	MAP_NATIVE(UDemoInterface,execReadTo)
+	MAP_NATIVE(UDemoInterface,execJumpBack)
+	MAP_NATIVE(UDemoInterface,execSetSpeed)
 	{NULL,NULL}
 };
-IMPLEMENT_NATIVE_HANDLER(udemo,UUZHandler);
+IMPLEMENT_NATIVE_HANDLER(udemo,UDemoInterface);
 
 UudnativeNativeInfo GudemoUudnativeNatives[] = 
 { 
@@ -268,23 +280,13 @@ UudnativeNativeInfo GudemoUudnativeNatives[] =
 };
 IMPLEMENT_NATIVE_HANDLER(udemo,Uudnative);
 
-UDemoInterfaceNativeInfo GudemoUDemoInterfaceNatives[] = 
+UUZHandlerNativeInfo GudemoUUZHandlerNatives[] = 
 { 
-	MAP_NATIVE(UDemoInterface,execGetStubPlayer)
-	MAP_NATIVE(UDemoInterface,execGetStartTime)
-	MAP_NATIVE(UDemoInterface,execSetPlayBackMode)
-	MAP_NATIVE(UDemoInterface,execIsPaused)
-	MAP_NATIVE(UDemoInterface,execPauseDemo)
-	MAP_NATIVE(UDemoInterface,execGetTotalFrames)
-	MAP_NATIVE(UDemoInterface,execGetCurrentFrame)
-	MAP_NATIVE(UDemoInterface,execGetTotalTime)
-	MAP_NATIVE(UDemoInterface,execGetCurrentTime)
-	MAP_NATIVE(UDemoInterface,execReadCache)
-	MAP_NATIVE(UDemoInterface,execReadTo)
-	MAP_NATIVE(UDemoInterface,execJumpBack)
-	MAP_NATIVE(UDemoInterface,execSetSpeed)
+	MAP_NATIVE(UUZHandler,execForceSave)
+	MAP_NATIVE(UUZHandler,execSaveFile)
+	MAP_NATIVE(UUZHandler,execAppend)
 	{NULL,NULL}
 };
-IMPLEMENT_NATIVE_HANDLER(udemo,UDemoInterface);
+IMPLEMENT_NATIVE_HANDLER(udemo,UUZHandler);
 
 #endif // NATIVES_ONLY
