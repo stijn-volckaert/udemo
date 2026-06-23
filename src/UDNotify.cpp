@@ -88,7 +88,7 @@ void UDReader::getTime(double * time, int * frames)
 -----------------------------------------------------------------------------*/
 void UDReader::NotifyReceivedText( UNetConnection* Connection, const TCHAR* Text )
 {
-	guard(UDPlayPendingLevel::NotifyReceivedText);
+	guard(UDReader::NotifyReceivedText);
 
 	GLog->Logf(TEXT("Received Text: %s from Connection %s"),Text,Connection->GetFullName());
 

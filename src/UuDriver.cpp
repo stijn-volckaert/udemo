@@ -135,7 +135,7 @@ void UuDemoDriver::TimeSync(FTime NewTime, FTime OldTime)
 -----------------------------------------------------------------------------*/
 void UuDemoDriver::TickDispatch( FLOAT Delta )
 {
-	guard(UuDemoDriver:TickDispatch);	
+	guard(UuDemoDriver::TickDispatch);
 	
 	// rollback seconds spent to seeking demo
 	if (Interface && Interface->bFixLevelTime)
@@ -683,7 +683,7 @@ UuDemoDriver* UuDemoConnection::GetDemoDriver() //new driver reading
 -----------------------------------------------------------------------------*/
 void UuDemoConnection::HandleClientPlayer( APlayerPawn* Pawn )
 {
-	guard(UAdvancedConnection::HandleClientPlayer);
+	guard(UuDemoConnection::HandleClientPlayer);
 	UViewport* Viewport = NULL;
 
 	UClass* C = StaticLoadClass(AActor::StaticClass(), NULL, TEXT("Engine.DemoRecSpectator"), NULL, LOAD_NoFail, NULL);
