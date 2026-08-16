@@ -113,6 +113,10 @@ v3.6.0:
 * [ADDED] Ini option FollowMyCam, which force Camera follow spectate target, so when you detach cam it not jump to old position, but continue from last spectated target position (seamless transition)
 * [ADDED] Command "FollowMyCam", which allow change FollowMyCam ini option
 * [ADDED] Support for rypelcam properly work
+* [ADDED] Command "DemoPanel", which opens a floating playback panel with a
+  clickable timeline (click or drag to seek, mouse wheel to step), pause,
+  speed/slow motion controls, camera modes and hud toggles. The demo keeps
+  playing while the panel is open.
 * [ADDED] Command "SloMo2", which accept relative values (use "+" or "-" before number) and/or percentage values (use "%" after number)
 * [CHANGED] Minor adjustments to the GUI to work better with v469's GUI scaling
 
@@ -205,6 +209,7 @@ report bugs.
 7) Additional demo play commands
 --------------------
 
+DemoPanel - Open (or close) the floating playback panel: timeline with click/drag seeking and mouse wheel stepping, pause/play, seek buttons, playback speed slider and presets, free camera speed, camera modes (free/recorder/first person/next player/flags), stats, behind view, scoreboard, hide hud, timing mode and a "Go to" field which accepts the same values as SeekTo. Press Escape or the close box to hide it again.
 Playback {0/1/2} - Switch to specified demo playback mode: 0 = timebased, 1 = framebased, 2 = noframecap.
 SloMo speed - Change demo playback speed. Accept only absolute decimal value, like 0.1 0.5 1.0 2.0 and so on. 1.0 is normal speed.
 SloMo2 [+/-]speed[%] - Change demo playback speed. Accept absolute decimal value, relative decimal value (use "+" or "-" before number) and/or percentage values (use "%" after number). Can specify speed with minutes or hours like `1:42` or `1:8:36`.

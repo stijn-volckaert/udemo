@@ -22,6 +22,9 @@ var config byte Timing; //saved timing mode
 var config bool SpecDemo; //3rd person
 var config bool OrderByDate; // order demo list by date
 
+//playback panel (UDPlaybackWindow) placement. Negative position = not placed yet.
+var config float PanelLeft, PanelTop, PanelWidth, PanelHeight;
+
 //paths:
 var localized config string DemoPaths[5]; //1 of these is setup to be base directory on first load.
 var config int RecordingDir; //DemoPaths[recordingdir] is where to record.
@@ -280,6 +283,8 @@ static function string FloatString(float A)
 defaultproperties
 {
 	FollowMyCam=True
+	PanelLeft=-1.000000
+	PanelTop=-1.000000
 	timing=1
 	OrderByDate=True
 	DemoPaths(0)="Empty"

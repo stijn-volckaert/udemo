@@ -174,9 +174,21 @@ exec function SeekTo(string Point) {
 		T = Driver.GetTotalTime()*T/100.0;
 	if (sign == "+" || sign == "-")
 		T = FMax(0.0, Driver.GetCurrentTime() + T);
+	SeekToTime(T);
+}
+
+// Seek to T seconds (counted from the start of the playback)
+function SeekToTime(float T)
+{
 	if (T < Driver.GetCurrentTime())
 		EndGameCam = EGC_NotDetected;
 	SetSeek(T);
+}
+
+// Floating playback panel
+exec function DemoPanel()
+{
+	class'UDPlaybackWindow'.static.Toggle(Self);
 }
 
 exec function FollowMyCam(bool Follow)
