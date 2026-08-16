@@ -107,7 +107,10 @@ function LMouseUp(float X, float Y)
 		bScrubbing = False;
 		Panel.SeekFraction(FracAt(X));
 	}
-	Marker = -1;
+
+	// released outside the bar - the capture kept the events coming to us
+	if (!MouseIsOver())
+		Marker = -1;
 }
 
 function MouseLeave()
