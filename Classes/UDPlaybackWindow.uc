@@ -12,8 +12,8 @@ class UDPlaybackWindow expands UWindowFramedWindow;
 var localized string LocNoUWindow;
 var bool bPlaced;               // position checked against the screen size once
 
-const DefaultWidth  = 470;
-const DefaultHeight = 226;
+const DefaultWidth  = 490;
+const DefaultHeight = 258;
 
 // =============================================================================
 // Toggle ~ Show the panel, or close it when it is already up
@@ -90,8 +90,8 @@ function Created()
 
 	bStatusBar = True;
 	bSizable = True;
-	MinWinWidth = 380;
-	MinWinHeight = 200;
+	MinWinWidth = 430;
+	MinWinHeight = 250;
 }
 
 function Close(optional bool bByParent)

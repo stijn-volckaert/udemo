@@ -6,6 +6,11 @@
 // udemo.UDPlaybackClient: contents of the floating playback panel. Holds the
 // timeline plus the controls for everything one usually needs while watching a
 // demo: pausing, seeking, speed, camera and hud.
+//
+// The panel is laid out as a form: one label column on the left, the controls
+// of a row start right behind their label, and groups are split by a rule.
+// Everything whose width depends on text is placed in LayoutText, which runs
+// from BeforePaint because measuring text needs a canvas.
 // =============================================================================
 class UDPlaybackClient expands UWindowDialogClientWindow;
 
@@ -20,8 +25,20 @@ var UWindowEditControl      GotoEdit;
 var UWindowSmallButton      BGoto;
 
 var float SpeedPreset[6];
-var float CheckRowY;        // checkboxes are sized to their text, which needs a canvas
-var bool  bUpdating;        // set while the controls are refreshed from the driver
+var bool  bUpdating;         // set while the controls are refreshed from the driver
+
+// row positions, filled in by LayoutControls
+var float TransportRowY, SpeedRowY, ViewRowY, CheckRowY, BottomRowY;
+var float SepY[3];
+
+var string SpeedValue, AccelValue;   // drawn behind the sliders
+var color  LabelColor;
+
+const Margin       = 6;
+const ButtonHeight = 18;
+const ButtonPad    = 14;   // text width + this = button width
+const ButtonGap    = 5;
+const ValueColumn  = 46;   // room for "10.00x" behind a slider
 
 var localized string LocRestart, LocRestartHelp;
 var localized string LocBack30, LocBack5, LocFwd5, LocFwd30, LocStepHelp;
@@ -29,6 +46,7 @@ var localized string LocPlay, LocPause, LocPlayHelp;
 var localized string LocSpeedText[6];
 var localized string LocSpeed, LocSpeedHelp;
 var localized string LocAccel, LocAccelHelp;
+var localized string LocView;
 var localized string LocFree, LocFreeHelp;
 var localized string LocRecorder, LocRecorderHelp;
 var localized string LocFirst, LocFirstHelp;
@@ -41,7 +59,7 @@ var localized string LocModeTimeBased, LocModeFrameBased, LocModeNoCap;
 var localized string LocGoto, LocGotoHelp, LocGotoButton;
 
 // =============================================================================
-// Created ~ Build the controls. Positioning happens in LayoutControls
+// Created ~ Build the controls
 // =============================================================================
 function Created()
 {
@@ -49,7 +67,7 @@ function Created()
 
 	Super.Created();
 
-	SeekBar = UDSeekBar(CreateWindow(class'UDSeekBar', 0, 0, 100, 20));
+	SeekBar = UDSeekBar(CreateWindow(class'UDSeekBar', 0, 0, 100, 22));
 	SeekBar.Panel = Self;
 
 	BRestart = NewButton(LocRestart, LocRestartHelp);
@@ -59,18 +77,10 @@ function Created()
 	BFwd5    = NewButton(LocFwd5, LocStepHelp);
 	BFwd30   = NewButton(LocFwd30, LocStepHelp);
 
-	SpeedSlider = UWindowHSliderControl(CreateControl(class'UWindowHSliderControl', 0, 0, 100, 1));
-	SpeedSlider.SetRange(5, 400, 5);
-	SpeedSlider.Align = TA_Left;
-	SpeedSlider.SetHelpText(LocSpeedHelp);
-
+	SpeedSlider = NewSlider(LocSpeed, LocSpeedHelp, 5, 400, 5);
 	for (i = 0; i < ArrayCount(BSpeed); i++)
 		BSpeed[i] = NewButton(LocSpeedText[i], LocSpeedHelp);
-
-	AccelSlider = UWindowHSliderControl(CreateControl(class'UWindowHSliderControl', 0, 0, 100, 1));
-	AccelSlider.SetRange(25, 800, 25);
-	AccelSlider.Align = TA_Left;
-	AccelSlider.SetHelpText(LocAccelHelp);
+	AccelSlider = NewSlider(LocAccel, LocAccelHelp, 25, 800, 25);
 
 	BFree     = NewButton(LocFree, LocFreeHelp);
 	BRecorder = NewButton(LocRecorder, LocRecorderHelp);
@@ -89,7 +99,7 @@ function Created()
 	ModeCombo.Align = TA_Left;
 	ModeCombo.SetText(LocMode);
 	ModeCombo.SetHelpText(LocModeHelp);
-	ModeCombo.AddItem(LocModeTimeBased);   // matches DemoInterface.PlayBackMode
+	ModeCombo.AddItem(LocModeTimeBased);   // index matches DemoInterface.PlayBackMode
 	ModeCombo.AddItem(LocModeFrameBased);
 	ModeCombo.AddItem(LocModeNoCap);
 
@@ -107,8 +117,9 @@ function UWindowSmallButton NewButton(string Text, string Tip)
 {
 	local UWindowSmallButton B;
 
-	B = UWindowSmallButton(CreateControl(class'UWindowSmallButton', 0, 0, 40, 16));
+	B = UWindowSmallButton(CreateControl(class'UWindowSmallButton', 0, 0, 40, ButtonHeight));
 	B.SetText(Text);
+	B.SetFont(F_Bold);
 	B.SetHelpText(Tip);
 	B.ToolTipString = Tip;
 	return B;
@@ -120,27 +131,58 @@ function UWindowCheckbox NewCheckbox(string Text)
 
 	B = UWindowCheckbox(CreateControl(class'UWindowCheckbox', 0, 0, 100, 16));
 	B.SetText(Text);
-	B.Align = TA_Right;   // box on the left, label right next to it
+	B.SetFont(F_Bold);
+	B.Align = TA_Right;   // box first, label right behind it
 	return B;
 }
 
-// Place a checkbox at X and return where the next one starts
-function float PlaceCheckbox(Canvas C, UWindowCheckbox B, float X, float Y)
+function UWindowHSliderControl NewSlider(string Text, string Tip, float MinV, float MaxV, int StepV)
 {
-	local float W, H;
+	local UWindowHSliderControl S;
 
-	C.Font = Root.Fonts[B.Font];
-	TextSize(C, B.Text, W, H);
-	Place(B, X, Y, W + 18, 16);
-
-	return X + W + 32;
+	S = UWindowHSliderControl(CreateControl(class'UWindowHSliderControl', 0, 0, 100, 1));
+	S.SetRange(MinV, MaxV, StepV);
+	S.Align = TA_Left;
+	S.SetFont(F_Bold);
+	S.SetText(Text);
+	S.SetHelpText(Tip);
+	return S;
 }
 
+// =============================================================================
+// Layout
+// =============================================================================
 function Place(UWindowWindow W, float X, float Y, float NewWidth, float NewHeight)
 {
 	W.WinLeft = X;
 	W.WinTop = Y;
 	W.SetSize(NewWidth, NewHeight);
+}
+
+function float TextWidth(Canvas C, int Fnt, string S)
+{
+	local float W, H;
+
+	C.Font = Root.Fonts[Fnt];
+	TextSize(C, S, W, H);
+	return W;
+}
+
+// Place a button sized to its own label, return where the next one starts
+function float PlaceButton(Canvas C, UWindowSmallButton B, float X, float Y)
+{
+	Place(B, X, Y, TextWidth(C, B.Font, B.Text) + ButtonPad, ButtonHeight);
+	return X + B.WinWidth + ButtonGap;
+}
+
+function float PlaceCheckbox(Canvas C, UWindowCheckbox B, float X, float Y)
+{
+	local float W;
+
+	W = TextWidth(C, B.Font, B.Text);
+	Place(B, X, Y, W + 18, 16);
+
+	return X + W + 34;
 }
 
 function Resized()
@@ -149,62 +191,139 @@ function Resized()
 	LayoutControls();
 }
 
-// =============================================================================
-// LayoutControls ~ Fit everything into the current client size
-// =============================================================================
+// Vertical layout - the rows themselves are filled in by LayoutText
 function LayoutControls()
 {
-	local float M, CW, Y, BW;
-	local int i;
+	local float CW, Y;
 
 	if (SeekBar == None)
 		return;
 
-	M = 5;
-	CW = WinWidth - 2*M;
-	Y = M;
+	CW = WinWidth - 2*Margin;
+	Y = Margin;
 
-	Place(SeekBar, M, Y, CW, 20);
-	Y += 24;
+	Place(SeekBar, Margin, Y, CW, 22);
+	Y += 22 + Margin;
 
-	BW = (CW - 5*4)/6;
-	Place(BRestart, M,                Y, BW, 16);
-	Place(BBack30,  M + (BW + 4),     Y, BW, 16);
-	Place(BBack5,   M + 2*(BW + 4),   Y, BW, 16);
-	Place(BPlay,    M + 3*(BW + 4),   Y, BW, 16);
-	Place(BFwd5,    M + 4*(BW + 4),   Y, BW, 16);
-	Place(BFwd30,   M + 5*(BW + 4),   Y, BW, 16);
+	TransportRowY = Y;
+	Y += ButtonHeight + Margin;
+
+	SepY[0] = Y;
+	Y += 8;
+
+	Place(SpeedSlider, Margin, Y, CW - ValueColumn, 14);
 	Y += 20;
 
-	Place(SpeedSlider, M, Y, CW, 14);
-	SpeedSlider.SliderWidth = CW*0.6;
-	Y += 18;
+	SpeedRowY = Y;
+	Y += ButtonHeight + 4;
 
+	Place(AccelSlider, Margin, Y, CW - ValueColumn, 14);
+	Y += 20 + 2;
+
+	SepY[1] = Y;
+	Y += 8;
+
+	ViewRowY = Y;
+	Y += ButtonHeight + 4;
+
+	CheckRowY = Y;
+	Y += 16 + Margin;
+
+	SepY[2] = Y;
+	Y += 8;
+
+	BottomRowY = Y;
+}
+
+// Horizontal layout of everything that has to be measured first
+function LayoutText(Canvas C)
+{
+	local float CW, LabelW, X, HalfW, GoW, PlayW;
+	local int i;
+
+	CW = WinWidth - 2*Margin;
+
+	// one shared label column keeps the rows lined up
+	LabelW = TextWidth(C, F_Bold, SpeedSlider.Text);
+	LabelW = FMax(LabelW, TextWidth(C, F_Bold, AccelSlider.Text));
+	LabelW = FMax(LabelW, TextWidth(C, F_Bold, LocView));
+	LabelW = FMax(LabelW, TextWidth(C, ModeCombo.Font, ModeCombo.Text));
+	LabelW += 8;
+
+	SpeedSlider.SliderWidth = CW - ValueColumn - LabelW;
+	AccelSlider.SliderWidth = CW - ValueColumn - LabelW;
+
+	// transport row, centred over the timeline
+	PlayW = FMax(TextWidth(C, BPlay.Font, LocPlay), TextWidth(C, BPlay.Font, LocPause)) + ButtonPad;
+	X = TextWidth(C, BRestart.Font, BRestart.Text) + TextWidth(C, BBack30.Font, BBack30.Text)
+	  + TextWidth(C, BBack5.Font, BBack5.Text) + TextWidth(C, BFwd5.Font, BFwd5.Text)
+	  + TextWidth(C, BFwd30.Font, BFwd30.Text) + 5*ButtonPad + PlayW + 5*ButtonGap;
+	X = Margin + FMax(0, (CW - X)/2);
+
+	X = PlaceButton(C, BRestart, X, TransportRowY);
+	X = PlaceButton(C, BBack30, X, TransportRowY);
+	X = PlaceButton(C, BBack5, X, TransportRowY);
+	Place(BPlay, X, TransportRowY, PlayW, ButtonHeight);   // fixed, so the row doesn't jump on PLAY/PAUSE
+	X += PlayW + ButtonGap;
+	X = PlaceButton(C, BFwd5, X, TransportRowY);
+	PlaceButton(C, BFwd30, X, TransportRowY);
+
+	X = Margin + LabelW;
 	for (i = 0; i < ArrayCount(BSpeed); i++)
-		Place(BSpeed[i], M + i*(BW + 4), Y, BW, 16);
-	Y += 20;
+		X = PlaceButton(C, BSpeed[i], X, SpeedRowY);
 
-	Place(AccelSlider, M, Y, CW, 14);
-	AccelSlider.SliderWidth = CW*0.6;
-	Y += 18;
+	X = Margin + LabelW;
+	X = PlaceButton(C, BFree, X, ViewRowY);
+	X = PlaceButton(C, BRecorder, X, ViewRowY);
+	X = PlaceButton(C, BFirst, X, ViewRowY);
+	X = PlaceButton(C, BNext, X, ViewRowY);
+	X = PlaceButton(C, BFlags, X, ViewRowY);
+	PlaceButton(C, BStats, X, ViewRowY);
 
-	Place(BFree,     M,              Y, BW, 16);
-	Place(BRecorder, M + (BW + 4),   Y, BW, 16);
-	Place(BFirst,    M + 2*(BW + 4), Y, BW, 16);
-	Place(BNext,     M + 3*(BW + 4), Y, BW, 16);
-	Place(BFlags,    M + 4*(BW + 4), Y, BW, 16);
-	Place(BStats,    M + 5*(BW + 4), Y, BW, 16);
-	Y += 20;
+	X = Margin + LabelW;
+	X = PlaceCheckbox(C, CBehind, X, CheckRowY);
+	X = PlaceCheckbox(C, CScores, X, CheckRowY);
+	PlaceCheckbox(C, CHideHUD, X, CheckRowY);
 
-	CheckRowY = Y;   // the checkboxes themselves are placed in BeforePaint
-	Y += 20;
+	// bottom row: timing on the left, jump-to on the right
+	HalfW = (CW - 10)/2;
+	GoW = TextWidth(C, BGoto.Font, BGoto.Text) + ButtonPad;
 
-	BW = (CW - 8)/2;
-	Place(ModeCombo, M, Y, BW, 14);
-	ModeCombo.EditBoxWidth = BW*0.62;
-	Place(GotoEdit, M + BW + 8, Y, BW - 44, 14);
-	GotoEdit.EditBoxWidth = (BW - 44)*0.62;
-	Place(BGoto, M + CW - 40, Y, 40, 16);
+	Place(ModeCombo, Margin, BottomRowY + 1, HalfW, 14);
+	ModeCombo.EditBoxWidth = HalfW - LabelW;
+
+	Place(BGoto, Margin + CW - GoW, BottomRowY, GoW, ButtonHeight);
+	Place(GotoEdit, Margin + HalfW + 10, BottomRowY + 1, CW - HalfW - 10 - GoW - ButtonGap, 14);
+	GotoEdit.EditBoxWidth = GotoEdit.WinWidth - TextWidth(C, GotoEdit.Font, GotoEdit.Text) - 8;
+}
+
+// =============================================================================
+// Paint ~ Group rules, the row label of the view buttons and the slider values
+// =============================================================================
+function Paint(Canvas C, float X, float Y)
+{
+	local int i;
+	local Region R;
+
+	Super.Paint(C, X, Y);
+
+	C.DrawColor.R = 255;
+	C.DrawColor.G = 255;
+	C.DrawColor.B = 255;
+	R = LookAndFeel.HLine;
+	for (i = 0; i < ArrayCount(SepY); i++)
+		DrawStretchedTextureSegment(C, Margin, SepY[i], WinWidth - 2*Margin, R.H, R.X, R.Y, R.W, R.H, GetLookAndFeelTexture());
+
+	C.Font = Root.Fonts[F_Bold];
+	C.DrawColor = LabelColor;
+	ClipText(C, SpeedSlider.WinLeft + SpeedSlider.WinWidth + ButtonGap, SpeedSlider.WinTop, SpeedValue);
+	ClipText(C, AccelSlider.WinLeft + AccelSlider.WinWidth + ButtonGap, AccelSlider.WinTop, AccelValue);
+
+	ClipText(C, Margin, ViewRowY + 3, LocView);
+
+	C.DrawColor.R = 255;
+	C.DrawColor.G = 255;
+	C.DrawColor.B = 255;
 }
 
 // =============================================================================
@@ -281,13 +400,11 @@ function string SpeedString(float V)
 function BeforePaint(Canvas C, float X, float Y)
 {
 	local DemoPlaybackSpec S;
-	local float Len, Pos, CheckX;
+	local float Len, Pos;
 
 	Super.BeforePaint(C, X, Y);
 
-	CheckX = PlaceCheckbox(C, CBehind, 5, CheckRowY);
-	CheckX = PlaceCheckbox(C, CScores, CheckX, CheckRowY);
-	PlaceCheckbox(C, CHideHUD, CheckX, CheckRowY);
+	LayoutText(C);
 
 	S = GetSpec();
 	if (S == None)
@@ -308,11 +425,11 @@ function BeforePaint(Canvas C, float X, float Y)
 	else
 		BPlay.SetText(LocPause);
 
-	SpeedSlider.SetText(LocSpeed @ SpeedString(S.Driver.MySpeed));
+	SpeedValue = SpeedString(S.Driver.MySpeed);
 	if (!SpeedSlider.bSliding)
 		SpeedSlider.SetValue(S.Driver.MySpeed*100, True);
 
-	AccelSlider.SetText(LocAccel @ SpeedString(FMax(S.AccelFactor, 0.01)));
+	AccelValue = SpeedString(FMax(S.AccelFactor, 0.01));
 	if (!AccelSlider.bSliding)
 		AccelSlider.SetValue(FMax(S.AccelFactor, 0.01)*100, True);
 
@@ -449,6 +566,7 @@ function Notify(UWindowDialogControl C, byte E)
 
 defaultproperties
 {
+	LabelColor=(R=0,G=0,B=0)
 	SpeedPreset(0)=0.100000
 	SpeedPreset(1)=0.250000
 	SpeedPreset(2)=0.500000
@@ -461,12 +579,12 @@ defaultproperties
 	LocSpeedText(3)="1x"
 	LocSpeedText(4)="2x"
 	LocSpeedText(5)="4x"
-	LocRestart="|<"
+	LocRestart="|< Start"
 	LocRestartHelp="Jump back to the beginning of the demo"
-	LocBack30="<<30"
-	LocBack5="<5"
-	LocFwd5="5>"
-	LocFwd30="30>>"
+	LocBack30="-30s"
+	LocBack5="-5s"
+	LocFwd5="+5s"
+	LocFwd30="+30s"
 	LocStepHelp="Seek by the given amount of seconds"
 	LocPlay="PLAY"
 	LocPause="PAUSE"
@@ -475,6 +593,7 @@ defaultproperties
 	LocSpeedHelp="Playback speed. 1x is the speed the demo was recorded at"
 	LocAccel="Camera"
 	LocAccelHelp="Movement speed of the free camera"
+	LocView="View"
 	LocFree="Free"
 	LocFreeHelp="Detach the camera and fly around freely"
 	LocRecorder="Recorder"
