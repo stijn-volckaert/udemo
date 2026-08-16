@@ -14,6 +14,7 @@ var bool bPlaced;               // position checked against the screen size once
 
 const DefaultWidth  = 490;
 const DefaultHeight = 258;
+const GrabMargin    = 80;   // width of the title bar that always stays reachable
 
 // =============================================================================
 // Toggle ~ Show the panel, or close it when it is already up
@@ -71,17 +72,41 @@ function BeforePaint(Canvas C, float X, float Y)
 {
 	Super.BeforePaint(C, X, Y);
 
-	if (bPlaced || Root.WinWidth <= 0)
+	if (Root.WinWidth <= 0)
 		return;
-	bPlaced = True;
 
-	if (WinLeft < 0)
-		WinLeft = (Root.WinWidth - WinWidth)/2;
-	if (WinTop < 0)
-		WinTop = Root.WinHeight - WinHeight - 24;
+	if (!bPlaced)
+	{
+		bPlaced = True;
 
-	WinLeft = FClamp(WinLeft, 0, FMax(0, Root.WinWidth - WinWidth));
-	WinTop = FClamp(WinTop, 0, FMax(0, Root.WinHeight - WinHeight));
+		if (WinLeft < 0)
+			WinLeft = (Root.WinWidth - WinWidth)/2;
+		if (WinTop < 0)
+			WinTop = Root.WinHeight - WinHeight - 24;
+
+		// a freshly opened panel starts out fully visible
+		WinLeft = FClamp(WinLeft, 0, FMax(0, Root.WinWidth - WinWidth));
+		WinTop = FClamp(WinTop, 0, FMax(0, Root.WinHeight - WinHeight));
+	}
+
+	KeepOnScreen();
+}
+
+// The window is dragged by its title bar, so a grabbable piece of it has to
+// stay on screen - after dragging, after resizing and after a mode change.
+function KeepOnScreen()
+{
+	local Region Client;
+	local float TitleHeight;
+
+	if (WinWidth > Root.WinWidth || WinHeight > Root.WinHeight)
+		SetSize(FMin(WinWidth, Root.WinWidth), FMin(WinHeight, Root.WinHeight));
+
+	Client = LookAndFeel.FW_GetClientArea(Self);
+	TitleHeight = FMax(Client.Y, 16);
+
+	WinLeft = FClamp(WinLeft, GrabMargin - WinWidth, Root.WinWidth - GrabMargin);
+	WinTop = FClamp(WinTop, 0, Root.WinHeight - TitleHeight);
 }
 
 function Created()
