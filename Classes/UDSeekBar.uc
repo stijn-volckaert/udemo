@@ -12,6 +12,7 @@ var UDPlaybackClient Panel;   // panel the seeks are reported to
 var float            Progress;// 0..1, part of the demo already played
 var float            Marker;  // 0..1 mouse marker position, -1 when the mouse is away
 var bool             bScrubbing;
+var bool             bSeeking;// a seek is running - the game is about to freeze
 var string           TimeText;// drawn on top of the bar
 
 const BarInset = 2;
@@ -45,12 +46,21 @@ function Paint(Canvas C, float X, float Y)
 	C.DrawColor.B = 40;
 	DrawStretchedTexture(C, BarInset, BarInset, InnerW, InnerH, T);
 
-	C.DrawColor.R = 40;
-	C.DrawColor.G = 110;
-	C.DrawColor.B = 200;
+	if (bSeeking)
+	{
+		C.DrawColor.R = 160;
+		C.DrawColor.G = 75;
+		C.DrawColor.B = 0;
+	}
+	else
+	{
+		C.DrawColor.R = 40;
+		C.DrawColor.G = 110;
+		C.DrawColor.B = 200;
+	}
 	DrawStretchedTexture(C, BarInset, BarInset, InnerW*Progress, InnerH, T);
 
-	if (Marker >= 0.0)
+	if (Marker >= 0.0 && !bSeeking)
 	{
 		C.DrawColor.R = 255;
 		C.DrawColor.G = 220;
@@ -58,11 +68,18 @@ function Paint(Canvas C, float X, float Y)
 		DrawStretchedTexture(C, BarInset + InnerW*Marker - 1, BarInset, 2, InnerH, T);
 	}
 
+	// shadow first - the text runs over both the filled and the empty part
+	C.Font = Root.Fonts[F_Bold];
+	TextSize(C, TimeText, W, H);
+
+	C.DrawColor.R = 0;
+	C.DrawColor.G = 0;
+	C.DrawColor.B = 0;
+	ClipText(C, (WinWidth - W)/2 + 1, (WinHeight - H)/2 + 1, TimeText);
+
 	C.DrawColor.R = 255;
 	C.DrawColor.G = 255;
 	C.DrawColor.B = 255;
-	C.Font = Root.Fonts[F_Normal];
-	TextSize(C, TimeText, W, H);
 	ClipText(C, (WinWidth - W)/2, (WinHeight - H)/2, TimeText);
 }
 

@@ -57,6 +57,7 @@ var localized string LocBehind, LocScores, LocHideHUD;
 var localized string LocMode, LocModeHelp;
 var localized string LocModeTimeBased, LocModeFrameBased, LocModeNoCap;
 var localized string LocGoto, LocGotoHelp, LocGotoButton;
+var localized string LocSeeking;
 
 // =============================================================================
 // Created ~ Build the controls
@@ -365,7 +366,7 @@ function SeekPos(float T)
 	local DemoPlaybackSpec S;
 
 	S = GetSpec();
-	if (S == None)
+	if (S == None || S.SeekTick > 0)   // one seek at a time
 		return;
 
 	// GotoFrame ignores anything below the initial timestamp or past the end
@@ -380,6 +381,23 @@ function SeekFraction(float F)
 function SeekRelative(float Delta)
 {
 	SeekPos(PlayPos() + Delta);
+}
+
+// Wait cursor over the whole panel while the stream is being replayed
+function UpdateSeekingState(bool bNowSeeking)
+{
+	if (bNowSeeking == SeekBar.bSeeking)
+		return;
+
+	SeekBar.bSeeking = bNowSeeking;
+
+	if (bNowSeeking)
+		GetParent(class'UWindowFramedWindow').SetCursor(Root.WaitCursor);
+	else
+	{
+		GetParent(class'UWindowFramedWindow').SetCursor(Root.NormalCursor);
+		SeekBar.Cursor = Root.HandCursor;
+	}
 }
 
 function string SpeedString(float V)
@@ -408,15 +426,30 @@ function BeforePaint(Canvas C, float X, float Y)
 
 	S = GetSpec();
 	if (S == None)
+	{
+		UpdateSeekingState(False);
 		return;
+	}
 
 	Len = PlayLength();
 	Pos = PlayPos();
 
-	SeekBar.Progress = Pos/Len;
-	SeekBar.TimeText = class'DemoSettings'.static.parseTime(Pos) $ " / " $ class'DemoSettings'.static.parseTime(Len);
-	if (SeekBar.Marker >= 0.0)
-		SeekBar.TimeText = SeekBar.TimeText @ "->" @ class'DemoSettings'.static.parseTime(SeekBar.Marker*Len);
+	// A seek blocks the game for as long as it takes to replay the stream, so
+	// say so on the frame the seek is requested - one frame before the freeze.
+	UpdateSeekingState(S.SeekTick > 0 || S.bSeeking);
+
+	if (SeekBar.bSeeking)
+	{
+		SeekBar.Progress = FClamp(S.SeekTime/Len, 0.0, 1.0);
+		SeekBar.TimeText = LocSeeking @ class'DemoSettings'.static.parseTime(S.SeekTime);
+	}
+	else
+	{
+		SeekBar.Progress = Pos/Len;
+		SeekBar.TimeText = class'DemoSettings'.static.parseTime(Pos) $ " / " $ class'DemoSettings'.static.parseTime(Len);
+		if (SeekBar.Marker >= 0.0)
+			SeekBar.TimeText = SeekBar.TimeText @ "->" @ class'DemoSettings'.static.parseTime(SeekBar.Marker*Len);
+	}
 
 	bUpdating = True;
 
@@ -617,4 +650,5 @@ defaultproperties
 	LocGoto="Go to"
 	LocGotoHelp="Jump to a position, e.g. 90, 1:30, 50% or +15"
 	LocGotoButton="GO"
+	LocSeeking="SEEKING..."
 }
