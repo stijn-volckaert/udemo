@@ -22,6 +22,7 @@ var UWindowSmallButton      BFree, BRecorder, BFirst, BNext, BFlags, BStats;
 var UWindowCheckbox         CBehind, CScores, CHideHUD;
 var UWindowComboControl     ModeCombo;
 var UWindowEditControl      GotoEdit;
+var UWindowComboControl     GotoMode;
 var UWindowSmallButton      BGoto;
 
 var float SpeedPreset[6];
@@ -39,6 +40,7 @@ const ButtonHeight = 18;
 const ButtonPad    = 14;   // text width + this = button width
 const ButtonGap    = 5;
 const ValueColumn  = 46;   // room for "10.00x" behind a slider
+const GotoModeWidth = 105;
 
 var localized string LocRestart, LocRestartHelp;
 var localized string LocBack30, LocBack5, LocFwd5, LocFwd30, LocStepHelp;
@@ -57,6 +59,7 @@ var localized string LocBehind, LocScores, LocHideHUD;
 var localized string LocMode, LocModeHelp;
 var localized string LocModeTimeBased, LocModeFrameBased, LocModeNoCap;
 var localized string LocGoto, LocGotoHelp, LocGotoButton;
+var localized string LocGotoDemo, LocGotoClock, LocGotoClockHelp, LocGotoModeHelp;
 var localized string LocSeeking;
 
 // =============================================================================
@@ -108,6 +111,15 @@ function Created()
 	GotoEdit.Align = TA_Left;
 	GotoEdit.SetText(LocGoto);
 	GotoEdit.SetHelpText(LocGotoHelp);
+
+	GotoMode = UWindowComboControl(CreateControl(class'UWindowComboControl', 0, 0, 100, 1));
+	GotoMode.SetEditable(False);
+	GotoMode.Align = TA_Left;
+	GotoMode.SetText("");
+	GotoMode.SetHelpText(LocGotoModeHelp);
+	GotoMode.AddItem(LocGotoDemo);
+	GotoMode.AddItem(LocGotoClock);
+	GotoMode.SetSelectedIndex(0);
 
 	BGoto = NewButton(LocGotoButton, LocGotoHelp);
 
@@ -239,7 +251,7 @@ function LayoutControls()
 // Horizontal layout of everything that has to be measured first
 function LayoutText(Canvas C)
 {
-	local float CW, LabelW, X, HalfW, GoW, PlayW;
+	local float CW, LabelW, X, TimingW, GoW, PlayW;
 	local int i;
 
 	CW = WinWidth - 2*Margin;
@@ -287,14 +299,19 @@ function LayoutText(Canvas C)
 	PlaceCheckbox(C, CHideHUD, X, CheckRowY);
 
 	// bottom row: timing on the left, jump-to on the right
-	HalfW = (CW - 10)/2;
+	TimingW = LabelW + 110;
 	GoW = TextWidth(C, BGoto.Font, BGoto.Text) + ButtonPad;
 
-	Place(ModeCombo, Margin, BottomRowY + 1, HalfW, 14);
-	ModeCombo.EditBoxWidth = HalfW - LabelW;
+	Place(ModeCombo, Margin, BottomRowY + 1, TimingW, 14);
+	ModeCombo.EditBoxWidth = TimingW - LabelW;
 
+	// filled in from the right edge, so the entry field is what gives way first
 	Place(BGoto, Margin + CW - GoW, BottomRowY, GoW, ButtonHeight);
-	Place(GotoEdit, Margin + HalfW + 10, BottomRowY + 1, CW - HalfW - 10 - GoW - ButtonGap, 14);
+	Place(GotoMode, Margin + CW - GoW - ButtonGap - GotoModeWidth, BottomRowY + 1, GotoModeWidth, 14);
+	GotoMode.EditBoxWidth = GotoModeWidth;
+
+	X = Margin + TimingW + 16;
+	Place(GotoEdit, X, BottomRowY + 1, FMax(60, GotoMode.WinLeft - ButtonGap - X), 14);
 	GotoEdit.EditBoxWidth = GotoEdit.WinWidth - TextWidth(C, GotoEdit.Font, GotoEdit.Text) - 8;
 }
 
@@ -383,6 +400,21 @@ function SeekRelative(float Delta)
 	SeekPos(PlayPos() + Delta);
 }
 
+// The entry field either holds a position in the demo or a match clock reading
+function DoGoto()
+{
+	local DemoPlaybackSpec S;
+
+	S = GetSpec();
+	if (S == None || S.SeekTick > 0 || GotoEdit.GetValue() == "")
+		return;
+
+	if (GotoMode.GetSelectedIndex() == 1)
+		S.JumpTo(GotoEdit.GetValue());
+	else
+		S.SeekTo(GotoEdit.GetValue());
+}
+
 // Wait cursor over the whole panel while the stream is being replayed
 function UpdateSeekingState(bool bNowSeeking)
 {
@@ -436,7 +468,8 @@ function BeforePaint(Canvas C, float X, float Y)
 
 	// A seek blocks the game for as long as it takes to replay the stream, so
 	// say so on the frame the seek is requested - one frame before the freeze.
-	UpdateSeekingState(S.SeekTick > 0 || S.bSeeking);
+	// a JumpTo runs several seeks in a row - keep saying so between them
+	UpdateSeekingState(S.SeekTick > 0 || S.bSeeking || S.JumpRemaining >= 0);
 
 	if (SeekBar.bSeeking)
 	{
@@ -473,6 +506,17 @@ function BeforePaint(Canvas C, float X, float Y)
 
 	if (ModeCombo.GetSelectedIndex() != S.Driver.PlayBackMode)
 		ModeCombo.SetSelectedIndex(S.Driver.PlayBackMode);
+
+	if (GotoMode.GetSelectedIndex() == 1)
+	{
+		BGoto.ToolTipString = LocGotoClockHelp;
+		GotoEdit.SetHelpText(LocGotoClockHelp);
+	}
+	else
+	{
+		BGoto.ToolTipString = LocGotoHelp;
+		GotoEdit.SetHelpText(LocGotoHelp);
+	}
 
 	bUpdating = False;
 }
@@ -555,7 +599,7 @@ function Notify(UWindowDialogControl C, byte E)
 					break;
 
 				case BGoto:
-					S.SeekTo(GotoEdit.GetValue());
+					DoGoto();
 					break;
 			}
 			break;
@@ -592,7 +636,7 @@ function Notify(UWindowDialogControl C, byte E)
 
 		case DE_EnterPressed:
 			if (C == GotoEdit)
-				S.SeekTo(GotoEdit.GetValue());
+				DoGoto();
 			break;
 	}
 }
@@ -648,7 +692,11 @@ defaultproperties
 	LocModeFrameBased="Frame based"
 	LocModeNoCap="Fast as possible"
 	LocGoto="Go to"
-	LocGotoHelp="Jump to a position, e.g. 90, 1:30, 50% or +15"
+	LocGotoHelp="Position in the demo: 90, 1:30, 50% or +15"
 	LocGotoButton="GO"
+	LocGotoDemo="Demo time"
+	LocGotoClock="Match clock"
+	LocGotoClockHelp="Remaining match time as shown by the HUD: 11:40, or +30 to move by match time"
+	LocGotoModeHelp="Whether the value is a position in the demo or the remaining time of the match"
 	LocSeeking="SEEKING..."
 }
