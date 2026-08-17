@@ -161,7 +161,7 @@ function float GetFloat(string Str)
 	local int sign, pos;
 	
 	T = float(Str);
-	if (T < 0)
+	if (Left(Str, 1) == "-") // not from T, which is 0 for "-0:30"
 		sign = -1;
 	else
 		sign = 1;
@@ -202,6 +202,11 @@ function SeekToTime(float T)
 // JumpTo - seek to the point where the match clock (the "Remaining Time" of the
 // HUD and of F1) reads the given time. Accepts seconds, mm:ss and h:mm:ss.
 //
+// A leading "+" or "-" moves by that much match time, in the same direction as
+// SeekTo does: "+" goes further into the demo, which means less time left.
+// Unlike SeekTo the step is measured on the match clock, so a pause or the
+// warmup between rounds does not eat into it.
+//
 // The clock is driven by the demo stream itself (uDemoDriver::TimeSync), so it
 // runs 1:1 with demo time and is up to date right after a seek. That makes the
 // first jump plain arithmetic; whatever the warmup, a server pause or the end
@@ -209,6 +214,9 @@ function SeekToTime(float T)
 // =============================================================================
 exec function JumpTo(string Point)
 {
+	local float T;
+	local string sign;
+
 	if (SeekTick > 0)
 		return; // already seeking
 
@@ -221,7 +229,14 @@ exec function JumpTo(string Point)
 	while (Right(Point, 1) == " ")
 		Point = Mid(Point, 0, Len(Point) - 1);
 
-	JumpRemaining = FMax(0.0, GetFloat(Point));
+	T = GetFloat(Point);
+	sign = Mid(Point, 0, 1);
+
+	if (sign == "+" || sign == "-")
+		JumpRemaining = FMax(0.0, GameReplicationInfo.RemainingTime - T); // forward in the demo = less time left
+	else
+		JumpRemaining = FMax(0.0, T);
+
 	JumpLastError = Driver.GetTotalTime();
 	JumpTries = 0;
 
