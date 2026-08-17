@@ -113,6 +113,8 @@ v3.6.0:
 * [ADDED] Ini option FollowMyCam, which force Camera follow spectate target, so when you detach cam it not jump to old position, but continue from last spectated target position (seamless transition)
 * [ADDED] Command "FollowMyCam", which allow change FollowMyCam ini option
 * [ADDED] Support for rypelcam properly work
+* [ADDED] Command "JumpTo", which seeks by the match clock instead of by the
+  demo position: "JumpTo 11:40" stops where the HUD (and F1) shows 11:40 left
 * [ADDED] Command "DemoPanel", which opens a floating playback panel with a
   clickable timeline (click or drag to seek, mouse wheel to step), pause,
   speed/slow motion controls, camera modes and hud toggles. The demo keeps
@@ -219,6 +221,7 @@ TotalTime - Snow total time in the demo
 TotalFrames - Snow total frames in the demo
 StartTime - Show initial time-stamp for the demo. Time when player join to the game.
 Now - Show bunch of different timers in the game. Mostly used for debug.
+JumpTo time - Rewind demo to the point where the match clock ("Remaining Time" of the HUD and of F1) shows the given time. Accepts seconds, `11:40` and `1:02:30`. Only absolute values. Lands within a second of the requested time; if the clock never reaches it (no time limit, or a value above the limit), the closest reached time is reported.
 SeekTo [+/-]seconds[%] - Rewind demo to specified position in seconds. Accept absolute decimal value, relative decimal value (use "+" or "-" before number) and/or percentage values (use "%" after number).
 Pause - Toggle pause mode for the demo
 SetPauseText [hide/some text] - Set/hide/restore pause message. Without parameter restore default  pause message.

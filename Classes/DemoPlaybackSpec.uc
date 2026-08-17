@@ -57,6 +57,15 @@ const EGC_NotDetected = 0;
 const EGC_TrackViewTarget = 1;
 const EGC_Done = 2;
 
+// JumpTo: seeking by the match clock instead of by the demo position
+var float JumpRemaining;        // wanted remaining time, -1 when no jump is running
+var float JumpLastError;        // how far off we were before the last jump
+var int JumpTries;
+var int JumpCheck;              // ticks left before the result of a jump is measured
+const JumpMaxTries = 4;
+const JumpBias = 2.0;           // land this much early - correcting forwards is cheap
+const JumpPrecision = 1.0;      // the match clock only has whole seconds
+
 // list for bOwnerNoSee actors hidden during render
 var Actor HideActors[16384];
 var int HideActorsCount;
@@ -89,6 +98,10 @@ var localized string LocCannotGoToFPSMode;
 var localized string LocDemoIsNowPlayingBackPrefix;
 var localized string LocDemoIsNowPlayingBackSuffix;
 var localized string LocServerDemosHaveNoPlayerRecorders;
+var localized string LocJumpNoClock;
+var localized string LocJumpTo;
+var localized string LocJumpDone;
+var localized string LocJumpClosest;
 
 // =============================================================================
 // EXEC COMMANDS:   (debug, etc.)
@@ -183,6 +196,93 @@ function SeekToTime(float T)
 	if (T < Driver.GetCurrentTime())
 		EndGameCam = EGC_NotDetected;
 	SetSeek(T);
+}
+
+// =============================================================================
+// JumpTo - seek to the point where the match clock (the "Remaining Time" of the
+// HUD and of F1) reads the given time. Accepts seconds, mm:ss and h:mm:ss.
+//
+// The clock is driven by the demo stream itself (uDemoDriver::TimeSync), so it
+// runs 1:1 with demo time and is up to date right after a seek. That makes the
+// first jump plain arithmetic; whatever the warmup, a server pause or the end
+// of the match throws off is corrected by measuring again and jumping once more.
+// =============================================================================
+exec function JumpTo(string Point)
+{
+	if (SeekTick > 0)
+		return; // already seeking
+
+	if (GameReplicationInfo == None)
+	{
+		ClientMessage(LocJumpNoClock);
+		return;
+	}
+
+	while (Right(Point, 1) == " ")
+		Point = Mid(Point, 0, Len(Point) - 1);
+
+	JumpRemaining = FMax(0.0, GetFloat(Point));
+	JumpLastError = Driver.GetTotalTime();
+	JumpTries = 0;
+
+	ClientMessage(LocJumpTo @ class'DemoSettings'.static.parseTime(JumpRemaining));
+	JumpToRemaining();
+}
+
+function JumpToRemaining()
+{
+	local float Error, Target, Pos;
+
+	Pos = Driver.GetCurrentTime() - Driver.GetStartTime();
+	Error = GameReplicationInfo.RemainingTime - JumpRemaining; // > 0: the target is further into the demo
+	Target = Pos + Error;
+
+	// on long jumps the clock may have been stopped somewhere along the way, so
+	// aim short and let the correction run forwards through the cache
+	if (Abs(Error) > 5.0)
+		Target -= JumpBias;
+
+	Target = FClamp(Target, Driver.GetStartTime(), Driver.GetTotalTime() - Driver.GetStartTime() - 1.0);
+
+	// clamped onto the spot we are already at - the demo never reaches that time
+	if (Abs(Target - Pos) < JumpPrecision)
+	{
+		JumpRemaining = -1;
+		ClientMessage(LocJumpClosest @ class'DemoSettings'.static.parseTime(GameReplicationInfo.RemainingTime));
+		return;
+	}
+
+	JumpLastError = Abs(Error);
+	JumpTries++;
+	SeekToTime(Target);
+}
+
+// Called a couple of ticks after a jump has finished, when the clock is valid again
+function CheckJump()
+{
+	local float Error;
+
+	if (GameReplicationInfo == None)
+	{
+		JumpRemaining = -1;
+		ClientMessage(LocJumpNoClock);
+		return;
+	}
+
+	Error = Abs(GameReplicationInfo.RemainingTime - JumpRemaining);
+
+	// good enough, out of tries, or the clock is not moving us any closer
+	if (Error <= JumpPrecision || JumpTries >= JumpMaxTries || Error >= JumpLastError)
+	{
+		JumpRemaining = -1;
+		if (Error <= JumpPrecision)
+			ClientMessage(LocJumpDone @ class'DemoSettings'.static.parseTime(GameReplicationInfo.RemainingTime));
+		else
+			ClientMessage(LocJumpClosest @ class'DemoSettings'.static.parseTime(GameReplicationInfo.RemainingTime));
+		return;
+	}
+
+	JumpToRemaining();
 }
 
 // Floating playback panel
@@ -733,6 +833,10 @@ function EndSeek()
 	foreach AllActors(class'ScoreBoard',sb)
 		if (sb.Owner == none)
 			sb.Owner = PlayerLinked;
+
+	// give the stream a couple of ticks to rebuild the GRI before reading the clock
+	if (JumpRemaining >= 0)
+		JumpCheck = 2;
 }
 
 // Store playerid of current viewtarget (cam will try to relock on viewtarget after the seek)
@@ -844,6 +948,13 @@ state CheatFlying
 
 		if (SeekTick > 0)
 			SeekTick--;
+
+		if (JumpCheck > 0 && SeekTick == 0)
+		{
+			JumpCheck--;
+			if (JumpCheck == 0)
+				CheckJump();
+		}
 
 		// (Anth) Fix for broken HUD in server-side demos
 		if (PlayerLinked != None && PlayerLinked.IsA('DemoRecSpectator'))
@@ -2002,6 +2113,11 @@ defaultproperties
 	LocCannotGoToFPSMode="Cannot go to first person mode in server demos!"
 	LocDemoIsNowPlayingBackPrefix="Demo is now playing back with type"
 	LocServerDemosHaveNoPlayerRecorders="Server demos have no player recorders!"
+	LocJumpNoClock="This demo has no match clock."
+	LocJumpTo="Jumping to remaining time"
+	LocJumpDone="Remaining time is now"
+	LocJumpClosest="Closest remaining time reached:"
+	JumpRemaining=-1.000000
 	HUDType=None
 	bAdmin=True
 	bAlwaysTick=True
