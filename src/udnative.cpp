@@ -290,7 +290,7 @@ void Uudnative::execIsMismatch (FFrame& Stack, RESULT_DECL)
 	}
 	
 	BeginLoad(); 	
-	ULinkerLoad* Linker = GetPackageLinker( NULL, *FileName, LOAD_None, NULL, &PackageGUID); //load with GUID!
+	ULinkerLoad* Linker = GetPackageLinker( NULL, *FileName, LOAD_Verify | LOAD_NoVerify, NULL, &PackageGUID); //load with GUID!
 	// No linker => file not present or access denied?
 	if (!Linker)
 	{ 
